@@ -1,0 +1,58 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[pdftex]{graphicx}
+\usepackage[cmex10]{amsmath}
+\interdisplaylinepenalty=2500
+\usepackage{algorithmic}
+\usepackage{array}
+\usepackage{mdwmath}
+\usepackage{mdwtab}
+\usepackage{eqparbox}
+\usepackage[font=footnotesize]{subfig}
+\usepackage{fixltx2e}
+\usepackage{url}
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+% additional packages and utility commands
+\usepackage{minted}
+% \usepackage{flushend}
+
+% \usepackage{lineno}
+% \setlength\linenumbersep{1mm}
+% \linenumbers
+
+\begin{document}
+
+% to avoid syntax error highlighting - e.g. foo's not js ;-)
+\expandafter\def\csname PY@tok@err\endcsname{}
+
+\title{A Domain Specific Language for Functional Code Fusion of
+       Intrusion Detection Algorithms in Wireless Sensor Networks}
+
+\author{\IEEEauthorblockN{Christophe Van Ginneken, Jef Maerien, Christophe
+Huygens, Danny Hughes, Wouter Joosen}%
+\IEEEauthorblockA{iMinds - DistriNet - KU Leuven\\
+B-3001, Leuven, Belgium\\
+\{firstname.lastname\}@cs.kuleuven.be}}
+
+\maketitle
+
+\begin{abstract}
+  
+Introducing intrusion detection in a wireless sensor network puts a strain on
+the limited resources of its nodes. Fusing the underlying algorithms' code can
+alleviate this, but the manual and repetitive labor proves to an unacceptable
+economic burden. Intrusion detection algorithms share common functionality and
+therefore are a prime candidate for applying a domain specific language. In
+this paper we propose such a domain specific language to describe these
+algorithms in a formal and functional way. This allows for the automation of
+the fusion of these algorithms on a functional level though code generation.
+The code, produced by a prototype code generator, shows to have less impact on
+e.g. the execution time of the resulting intrusion detection system and its use
+of the wireless network.
+
+\end{abstract}
+
+\bibliographystyle{IEEEtran}
+\bibliography{referenties}
+
+\end{document}
