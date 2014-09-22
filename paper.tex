@@ -25,7 +25,7 @@
 % to avoid syntax error highlighting - e.g. foo's not js ;-)
 \expandafter\def\csname PY@tok@err\endcsname{}
 
-\title{A Domain Specific Language for Functional Code Fusion of
+\title{A Domain Specific Language for Functional Code Fusion for
        Intrusion Detection Algorithms in Wireless Sensor Networks}
 
 \author{\IEEEauthorblockN{Christophe Van Ginneken, Jef Maerien, Christophe
@@ -37,22 +37,86 @@ B-3001, Leuven, Belgium\\
 \maketitle
 
 \begin{abstract}
-  
+
 Introducing intrusion detection in wireless sensor network (WSNs) puts a strain
-on the limited resources of its nodes. Fusing the underlying algorithms' code
-can alleviate this, but the manual and repetitive labor proves to an
-unacceptable economic burden. Intrusion detection algorithms share common
-functionality and therefore are a prime candidate for applying a domain
-specific language. In this paper we propose such a domain specific language to
-describe these algorithms in a formal and functional way. This allows for the
-automation of the fusion of these algorithms on a functional level though code
-generation. The code, produced by a prototype code generator, shows to have
-less impact on e.g. the execution time of the resulting intrusion detection
-system and its use of the wireless network.
+on the limited resources of its nodes. Fusion of the underlying algorithms can
+alleviate this, but the manual and repetitive labor proves to be an
+unacceptable economic burden and is error-prone. Intrusion detection algorithms
+share common functionality and structure, and therefore are a prime candidate
+for the application of a domain specific language (DSL). In this paper we
+propose such a DSL to describe these algorithms in a formal and functional way.
+This allows for the automation of the fusion of these algorithms on a
+functional level though code generation. The code, produced by a prototype code
+generator implementation, shows to have less impact on e.g. the execution time
+of the resulting intrusion detection system and its use of the wireless
+network, in comparison with a basic side-by-side implementation of the same
+algorithms.
 
 \end{abstract}
 
-\bibliographystyle{IEEEtran}
-\bibliography{referenties}
+\section{Introduction}
+
+WSN
+
+IDS as a non-functional cost
+
+Economics of development
+
+Functional Code Fusion
+
+The remainder of this paper proceeds as follows: ...
+
+\section{Related Work}
+
+DSL for WSN
+
+DSL for IDS
+
+Code Generation for WSN
+
+Code Optimization for embedded systems/WSN
+
+Code Generation for IDS
+
+\section{Background}
+
+Theory of Loop Fusion
+
+Examples of code/loop fusion (e.g. Haskell Stream Fusion)
+
+Function Inlining (e.g. TinyOS)
+
+\section{Problem Analysis}
+
+
+
+\section{Evaluation}
+
+network usages: number of packets, number of bytes
+
+processing time
+
+image size
+
+TODO: memory usage
+
+2 algorithms
+TODO: adding 3rd ?
+
+\section{Conclusions and Future Work}
+
+theoretical gains are met in practice
+
+
+
+\section*{Acknowledgements}
+
+We would like to thank the reviewers for their thoughtful and helpful comments
+that enhanced the readability of this paper. Our gratitude and respect also
+goes out to all members of the NES task force at KU Leuven/DistriNet for
+creating the nurturing environment where these ideas could grow.
+
+% \bibliographystyle{IEEEtran}
+% \bibliography{referenties}
 
 \end{document}
