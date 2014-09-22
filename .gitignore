@@ -3,3 +3,5 @@
 *.pyg
 *.synctex.gz
 *.aux
+*.bbl
+*.bbg
