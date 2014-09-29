@@ -1,8 +1,9 @@
 *.log
-*.pdf
 *.pyg
 *.synctex.gz
 *.aux
 *.bbl
 *.bbg
 *.blg
+paper.pdf
+
