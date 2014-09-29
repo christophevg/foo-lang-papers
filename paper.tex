@@ -25,8 +25,7 @@
 % to avoid syntax error highlighting - e.g. foo's not js ;-)
 \expandafter\def\csname PY@tok@err\endcsname{}
 
-\title{A Domain Specific Language for Functional Code Fusion for
-       Intrusion Detection Algorithms in Wireless Sensor Networks}
+\title{Efficiently Detecting Intrusions\\in the Internet of Things}
 
 \author{\IEEEauthorblockN{Christophe Van Ginneken, Jef Maerien, Christophe
 Huygens, Danny Hughes, Wouter Joosen}%
@@ -38,19 +37,17 @@ Huygens, Danny Hughes, Wouter Joosen}%
 
 \begin{abstract}
 
-Introducing intrusion detection in wireless sensor network (WSNs) puts a strain
-on the limited resources of its nodes. Fusion of the underlying algorithms can
-alleviate this, but the manual and repetitive labor proves to be an
-unacceptable economic burden and is error-prone. Intrusion detection algorithms
-share common functionality and structure, and therefore are a prime candidate
-for the application of a domain specific language (DSL). This paper propose
-such a DSL to describe these algorithms in a formal and functional way. This
-allows for the automation of the fusion of these algorithms on a functional
-level though code generation. The more optimally fused code, produced by a
-prototype code generator implementation, shows to have less impact on e.g. the
-execution time of the resulting intrusion detection system and its use of the
-wireless network, in comparison with a basic side-by-side implementation of the
-same algorithms.
+Supporting multiple intrusion detection (ID) algorithms imposes significant
+overhead on Internet of Things (IoT) devices. Fusion of the underlying
+algorithms can alleviate this, yet, proves to be time-consuming, repetitive and
+error-prone. To address this problem we introduce id-foo, a framework for the
+development of efficient intrusion detection systems (IDS). It consists of a
+domain specific language (DSL) that allows describing ID algorithms in a formal
+and functional way. The id-foo code generator then fuses these algorithms on a
+functional level and produces more optimally organised source code. A
+side-by-side comparison shows that id-foo-based code significantly reduces
+memory footprint, message passing overhead and execution time in comparison to
+a straightforward and sequential implementation of the same algorithms.
 
 \end{abstract}
 
