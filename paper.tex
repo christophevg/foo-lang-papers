@@ -42,12 +42,12 @@ overhead on Internet of Things (IoT) devices. Fusion of the underlying
 algorithms can alleviate this, yet, proves to be time-consuming, repetitive and
 error-prone. To address this problem we introduce id-foo, a framework for the
 development of efficient intrusion detection systems (IDS). It consists of a
-domain specific language (DSL) that allows describing ID algorithms in a formal
-and functional way. The id-foo code generator then fuses these algorithms on a
-functional level and produces more optimally organised source code. A
-side-by-side comparison shows that id-foo-based code significantly reduces
-memory footprint, message passing overhead and execution time in comparison to
-a straightforward and sequential implementation of the same algorithms.
+domain specific language (DSL) that allows formally describing ID algorithms on
+a functional level. The id-foo code generator then fuses these algorithms and
+produces more optimally organised source code. A side-by-side comparison shows
+that generated code reduces memory footprint, message passing overhead and
+execution time in comparison to a straightforward sequential implementation of
+the same algorithms.
 
 \end{abstract}
 
@@ -55,82 +55,83 @@ a straightforward and sequential implementation of the same algorithms.
 
 % context
 
-The promise of the Internet of Things (IoT) is exciting. Soon my car will
-notify the central heating system at home that I will be late, due to
-unforeseen heavy traffic. It now can turn up the heat a bit later, thus
-lowering my energy bills and adding to a greener world. Wonderful, I'm in.
+The promise of the Internet of Things (IoT) is exciting: my car will notify the
+central heating system at my smart home \cite{aldrich2003smart} that I will be
+late. It now can turn up the heat later, thus lowering my energy bills and
+adding to a greener world. Wonderful, I'm in.
 
-But what if the energy company is capable of doing the same? What if they
-decide to turn up the heat while I'm gone, making my home nice and cosy but
-also cranking up my bill and their profit. No thank you, let me out.
+But what if the energy company can do the same? What if they are able to turn
+up the heat while I'm gone, making my home nice and cosy but also cranking up
+my bill and their profit. No thank you, let me out.
 
-Along with all the wonderful possibilities, the IoT also holds an enormous
+Along with all the wonderful possibilities, the IoT clearly holds an enormous
 threat: by opening our homes and lives to all these interconnected devices, we
-also open them to everyone who is technologically savvy enough to break these
-new virtual locks, only now most of the time without a trace.
+also open them to everyone who is able to break these new, virtual locks, often
+without leaving a trace.
 
-In classic (wired) networks, members of the network are protected by a firewall
-that cleanses all traffic before it actually enters the local network.
-Firewalls are primarily focusing on the actual network traffic, prohibiting
-access to certain destinations and/or services. Attackers though often use
-complicated strategies that abuse flaws in the actual services themselves. The
-firewall can't see these, they pass the wall of fire unnoticed and deliver
-their payload to the system under attack.
+In classic networks, members are protected by a firewall that inspects all
+traffic before it's passed on into the network. Firewalls focus on individual
+network packets, prohibiting access to certain destinations and/or services.
+But attackers often use strategies that abuse flaws in one or more services
+themselves. The firewall can't distinguish these from legitimate packets, they
+pass unnoticed and deliver their payload.
 
-At that point it becomes important to know that something went wrong and if
-possible how it went wrong. This information will at least enable us to learn
-from the incident and prepare for future situations or correctly assess the
-impact and mitigate it. This is where intrusion detection steps in. An
-intrusion detection (ID) probe monitors all traffic that passes the firewall
-and looks for known patterns. To do this, it typically gets a copied feed of
-all traffic from the firewall. Often the intrusion detection system (IDS) also
-has a feedback link to the firewall, enabling it to lock out the evildoer based
-on its origin, but most of the time post-mortem.
+Now it becomes important to know that something went wrong and, if possible,
+how it went wrong. This information will at least enable us to learn from the
+incident and prepare for future situations or correctly assess the impact and
+mitigate it. This is where intrusion detection steps in. An intrusion detection
+(ID) probe monitors all traffic that passes the firewall and looks for known
+patterns. To do this, it typically gets a copied feed of all traffic from the
+firewall. Often the intrusion detection system (IDS) also has a feedback link
+to the firewall, enabling it to lock out the evildoer based on its origin, but
+most of the time this can't stop the initial attack.
 
-In a wireless network however, it is not possible to have this single point in
-the network that can oversee all traffic. Every node is uniquely addressable,
-without the need to pass by any other node. So if the security perimeter
-diminishes and every device stands on its own, every device will have to
-implement its own lines of defence.
+In a mobile ad hoc network (MANET) however, it is not possible to have this
+single point in the network that can oversee all traffic
+\cite{mishra2004intrusion}. Every node is individually approachable, without
+the need to pass by any other node. So if the security perimeter diminishes and
+every device stands on its own, every device will have to implement its own
+lines of defence.
 
 There is one upside to this situation though: with protection and ID present on
 every device, the services running on those devices can take advantage of these
 security layers. If the IDS detects a problem, the service can immediately
 terminate the communication with the attacker, before it actually experiences
-the consequences. Just like a firewall, the localised IDS actually can be a
-layer between the hostile outside world and the software running on the device.
+the consequences. Just like a firewall, the IDS can be a layer between the
+hostile network and the software on the device.
 
 This integration will be a key point in development of security layers for IoT
 devices. More than in a classic network IDS, the algorithms that try to
 discover the attacks operate with a large degree of uncertainty. They also
 often have to collaborate with other nearby devices in the network, to unmask
-the culprit. This collaboration also increases the level of uncertainty,
-because no other device can be fully trusted. In the end the IDS on an IoT
-device will be able to provide information about the trust it puts in other
+the culprit \cite{marchang2008collaborative,krontiris2009cooperative}. This
+collaboration increases the level of uncertainty, because no other device can
+be fully trusted. In the end the IDS on an IoT device will be able to provide
+information about the trust \cite{ganeriwal2008reputation} it puts in other
 nodes in the network, but it will be up to some application-level policy to
 decide what to do with this information.
 
 % gap analysis
 
 Current developments in this area focus on programming frameworks to structure
-the implementation of different algorithms \cite{todo}, but don't offer a way
-to optimise the usage of resources. They also don't support systematic reuse to
-create different configurations for different nodes or evolution in time.
-\cite{todo}.
+the implementation of different algorithms \cite{valero2012di} and offer the
+required basic functional components to implement actual algorithms
+\cite{krontiris2008lidea}, but don't offer a way to optimise the usage of
+resources. They also don't support systematic reuse to create different
+configurations for different nodes or evolution in time.
 
 % problem -> requirements for solution
 
 The IoT is a very heterogeneous environment, both with respect to hardware and
 software. Being able to address this in a transparent and automated way is a
 key success factor for any kind of development in this area. For a
-non-functional and generic layer, such as ID, this aspect becomes even more
-paramount.
+non-functional layer, such as ID, this aspect becomes even more paramount.
 
 A solution that supports the integration of multiple algorithms and targets IoT
 devices needs to consider the impact on the resources of these devices. These
 devices not only need to survive using a limited battery, the production cost
-should also taken into consideration. Different algorithms should be combined
-as to avoid cumulating their impact.
+should also taken into consideration. Different algorithms should be merged to
+avoid accumulating their impact.
 
 % my approach (redundant -> contributions)
 
@@ -163,13 +164,12 @@ programming interface (API).
 The remainder of this paper proceeds as follows: Section \ref{background}
 details some of the ideas behind FCF and identifies the different aspects of
 the problem space. Section \ref{design} describes the design we applied to
-construct the framework, its language and code generator. Section
-\ref{evaluation} evaluates an implementation and application of the domain
-specific language (DSL) and code generator, using a set of ID algorithms found
-in literature. Section \ref{related} explores related work in the field of ID
-DSLs and code generation for the IoT. Finally, section \ref{conclusion}
-summarises out findings, draws conclusions and identifies topics for future
-work.
+construct the framework, its domain specific language (DSL) and code generator.
+Section \ref{evaluation} evaluates an implementation and application of the DSL
+and code generator, using a set of ID algorithms found in literature. Section
+\ref{related} explores related work in the field of ID DSLs and code generation
+for the IoT. Finally, section \ref{conclusion} summarises out findings, draws
+conclusions and identifies topics for future work.
 
 \section{Background}
 \label{background}
