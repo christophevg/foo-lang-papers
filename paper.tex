@@ -2,7 +2,7 @@
 \usepackage[pdftex]{graphicx}
 \usepackage[cmex10]{amsmath}
 \interdisplaylinepenalty=2500
-\usepackage{algorithmic}
+% \usepackage{algorithmic}
 \usepackage{array}
 \usepackage{mdwmath}
 \usepackage{mdwtab}
@@ -16,6 +16,7 @@
 \usepackage{minted}
 \usepackage{flushend}
 
+% while preparing, linenumbers come in handy
 \usepackage{lineno}
 \setlength\linenumbersep{1mm}
 \linenumbers
@@ -23,6 +24,24 @@
 % until we settle on the final name ;-)
 \usepackage{xspace}
 \newcommand{\NAME}{id-foo\xspace}
+
+% http://tex.stackexchange.com/questions/299/how-to-get-long-texttt-sections-to-break
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+% http://en.wikibooks.org/wiki/LaTeX/Customizing_LaTeX
+\newcommand{\ttt}[1]{\texttt{\justify{#1}}}
+
+\usepackage{algpseudocode}
+% custom Let command
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\renewcommand{\algorithmicforall}{\textbf{for each}}
+\let\ForEach\ForAll
 
 \begin{document}
 
@@ -143,6 +162,44 @@ work.
 
 \section{Background}
 \label{background}
+
+ID algorithms targeting MANETs share a common design pattern as illustrated in
+pseudocode listing \ref{alg:id-algo-pattern}. It consists of two functions:
+\ttt{process\_message} and \ttt{do\_housekeeping}. The former function
+represents the fact that ID algorithms inspect the network traffic that is
+captured by the wireless radio and process it, looking for malicious activity.
+The latter allows for algorithms to perform periodical tasks, checking their
+internal information and optionally act upon it. Some algorithms will implement
+both functions, some don't, but the abstract structure is applicable for a
+significant number of algorithms.
+
+\begin{listing}
+\begin{algorithmic}[1]
+  \Require{nodes, global storage for information about nodes}
+  \Function{process\_message}{$msg$}
+    \ForEach{$byte \in msg$} \label{alg:id-algo-pattern-loop1}
+     \State \dots \Comment{analyse byte-sequences}
+    \EndFor
+    \Let{$nodes_x$}{value}  \Comment{optionally update node info}
+    \State \Call{send}{$nodes_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send}
+  \EndFunction
+  \State
+  \Function{do\_housekeeping}{}
+    \ForEach{$node \in nodes$} \label{alg:id-algo-pattern-loop2}
+      \If{$node > \dots$} \Comment{validate recorded value}
+        \State \dots \Comment{take actions}
+      \EndIf
+    \EndFor
+  \EndFunction
+  \State
+\end{algorithmic}
+\caption{ID Algorithm Pattern\label{alg:id-algo-pattern}}
+\end{listing}
+
+The parts of interest here the iterations at lines
+\ref{alg:id-algo-pattern-loop1} and \ref{alg:id-algo-pattern-loop2}, and the
+interaction with the network at line \ref{alg:id-algo-pattern-send}. 
+
 
 Theory of Loop Fusion \cite{darte2000complexity}
 
