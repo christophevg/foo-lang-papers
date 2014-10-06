@@ -66,36 +66,29 @@ straightforward sequential implementation of the same algorithms.
 
 % IoT + threat
 
-The promise of the Internet of Things (IoT) is exciting: my smart car will
-notify the my smart home \cite{aldrich2003smart} that I will be late. It now
-can turn up the heat later, thus lowering my energy bills and adding to a
-greener world. Wonderful, I'm in. But what if the energy company can do the
-same? What if they are able to turn up the heat while I'm gone, making my home
-nice and cosy but also cranking up my bill and their profit. No thank you, let
-me out.
-
-Along with all the wonderful possibilities, the IoT clearly holds a significant
-threat: by opening our homes and lives to all these interconnected devices, we
-also open them to everyone who is able to break these new, virtual locks, often
-without leaving a trace.
+Along with its potential, the IoT also presents a significant threat: by
+opening our smart homes \cite{aldrich2003smart} and personal data to all these
+interconnected devices, we also open them to everyone who is able to break
+these new, virtual locks, often without leaving a trace.
 
 % classic networks: fw and central ids
 
-In classic networks, firewalls protect the outer perimeter of the network,
-filtering unwanted packets. But attacks on flaws in services can pass
-unnoticed. This is where intrusion detection (ID) steps in: an ID probe
-monitors all traffic that passes through the firewall, looking for patterns and
-optionally alerting the firewall if a malicious pattern is detected.
+In classic networks, firewalls focus on the outer perimeter of the network,
+filtering unwanted packets and protecting the entire internal network. But
+attacks on flaws in services can pass unnoticed. This is where intrusion
+detection (ID) steps in: an ID probe monitors all traffic that passes through
+the firewall, looking for patterns and optionally alerting the firewall if a
+malicious pattern is detected \cite{denning1987intrusion}.
 
 % manet: local ids -> localize -> limited resources
 
 In mobile ad hoc networks (MANET), which make up an important part of the IoT,
 it is not possible to have this single point in the network that can oversee
-all traffic \cite{mishra2004intrusion}. If the outer security perimeter
-diminishes, every device has to implement its own lines of defence.
-Localisation of the IDS requires resources, and resources are another important
-factor to consider: IoT devices typically have limited batteries, little
-processing power and memory is restricted to the bare minimum.
+all traffic \cite{zhang2000intrusion, mishra2004intrusion}. If the outer
+security perimeter diminishes, every device has to implement its own lines of
+defence. Making the IDS a local service on each device requires resources,
+which are another important constraint: IoT devices typically have limited
+batteries, little processing power and memory is restricted to the bare minimum.
 
 % gap analysis
 
@@ -125,9 +118,8 @@ merged to avoid accumulating their impact.
 The first contribution of this paper is a framework that enables the formal
 description of ID algorithms on a functional level. An automated code
 generation process produces corresponding source code, for a given platform and
-configuration. The way, the framework addresses the heterogeneous nature of
-both the IoT as a hardware and software platform, and that of the different ID
-algorithms.
+configuration. This way, the framework addresses the heterogeneous nature of
+both the IoT, as a hardware and software platform, and ID algorithms.
 
 % 2. FCF to optimise
 
