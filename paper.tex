@@ -20,12 +20,20 @@
 \setlength\linenumbersep{1mm}
 \linenumbers
 
+% until we settle on the final name ;-)
+\usepackage{xspace}
+\newcommand{\NAME}{id-foo\xspace}
+
 \begin{document}
 
 % to avoid syntax error highlighting - e.g. foo's not js ;-)
 \expandafter\def\csname PY@tok@err\endcsname{}
 
-\title{Efficiently Detecting Intrusions\\in the Internet of Things}
+\title{
+Introducing the \NAME framework\\
+for efficient Intrusion Detection\\
+in the Internet of Things
+}
 
 \author{\IEEEauthorblockN{Christophe Van Ginneken, Jef Maerien, Christophe
 Huygens, Danny Hughes, Wouter Joosen}%
@@ -40,15 +48,15 @@ Huygens, Danny Hughes, Wouter Joosen}%
 Supporting multiple intrusion detection (ID) algorithms imposes significant
 overhead on Internet of Things (IoT) devices. Fusion of the underlying
 algorithms can alleviate this, yet, proves to be time-consuming, repetitive and
-error-prone. To address this problem we introduce id-foo, a framework for the
+error-prone. To address this problem we introduce \NAME, a framework for the
 development of efficient intrusion detection systems (IDS). It consists of a
 domain specific language (DSL) that allows formally describing ID algorithms on
-a functional level. The id-foo code generator then fuses these algorithms and
-produces more optimally organised source code. Integration of applications with
-this code further enables reacting on threats as they occur, not post-mortem. A
-side-by-side comparison shows that generated code reduces memory footprint,
-message passing overhead and execution time in comparison to a straightforward
-sequential implementation of the same algorithms.
+a functional level. A code generator then fuses these algorithms and produces
+more optimally organised source code. This way, \NAME addresses the
+heterogeneity of both the IoT and ID, as well as the limited resources of IoT
+devices. A side-by-side comparison shows that generated code reduces memory
+footprint, message passing overhead and execution time in comparison to a
+straightforward sequential implementation of the same algorithms.
 
 \end{abstract}
 
@@ -66,7 +74,7 @@ same? What if they are able to turn up the heat while I'm gone, making my home
 nice and cosy but also cranking up my bill and their profit. No thank you, let
 me out.
 
-Along with all the wonderful possibilities, the IoT clearly holds an enormous
+Along with all the wonderful possibilities, the IoT clearly holds a significant
 threat: by opening our homes and lives to all these interconnected devices, we
 also open them to everyone who is able to break these new, virtual locks, often
 without leaving a trace.
@@ -79,31 +87,15 @@ unnoticed. This is where intrusion detection (ID) steps in: an ID probe
 monitors all traffic that passes through the firewall, looking for patterns and
 optionally alerting the firewall if a malicious pattern is detected.
 
-% manet: local ids + opportunity of integration
+% manet: local ids -> localize -> limited resources
 
 In mobile ad hoc networks (MANET), which make up an important part of the IoT,
 it is not possible to have this single point in the network that can oversee
-all traffic \cite{mishra2004intrusion}. Every node is individually
-approachable. If this outer security perimeter diminishes, every device has to
-implement its own lines of defence. The services running on those devices can
-take advantage of these local security layers. If the IDS detects a problem,
-the service can immediately terminate the communication with the attacker,
-before it's actually abused.
-
-% manet: IDS algorithms -> coorporation, trust
-
-More than in a classic network IDS, ID algorithms for MANETS operate with a
-large degree of uncertainty. They often have to collaborate with other devices
-in the network \cite{marchang2008collaborative,krontiris2009cooperative}, which
-increases the level of uncertainty, because no other device can fully be
-trusted. An IDS on an IoT device will be able to provide the services with
-information about the reputation \cite{ganeriwal2008reputation} of other nodes
-in the network.
-
-% manet: limited resources
-
-Resources are another important factor: IoT devices typically have limited
-batteries, little processing power and memory is restricted to the bare minimum.
+all traffic \cite{mishra2004intrusion}. If the outer security perimeter
+diminishes, every device has to implement its own lines of defence.
+Localisation of the IDS requires resources, and resources are another important
+factor to consider: IoT devices typically have limited batteries, little
+processing power and memory is restricted to the bare minimum.
 
 % gap analysis
 
@@ -125,14 +117,17 @@ A solution that supports the integration of multiple algorithms on IoT devices
 needs to consider the impact on their resources. Different algorithms should be
 merged to avoid accumulating their impact.
 
-% my approach merged into scientific contribution
+% my approach merged into ...
+% scientific contribution
 
 % 1. framework: language + code generator
 
 The first contribution of this paper is a framework that enables the formal
 description of ID algorithms on a functional level. An automated code
 generation process produces corresponding source code, for a given platform and
-configuration.
+configuration. The way, the framework addresses the heterogeneous nature of
+both the IoT as a hardware and software platform, and that of the different ID
+algorithms.
 
 % 2. FCF to optimise
 
@@ -141,12 +136,6 @@ paradigm. FCF identifies common data and functions, and organises code in such
 a way that redundant iterations, tests and computations are eliminated. Our
 results show substantially improved memory usage, execution time and usage of
 the wireless radio, reducing energy consumption.
-
-% 3. integration
-
-The final contribution is the integration of the generated IDS with the actual
-software. Information from the different algorithms is unified and made
-available to the applications, that can use it to actively protect themselves.
 
 % structure
 
@@ -176,10 +165,20 @@ TODO
 
 TODO
 
-\section{Evaluation}
+\section{Implementation and Evaluation}
 \label{evaluation}
 
-TODO
+network usages: number of packets, number of bytes
+
+processing time
+
+image size
+
+TODO: memory usage ?
+
+2 algorithms \cite{ganeriwal2008reputation}
+
+TODO: add 3rd ? \cite{krontiris2009cooperative}
 
 \section{Related Work}
 \label{related}
@@ -198,6 +197,16 @@ Code Optimization for embedded systems/WSNs \cite{panda2001data,naik2001software
 
 Code Generation for IDS \cite{charitakis2003code}
 
+% manet: IDS algorithms -> coorporation, trust
+
+More than in a classic network IDS, ID algorithms for MANETS operate with a
+large degree of uncertainty. They often have to collaborate with other devices
+in the network \cite{marchang2008collaborative,krontiris2009cooperative}, which
+increases the level of uncertainty, because no other device can fully be
+trusted. An IDS on an IoT device will be able to provide the services with
+information about the reputation \cite{ganeriwal2008reputation} of other nodes
+in the network.
+
 \section{Conclusion and Future Work}
 \label{conclusion}
 
@@ -207,20 +216,12 @@ explore more domains + implement corresponding DSLs for embedded systems
 
 extract generic language as host for DSLs
 
-\section{Implementation and Evaluation}
+Integration of applications with generated IDS allows actively and dynamically
+responding to changes in the reputation of other nodes.
 
-network usages: number of packets, number of bytes
-
-processing time
-
-image size
-
-TODO: memory usage ?
-
-2 algorithms \cite{ganeriwal2008reputation}
-
-TODO: add 3rd ? \cite{krontiris2009cooperative}
-
+The services running on those devices can take advantage of these local
+security layers. If the IDS detects a problem, the service can immediately
+terminate the communication with the attacker, before it's actually abused.
 
 \section*{Acknowledgements}
 
