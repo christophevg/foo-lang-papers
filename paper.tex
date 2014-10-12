@@ -163,17 +163,39 @@ work.
 \section{Background}
 \label{background}
 
-ID algorithms targeting MANETs share a common design pattern as illustrated in
-pseudocode listing \ref{alg:id-algo-pattern}. It consists of two functions:
-\ttt{process\_message} and \ttt{do\_housekeeping}. The former function
-represents the fact that ID algorithms inspect the network traffic that is
-captured by the wireless radio and process it, looking for malicious activity.
-The latter allows for algorithms to perform periodical tasks, checking their
-internal information and optionally act upon it. Some algorithms will implement
-both functions, some don't, but the abstract structure is applicable for a
-significant number of algorithms.
+The underlying problem addressed in this paper is of an economic nature: adding
+ID doesn't add functionality, so its impact should be reduced as much as
+possible.
 
-\begin{figure}
+In literature, many ID algorithm are described, but hardly any are implemented.
+If implementations would be available, one would typically apply a pattern as
+shown in listing \ref{alg:id-algo-application}.
+
+\begin{figure}[H]
+\begin{algorithmic}[1]
+  \Let{$msg$}{$network$} \Comment{all observed messages}
+  \ForEach{$algorithm \in algorithms$}
+    \State \Call{algorithm.progress\_message}{msg}
+  \EndFor
+  \State \dots
+  \Comment{at a given interval}
+  \ForEach{$algorithm \in algorithms$}
+    \State \Call{algorithm.do\_housekeeping}{}
+  \EndFor
+\end{algorithmic}
+\captionof{listing}{Sequential implementation of several ID algorithms\label{alg:id-algo-application}}
+\end{figure}
+
+The implementations would be linked and called in a sequential way, when new
+messages are observed on the network and at a regular interval to allow them to
+do internal housekeeping, processing the information extracted from the network
+traffic, often in a statistical way.
+
+This is a common design pattern of ID algorithms targetting MANETs. The
+implementation of this pattern also shares common structures, as illustrated in
+listing \ref{alg:id-algo-pattern}.
+
+\begin{figure}[H]
 \begin{algorithmic}[1]
   \Require{nodes, global storage for information about nodes}
   \Function{process\_message}{$msg$}
@@ -181,33 +203,60 @@ significant number of algorithms.
      \State \dots \Comment{analyse byte-sequences}
     \EndFor
     \Let{$nodes_x$}{value}  \Comment{optionally update node info}
-    \State \Call{send}{$nodes_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send}
+    \State \Call{send}{$nodes_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send1}
   \EndFunction
   \State
   \Function{do\_housekeeping}{}
-    \ForEach{$node \in nodes$} \label{alg:id-algo-pattern-loop2}
+    \ForEach{$node \in nodes$} \label{alg:id-algo-pattern-loop2} \label{alg:id-algo-pattern-common-data}
       \If{$node > \dots$} \Comment{validate recorded value}
         \State \dots \Comment{take actions}
+        \State \Call{send}{$node$, ``info''} \Comment{e.g. communicate} \label{alg:id-algo-pattern-send2}
       \EndIf
     \EndFor
   \EndFunction
   \State
 \end{algorithmic}
-\caption{ID Algorithm Pattern\label{alg:id-algo-pattern}}
+\captionof{listing}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
 \end{figure}
 
-The parts of interest here the iterations at lines
-\ref{alg:id-algo-pattern-loop1} and \ref{alg:id-algo-pattern-loop2}, and the
-interaction with the network at line \ref{alg:id-algo-pattern-send}. 
+The parts of interest here are the loops at lines
+\ref{alg:id-algo-pattern-loop1} and \ref{alg:id-algo-pattern-loop2}, the common
+\emph{nodes} data on line \ref{alg:id-algo-pattern-common-data} and the
+interaction with the network at lines \ref{alg:id-algo-pattern-send1} and
+\ref{alg:id-algo-pattern-send2}.
 
+\subsection{Loops and Common Data}
 
-Theory of Loop Fusion \cite{darte2000complexity}
+Given several ID algorithms, that all perform the same parsing loop, over the
+same byte stream, performing comparable operations to find similar patterns,
+one would clearly benefit from combining these loops, avoiding redundant
+reevaluation of the same byte patterns.
 
-Examples of code/loop fusion (e.g. Haskell Stream Fusion) \cite{coutts2007stream}
+The same goes for common data. Each algorithm not only has to parse the same
+message, it also has to store information about nodes within its own scope,
+resulting in a lot of common data that is duplicated in memory.
 
-Function Inlining (e.g. TinyOS) \cite{gay2007software,gay2003nesc}
+The only way to solve this, would be to change the provided implementation,
+pulling up the loops over the message and the nodes to a level above the loop
+over the algorithms. But this comes at a development cost. This cost typically
+isn't a one-time cost, e.g. in case a new version of the algorithm is released,
+or simply when a different set of algorithms is selected. Finally, changing, or
+simply implementing the algorithms from scratch, also holds the risk of making
+mistakes.
 
-TODO
+\subsection{Network Usage}
+
+But, as said before, there are hardly any implementations readily available.
+Probably the main reason for this is the heterogeneity of the IoT. A prime
+example is the \ttt{SEND} function. Different software stacks will have
+different application programming interfaces (APIs) for accessing the network.
+Simple, macro-like solutions can overcome this, but the dispersion of the calls
+to access the network is causing the wireless radio to be on a lot more that
+one would hope for.
+
+A valid solution would try to combine messages in a single, reducing the access
+to the network and even sharing some network overhead. The impact to implement
+this, again would weigh to much on
 
 \section{Design}
 \label{design}
