@@ -188,11 +188,11 @@ shown in listing \ref{alg:id-algo-application}.
 
 The implementations would be linked and called in a sequential way, when new
 messages are observed on the network and at a regular interval to allow them to
-do internal housekeeping, processing the information extracted from the network
-traffic, often in a statistical way.
+do internal housekeeping. This includes processing the information extracted
+from the network traffic, often in a statistical way.
 
-This is a common design pattern of ID algorithms targetting MANETs. The
-implementation of this pattern also shares common structures, as illustrated in
+This duality is a common design pattern of ID algorithms targeting MANETs. The
+internals of the pattern reveal more common structures, as illustrated in
 listing \ref{alg:id-algo-pattern}.
 
 \begin{figure}[H]
@@ -227,41 +227,56 @@ interaction with the network at lines \ref{alg:id-algo-pattern-send1} and
 
 \subsection{Loops and Common Data}
 
-Given several ID algorithms, that all perform the same parsing loop, over the
+Given several ID algorithms, that all execute the same parsing loop, over the
 same byte stream, performing comparable operations to find similar patterns,
 one would clearly benefit from combining these loops, avoiding redundant
 reevaluation of the same byte patterns.
 
 The same goes for common data. Each algorithm not only has to parse the same
 message, it also has to store information about nodes within its own scope,
-resulting in a lot of common data that is duplicated in memory.
+resulting in a lot of duplicated information in memory.
 
 The only way to solve this, would be to change the provided implementation,
 pulling up the loops over the message and the nodes to a level above the loop
 over the algorithms. But this comes at a development cost. This cost typically
 isn't a one-time cost, e.g. in case a new version of the algorithm is released,
-or simply when a different set of algorithms is selected. Finally, changing, or
-simply implementing the algorithms from scratch, also holds the risk of making
-mistakes.
+or simply when a different set of algorithms is selected due to a changing risk
+analysis. Finally, changing, or simply implementing the algorithms from
+scratch, also holds the risk of making mistakes.
 
 \subsection{Network Usage}
 
-But, as said before, there are hardly any implementations readily available.
-Probably the main reason for this is the heterogeneity of the IoT. A prime
-example is the \ttt{SEND} function. Different software stacks will have
-different application programming interfaces (APIs) for accessing the network.
-Simple, macro-like solutions can overcome this, but the dispersion of the calls
-to access the network is causing the wireless radio to be on a lot more that
-one would hope for.
+But there are hardly any implementations readily available. Probably the main
+reason for this is the heterogeneity of the IoT. A prime example is the
+\ttt{SEND} function. Different software stacks will have different application
+programming interfaces (APIs) for accessing the network. Simple, macro-like
+solutions can overcome this, but the dispersion of the calls to access the
+network is causing the wireless radio to be on a lot more that one would hope
+for.
 
-A valid solution would try to combine messages in a single, reducing the access
-to the network and even sharing some network overhead. The impact to implement
-this, again would weigh to much on
+A valid solution would try to combine messages in a single instance, reducing
+the access to the network and even sharing some network overhead. The impact to
+implement this manually will again outweigh the gain. An option would be to use
+a software library, that provides a unified API for accessing the network and
+collects individual calls and combines them in a single network message.
+
+Besides the fact that all researchers would have to use the same library in a
+consistent way, they would limit their operational scope to a single language,
+serving only a fraction of the heterogeneous IoT.
+
+\subsection{Situation Summary}
+
+Starting from scratch allows optimising the implementation of an IDS, but
+doesn't scale. Reusing existing implementations also doesn't help, due to the
+far from optimal sequential execution of the algorithms and the redundant
+storage of common data. Software libraries can solve many of the issues, but
+only cover parts of the entire spectrum, due to their tie-in with languages and
+frameworks.
 
 \section{Design}
 \label{design}
 
-TODO
+
 
 \section{Implementation and Evaluation}
 \label{evaluation}
