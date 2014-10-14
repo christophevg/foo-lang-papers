@@ -1,0 +1,64 @@
+// group functions and definitions
+module heartbeat
+
+const hb_interval         = 3000  // ms
+const validation_interval = 5000  // ms
+const max_fail_count      =    3
+
+// import external functionality
+from crypto import sha1(byte*) : byte[20]
+from crypto
+  import sha1_cmp(byte*, byte*) : boolean
+from time   import now() : timestamp
+
+// extend domain with custom properties
+extend nodes with {
+  sequence   : byte      = 0
+  last_seen  : timestamp = now()
+  fail_count : byte      = 0
+  sane       : boolean   = true
+}
+// validation
+@every(validation_interval)
+with nodes do function(node) {
+  if(now() - node.last_seen > hb_interval) {
+    node.fail_count++
+  }
+  if(node.fail_count > max_fail_count) {
+    node.sane = false
+  }
+}
+
+// handle all network traffic
+after nodes receive do
+function(me, sender, from, hop, to, payload) {
+  // "parse" using pattern matching
+  case payload {
+    contains([ #heartbeat, time:timestamp,
+               seq, signature:byte[20] ])
+    {
+      if(from == me ) { return }
+      if(! from.sane) { return }
+      // check signature
+      if(sha1_cmp(signature, [seq, time])) {
+        from.last_seen = now()
+        from.sequence  = seq
+      } else {
+        from.fail_count++
+      }
+    }
+  }
+}
+
+function broadcast_heartbeat(node) {
+  time = now()
+  nodes.broadcast([
+    #heartbeat, node.sequence,
+    time, sha1([node.sequence, time])
+  ])
+  node.sequence++
+}
+
+// broadcast our heartbeat
+@every(hb_interval)
+with nodes.self do broadcast_heartbeat

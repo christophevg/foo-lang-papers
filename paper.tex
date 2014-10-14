@@ -13,6 +13,8 @@
 \hyphenation{}
 
 % additional packages and utility commands
+\newcommand{\TODO}{\textbf{\color{red}TODO}}
+
 \usepackage{minted}
 \usepackage{flushend}
 
@@ -42,6 +44,8 @@
 \newcommand*\Let[2]{\State #1 $\gets$ #2}
 \renewcommand{\algorithmicforall}{\textbf{for each}}
 \let\ForEach\ForAll
+
+\usepackage{listings}
 
 \begin{document}
 
@@ -172,6 +176,7 @@ If implementations would be available, one would typically apply a pattern as
 shown in listing \ref{alg:id-algo-application}.
 
 \begin{figure}[H]
+\captionof{lstlisting}{Sequential implementation of ID algorithms\label{alg:id-algo-application}}
 \begin{algorithmic}[1]
   \Let{$msg$}{$network$} \Comment{all observed messages}
   \ForEach{$algorithm \in algorithms$}
@@ -183,7 +188,6 @@ shown in listing \ref{alg:id-algo-application}.
     \State \Call{algorithm.do\_housekeeping}{}
   \EndFor
 \end{algorithmic}
-\captionof{listing}{Sequential implementation of several ID algorithms\label{alg:id-algo-application}}
 \end{figure}
 
 The implementations would be linked and called in a sequential way, when new
@@ -196,6 +200,7 @@ internals of the pattern reveal more common structures, as illustrated in
 listing \ref{alg:id-algo-pattern}.
 
 \begin{figure}[H]
+\captionof{lstlisting}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
 \begin{algorithmic}[1]
   \Require{nodes, global storage for information about nodes}
   \Function{process\_message}{$msg$}
@@ -216,7 +221,6 @@ listing \ref{alg:id-algo-pattern}.
   \EndFunction
   \State
 \end{algorithmic}
-\captionof{listing}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
 \end{figure}
 
 The parts of interest here are the loops at lines
@@ -276,7 +280,93 @@ frameworks.
 \section{Design}
 \label{design}
 
+To bridge the gap between the research world and the heterogeneous IoT where
+developers want to implement an actual IDS, while still respecting the limited
+resources they have at their disposal, we introduce \NAME, a framework
+consisting of a DSL, code generator and software library.
 
+The DSL enables researchers to formally describe their ID algorithms, without
+focusing on any specific language or platform. Given such formal descriptions
+of ID algorithms, a code generator is now able to combine these, while avoiding
+the sequential patterns/problems presented in listings
+\ref{alg:id-algo-application} and \ref{alg:id-algo-pattern}. It can also target
+different languages and platforms, while reusing a software library that
+provides e.g. message parsing, network access wrapping,\dots
+
+\subsection{DSL}
+
+The DSL component of \NAME has two major goals and one minor: (1) allow the
+description of ID algorithms in a formal way and (2) avoid that those
+descriptions contain \emph{non-fusible} logic and/or data. Besides these (3)
+the usability of the language is also taken into account.
+
+The first goal is covered by the construction of the language itself. Given a
+description of an ID algorithm using the DSL, the algorithm can be
+unambiguously interpreted. The DSL borrows a lot of its syntax from C-like
+languages, dropping only a small subset of its capabilities, but replacing
+those with other higher-level constructs taken from object-oriented (OO)
+languages, aspect-orientation,\dots
+
+The most important omission from the C syntax are basic loops. Loops are very
+generic and make it hard to identify if they deal with the same logic and/or
+data. Fusing these loops across different algorithms is often non-trivial. In
+\NAME's DSL, other constructs have been introduced to lift the definition of
+these loops to a more functional level: scheduling and scoping of the execution
+of functions, reacting to events and pattern matching are three examples that
+allow describing the actual meaning of loops in stead of simply the loop
+itself. It sometimes requires rethinking the reason behind a technical loop,
+but often results in a much clearer description.
+
+To deal with common data, the domain provides the notion of \emph{nodes}. As
+most, if not all, ID algorithms targeting the IoT require some notion of the
+other nodes or devices in the vicinity, the DSL makes this the primary
+information carrier. All functional constructs, mentioned above, typically
+operate on the collection of known nodes, or a functionally defined subset of
+that. Each algorithm also has the possibility to \emph{extend} nodes, adding
+its own properties needed for its execution.
+
+Based on a C-like syntax the language is also very accessible. To further
+nurture the usability, syntactic sugar from OO languages is also adopted.
+Because not everything should be implemented in such a high-level language, it
+also provides a way to \emph{import} external functionality. In the first place
+this will include a standard library of functions that can be called, but it
+can include any custom built software component. Finally it tries to limit the
+need for type information and performs as much type inference as possible. As
+it aims to be language that describes algorithms on a functional level it seeks
+to safeguard its users from these \emph{technicalities}. The fact that the
+opportunities of such a formal description include generation of code in a
+variety of languages, each with possibly different types, also results the need
+for a more functional approach to types.
+
+Listing \ref{lst:heartbeat} illustrates some of the features mentioned above,
+using a small but representative example of an algorithm: a heartbeat. Using a
+heartbeat, nodes can broadcast a message at a regular interval, allowing other
+nodes to monitor its availability. Missing heartbeats could indicate problems,
+such as physical capturing of a certain node.
+
+\lstinputlisting[
+  float,
+  basicstyle=\small\ttfamily,
+  label=lst:heartbeat,
+  caption=Heartbeat in \NAME
+]{src/heartbeat.foo}
+
+\subsection{Code Generator}
+
+\TODO
+
+- semantic model \cite{fowler2010domain}
+- model transformations
+- code model + syntactic mapping using coding pattern-like instructions
+
+\subsection{Software Library}
+
+\TODO
+
+- incoming message parsing
+- outgoing message grouping
+- execution of schedules
+- standard library: high-level conceptual functions (e.g. now(), sha1,...)
 
 \section{Implementation and Evaluation}
 \label{evaluation}
