@@ -47,6 +47,8 @@
 
 \usepackage{listings}
 
+\usepackage{tikz}
+
 \begin{document}
 
 % to avoid syntax error highlighting - e.g. foo's not js ;-)
@@ -353,11 +355,65 @@ such as physical capturing of a certain node.
 
 \subsection{Code Generator}
 
+To convert the DSL based ID algorithms into production-ready code, we propose
+the use of a code generator. Although many approaches here are applicable, like
+template based text expansion, XSLT transformations or even using the
+CodeDom\cite{dollard2004code}, we believe that for the level of functional
+transformations that need to be performed, a richer model is required.
+
+A semantic model \cite{fowler2010domain}, tied closely to the DSL itself, can
+fulfil this role. Semantic transformations can now be applied to create a
+code-oriented model, comparable to the idea of CodeDom. From there on,
+syntactic transformations an emit actual source code. Figure
+\ref{fig:code-generation} shows the overall procedure.
+
+\begin{figure}[H]
+\begin{tikzpicture}[
+    nonterminal/.style={
+% The shape:
+rectangle,
+% The size:
+      minimum size=6mm,
+% The border:
+      very thick,
+      draw=red!50!black!50,
+      % The filling:
+top color=white,
+bottom color=red!50!black!20, % and something else at the bottom % Font
+font=\itshape
+    }]
+  \node [nonterminal] {TODO};
+\end{tikzpicture}
+\caption{Overview code generation process}
+\label{fig:code-generation}
+\end{figure}
+
+\subsection{Semantic Model}
+
 \TODO
 
-- semantic model \cite{fowler2010domain}
-- model transformations
-- code model + syntactic mapping using coding pattern-like instructions
+Figure \ref{fig:meta-model} shows the meta-model of the the semantic model.
+
+\begin{figure}[H]
+\begin{tikzpicture}[
+    nonterminal/.style={
+% The shape:
+rectangle,
+% The size:
+      minimum size=6mm,
+% The border:
+      very thick,
+      draw=red!50!black!50,
+      % The filling:
+top color=white,
+bottom color=red!50!black!20, % and something else at the bottom % Font
+font=\itshape
+    }]
+  \node [nonterminal] {TODO};
+\end{tikzpicture}
+\caption{Semantic Model Meta-Model}
+\label{fig:meta-model}
+\end{figure}
 
 \subsection{Software Library}
 
