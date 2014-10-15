@@ -386,18 +386,16 @@ requirements of the generator towards the platform are minimal, don't rely on
 advanced frameworks or operating systems and can therefore be applied in any
 environment, targeting any platform.
 
-For the evaluation we constructed a small WSN consisting of three nodes: an
-end-device, a router and a coordinator. The end-device and the router were
-completely autonomous nodes, while the coordinator consisted of an XBee module,
-directly connected to a computer via a USB break-out board, allowing serial
-access via a terminal.
+For the evaluation we constructed a small meshed network consisting of three
+devices, with only one device able to talk to both other devices, requiring
+routing of messages through this device.
 
-We started from a basic application that measures light intensity and reports
-it to the coordinator. The application was written both manually and generated.
-On top of this baseline we added two intrusion detection related algorithms: a
-heartbeat, that allows nodes to validate each other's continuous presence, and
-a reputation-building algorithm that checks if a parent node is cooperative and
-actually forwards messages with a destination further down the
+We started from a basic application that measures light intensity. The
+application was written both manually and generated. On top of this baseline we
+added two intrusion detection related algorithms: a heartbeat, that allows
+nodes to validate each other's continuous presence, and a reputation-building
+algorithm that checks if a parent node is cooperative and actually forwards
+messages with a destination further down the
 network\cite{ganeriwal2008reputation}.
 
 Three criteria were evaluated: the image size of the resulting compiled code,
@@ -408,20 +406,18 @@ and with both algorithms implemented.
 
 In case of the manual implementation, both algorithms were constructed as
 standalone modules and sequentially called from the base-application's event
-loop. The code generator was provided with FOO-lang descriptions of the
-algorithms and generated all four cases.
+loop. The code generator was provided with \NAME descriptions of the algorithms
+and generated all four cases.
 
 Before reviewing the results, it is very important to put these results in a
 proper perspective. Comparing manually written code to generated code is no
 exact science. One can always argue that the quality of the two code bases is
-not comparable and that the manual code always can be improved.
-
-Still it might be interesting to look at the numbers, given that both code
-bases are constructed with the same intentions and practices. We believe we
-have achieved this and have taken honest decisions while constructing the
-implementations, making them comparable. Numerical analysis of the
-implementation offers us a preliminary estimation of the effect of our proposed
-solution.
+not comparable and that the manual code always can be improved. Still it might
+be interesting to look at the numbers, given that both code bases are
+constructed with the same intentions and practices. We believe we have achieved
+this and have taken honest decisions while constructing the implementations,
+making them comparable. Numerical analysis of the implementation offers us a
+preliminary estimation of the effect of our proposed solution.
 
 Tables \ref{tbl:manual} and \ref{tbl:generated} show the collected data
 respectively for the manual and the generated implementation. The base case is
@@ -470,12 +466,12 @@ In the case of the generated implementation, this no longer holds: although
 that even the individual increases due to adding a single algorithm are higher
 than in the manual case, the result for the implementation of both algorithms
 is less than the sum of both. Here we clearly see the effect of reusing the
-framework that comes with FOO-lang. The same goes for all other metrics. Maybe
-most remarkable is the effect on the time of one event loop cycle: both
+software library that comes with \NAME. The same goes for all other metrics.
+Maybe most remarkable is the effect on the time of one event loop cycle: both
 algorithms by itself add 150\% with respect to the base case, but when
 combined, the impact hardly increases. Here we learn that the introduced
-framework is responsible for the initial overhead, but it clearly pays for
-itself when adding more algorithms.
+software library is responsible for the initial overhead, but it clearly pays
+for itself when adding more algorithms.
 
 Table \ref{tbl:summary} compares the two situations by subtracting the manual
 case from the generated case, showing the impact of the code generation. A
@@ -502,20 +498,20 @@ When comparing the results of both implementations we first can conclude that
 the generator produces exactly the same code for the base case. We couldn't
 measure any real differences between both implementations.
 
-Secondly, we see that the framework that comes with the generated code adds to
-the size of the resulting image. But the cost is almost constant and is
+Secondly, we see that the software library that comes with the generated code
+adds to the size of the resulting image. But the cost is almost constant and is
 relatively lower when algorithms are combined. With roughly 3KB of additional
 overhead, or 15\% in this simple case, this impact is affordable.
 
 From a functional point of view, the generated code lives up to the
-expectactions: both the number of frames as the bytes sent benefit from well
-organized code and reuse of a common framework.
+expectations: both the number of frames as the bytes sent benefit from well
+organised code and reuse of a common software library.
 
 Finally we see that both algorithms by itself add an equal amount of time to
 the processing of a single event loop cycle, but when combined, the event loop
 is about 7\% faster compared to the manual case.
 
-Without any effort to optimize the framework code, nor leveraging knowledge
+Without any effort to optimise the software library, nor leveraging knowledge
 about the specific algorithms, this very basic generated code shows that the
 proposed principles are not only theoretically feasible but actually result in
 interesting improvements.
