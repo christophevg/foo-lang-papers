@@ -48,6 +48,10 @@
 \usepackage{listings}
 
 \usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usetikzlibrary{graphs}
+\usetikzlibrary{trees}
 
 \begin{document}
 
@@ -367,22 +371,51 @@ code-oriented model, comparable to the idea of CodeDom. From there on,
 syntactic transformations an emit actual source code. Figure
 \ref{fig:code-generation} shows the overall procedure.
 
+\tikzset{
+  resource/.style={
+    rectangle,
+    minimum size=7mm,
+    thick, draw=black,
+    top color=white,
+    font=\ttfamily
+  },
+  representation/.style={
+    rectangle, minimum size=6mm, rounded corners=3mm,
+    minimum size=7mm,
+    thick, draw=black,
+    top color=white,
+    font=\itshape
+  }
+}
+
 \begin{figure}[H]
 \begin{tikzpicture}[
-    nonterminal/.style={
-% The shape:
-rectangle,
-% The size:
-      minimum size=6mm,
-% The border:
-      very thick,
-      draw=red!50!black!50,
-      % The filling:
-top color=white,
-bottom color=red!50!black!20, % and something else at the bottom % Font
-font=\itshape
-    }]
-  \node [nonterminal] {TODO};
+  node distance=8mm,
+  ,>=stealth,thick,black!50,text=black,
+  every new ->/.style={shorten >=1pt},
+]
+  \node (dsl)  [resource]                    {DSL};
+  \node (sm)   [representation,right=of dsl] {Semantic\\Model};
+  \node (cm)   [representation,right=of sm]  {Code\\Model};
+  \node (code) [resource,right=of cm]        {Code};
+
+
+  \draw [->] (dsl) -> (sm)  node [midway,above=10pt] {parse};
+  \draw [->] (sm)  -> (cm)   node [midway,above=10pt,align=center] {semantic\\transform};
+  \draw [->] (cm)  -> (code) node [midway,above=10pt] {emit code};
+
+  \draw [rounded corners,->]
+        ($ (sm.east) - (5mm,3.5mm) $)
+        -- ++(0,-.5)
+        -| ($ (sm.west) + (5mm,-3.5mm) $)
+           node [near start, below=1pt] {type inference};
+
+  \draw [rounded corners,->]
+        ($ (cm.east) - (5mm,3.5mm) $)
+        -- ++(0,-.5)
+        -| ($ (cm.west) + (5mm,-3.5mm) $)
+           node [near start, below=1pt,align=center] {syntactic\\transform};
+
 \end{tikzpicture}
 \caption{Overview code generation process}
 \label{fig:code-generation}
@@ -394,24 +427,33 @@ font=\itshape
 
 Figure \ref{fig:meta-model} shows the meta-model of the the semantic model.
 
+\tikzset{
+  class/.style={
+    rectangle,
+    minimum size=1cm,
+    thick, draw=black,
+    text centered,
+    text width=1.75cm,
+  }
+}
+
 \begin{figure}[H]
 \begin{tikzpicture}[
-    nonterminal/.style={
-% The shape:
-rectangle,
-% The size:
-      minimum size=6mm,
-% The border:
-      very thick,
-      draw=red!50!black!50,
-      % The filling:
-top color=white,
-bottom color=red!50!black!20, % and something else at the bottom % Font
-font=\itshape
-    }]
-  \node [nonterminal] {TODO};
+  edge from parent fork down,
+  sibling distance=5mm, level distance=20mm, node distance=8mm
+  ]
+  \node (model) [class] {Model}
+      child {node (module ) [class] {Module}
+        child {node (strategy) [class,align=center,xshift=-9mm] {Execution\\Strategy}
+          child {node(every) [class,xshift=-9mm] {Every}}
+          child {node (when) [class,xshift=9mm] {When}}
+        }
+        child {node [class,xshift=9mm] {function}}
+      };
+  \node (constant) [class,right=of model] {Constant};
+  \node (scope)    [class,left=of strategy] {Scope};
 \end{tikzpicture}
-\caption{Semantic Model Meta-Model}
+\caption{Partial Semantic Model Meta-Model}
 \label{fig:meta-model}
 \end{figure}
 
