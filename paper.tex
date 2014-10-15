@@ -52,6 +52,7 @@
 \usetikzlibrary{calc}
 \usetikzlibrary{graphs}
 \usetikzlibrary{trees}
+\usetikzlibrary{arrows}
 
 \begin{document}
 
@@ -434,7 +435,9 @@ Figure \ref{fig:meta-model} shows the meta-model of the the semantic model.
     thick, draw=black,
     text centered,
     text width=1.75cm,
-  }
+  },
+  subclass/.style={thick,draw=black,>=open triangle 60,<-},
+  aggregate/.style={thick,draw=black,>=diamond,<-}
 }
 
 \begin{figure}[H]
@@ -443,15 +446,18 @@ Figure \ref{fig:meta-model} shows the meta-model of the the semantic model.
   sibling distance=5mm, level distance=20mm, node distance=8mm
   ]
   \node (model) [class] {Model}
-      child {node (module ) [class] {Module}
-        child {node (strategy) [class,align=center,xshift=-9mm] {Execution\\Strategy}
-          child {node(every) [class,xshift=-9mm] {Every}}
-          child {node (when) [class,xshift=9mm] {When}}
+      child {node (module ) [class] {Module} edge from parent [aggregate]
+        child {node (strategy) [class,align=center,xshift=-9mm] {Execution\\Strategy} edge from parent [aggregate]
+          child {node(every) [class,xshift=-9mm] {Every} edge from parent [subclass]}
+          child {node (when) [class,xshift=9mm] {When} edge from parent [subclass]}
         }
-        child {node [class,xshift=9mm] {function}}
+        child {node [class,xshift=9mm] {function} edge from parent [aggregate]}
       };
   \node (constant) [class,right=of model] {Constant};
   \node (scope)    [class,left=of strategy] {Scope};
+  
+  \draw [thick,>=latex,->] (strategy) -- (scope);
+  \draw [aggregate] (model) -- (constant);
 \end{tikzpicture}
 \caption{Partial Semantic Model Meta-Model}
 \label{fig:meta-model}
