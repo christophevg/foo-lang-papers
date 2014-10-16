@@ -496,9 +496,33 @@ to the \emph{Execution Strategy}. This structure surrounds the actual
 \emph{Function}s and underlying \emph{Statement}s and allows for interpretation
 and fusion of the algorithms.
 
-\subsection{Function Code Fusion}
+\subsection{Functional Code Fusion}
 
-\TODO
+Thanks to the functional description of events and the effects that are
+triggered by them, the code generator is able to identify the same actions
+across different algorithms. This way it is possible to extract the parsing of
+incoming messages, group actions on the same sets of data or scheduled function
+executions.
+
+FCF typically looks for patterns in the semantic model and performs model
+transformations to change these patterns to a more optimized organization.
+Semantic transformations are performed on the semantic model itself and end
+with a transformation of the semantic model into a code model, which encodes
+the semantics into technical code constructs.
+
+\subsection{Code Model}
+
+The code model can be compared to an AST for a very expressive language. It
+contains constructs found in certain languages, but not in others. Therefore a
+second round of model transformations needs to be performed. These syntactic
+transformations morph the unsupported constructs into comparable constructs
+that are supported by the targeted platform and language.
+
+Depending on the target platform, some of the constructions used to e.g. parse
+incoming messages, schedule tasks,\dots may not be transformed into
+self-containing code. The generator then uses a software library to perform
+these tasks. It will look for patterns that indicate any of these actions and
+transform them into calls into the \NAME software library.
 
 \subsection{Software Library}
 
