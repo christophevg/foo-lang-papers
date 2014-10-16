@@ -375,58 +375,77 @@ syntactic transformations an emit actual source code. Figure
 \tikzset{
   resource/.style={
     rectangle,
-    minimum size=7mm,
+    minimum width=1cm,
+    minimum height=8mm,
     thick, draw=black,
     top color=white,
     font=\ttfamily
   },
   representation/.style={
-    rectangle, minimum size=6mm, rounded corners=3mm,
-    minimum size=7mm,
+    rectangle, rounded corners=3mm,
+    minimum width=2cm,
+    minimum height=8mm,
     thick, draw=black,
     top color=white,
     font=\itshape
   }
 }
 
-\begin{figure}[H]
+\begin{figure}[ht]
+  \centering
+  \scalebox{.85}{
 \begin{tikzpicture}[
   node distance=8mm,
   ,>=stealth,thick,black!50,text=black,
-  every new ->/.style={shorten >=1pt},
+  every new ->/.style={shorten >=1pt}
 ]
-  \node (dsl)  [resource]                    {DSL};
-  \node (sm)   [representation,right=of dsl] {Semantic\\Model};
-  \node (cm)   [representation,right=of sm]  {Code\\Model};
+  \node (dsl)  [resource]                                 {DSL};
+  \node (sm)   [representation,right=of dsl,align=center] {Semantic\\Model};
+  \node (cm)   [representation,right=of sm,align=center]  {Code\\Model};
   \node (code) [resource,right=of cm]        {Code};
 
 
-  \draw [->] (dsl) -> (sm)  node [midway,above=10pt] {parse};
+  \draw [->] (dsl) -> (sm)   node [midway,above=10pt]              {parse};
   \draw [->] (sm)  -> (cm)   node [midway,above=10pt,align=center] {semantic\\transform};
-  \draw [->] (cm)  -> (code) node [midway,above=10pt] {emit code};
+  \draw [->] (cm)  -> (code) node [midway,above=10pt]              {emit code};
 
   \draw [rounded corners,->]
-        ($ (sm.east) - (5mm,3.5mm) $)
+        ($ (sm.east) - (5mm,4.5mm) $)
         -- ++(0,-.5)
-        -| ($ (sm.west) + (5mm,-3.5mm) $)
+        -| ($ (sm.west) + (5mm,-4.5mm) $)
            node [near start, below=1pt] {type inference};
 
   \draw [rounded corners,->]
-        ($ (cm.east) - (5mm,3.5mm) $)
+        ($ (cm.east) - (5mm,4.5mm) $)
         -- ++(0,-.5)
-        -| ($ (cm.west) + (5mm,-3.5mm) $)
+        -| ($ (cm.west) + (5mm,-4.5mm) $)
            node [near start, below=1pt,align=center] {syntactic\\transform};
 
 \end{tikzpicture}
+}
 \caption{Overview code generation process}
 \label{fig:code-generation}
 \end{figure}
 
+The DSL is parsed and imported into a semantic model. Based on the minimal type
+information present in the model, all remaining types are inferred. Through a
+series of semantic transformations, the model evolves from the functional to a
+more technical one, a code model. This code model can be considered as a rich
+AST with an extensive set of language constructs. Syntactic transformations now
+lower this level of expressiveness according to the desired platform and
+language. In the end the code model can be directly emitted to the target
+language.
+
 \subsection{Semantic Model}
 
-\TODO
+The semantic model is the core of the solution. It offers a way to describe ID
+algorithms in a way that allows semantic reinterpretation. This way, the
+functionality of different algorithms can be reorganised to allow for more
+optimal execution and memory usage. Hence the name \NAME of the framework:
+intrusion detection functionality organisation optimisation.
 
-Figure \ref{fig:meta-model} shows the meta-model of the the semantic model.
+Figure \ref{fig:meta-model} shows the central part of the semantic model as
+implemented for \NAME.
 
 \tikzset{
   class/.style={
@@ -437,31 +456,49 @@ Figure \ref{fig:meta-model} shows the meta-model of the the semantic model.
     text width=1.75cm,
   },
   subclass/.style={thick,draw=black,>=open triangle 60,<-},
-  aggregate/.style={thick,draw=black,>=diamond,<-}
+  aggregate/.style={thick,draw=black,>=open diamond,<-},
+  composite/.style={thick,draw=black,>=diamond,<-},
+  dependency/.style={thick,>=latex,->}
 }
 
-\begin{figure}[H]
+\begin{figure}[ht]
+  \centering
+  \scalebox{.85}{
 \begin{tikzpicture}[
   edge from parent fork down,
-  sibling distance=5mm, level distance=20mm, node distance=8mm
+  sibling distance=5mm, level distance=20mm, node distance=6mm
   ]
   \node (model) [class] {Model}
-      child {node (module ) [class] {Module} edge from parent [aggregate]
-        child {node (strategy) [class,align=center,xshift=-9mm] {Execution\\Strategy} edge from parent [aggregate]
+      child {node (module) [class] {Module} edge from parent [composite]
+        child {node (strategy) [class,align=center,xshift=-9mm] {Execution\\Strategy} edge from parent [composite]
           child {node(every) [class,xshift=-9mm] {Every} edge from parent [subclass]}
           child {node (when) [class,xshift=9mm] {When} edge from parent [subclass]}
         }
-        child {node [class,xshift=9mm] {function} edge from parent [aggregate]}
+        child {node (function) [class,xshift=9mm] {Function} edge from parent [composite]}
       };
-  \node (constant) [class,right=of model] {Constant};
-  \node (scope)    [class,left=of strategy] {Scope};
+  \node (constant)  [class,right=of module]   {Constant};
+  \node (scope)     [class,left=of strategy]  {Scope};
+  \node (statement) [class,right=of function] {Statement};
+  \node (nodes)     [class,left=of module]    {Nodes\\Domain};
   
-  \draw [thick,>=latex,->] (strategy) -- (scope);
-  \draw [aggregate] (model) -- (constant);
+  \draw [aggregate]  (module)   -- (nodes);
+  \draw [composite]  (module)   -- (constant);
+  \draw [dependency] (strategy) -- (scope);
+  \draw [composite]  (function) -- (statement);
 \end{tikzpicture}
-\caption{Partial Semantic Model Meta-Model}
+}
+\caption{Partial Semantic Model for \NAME}
 \label{fig:meta-model}
 \end{figure}
+
+The concept driving this model is the structure starting at the \emph{Model} up
+to the \emph{Execution Strategy}. This structure surrounds the actual
+\emph{Function}s and underlying \emph{Statement}s and allows for interpretation
+and fusion of the algorithms.
+
+\subsection{Function Code Fusion}
+
+\TODO
 
 \subsection{Software Library}
 
