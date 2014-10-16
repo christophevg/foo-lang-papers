@@ -82,7 +82,7 @@ error-prone. To address this problem we introduce \NAME, a framework for the
 development of efficient intrusion detection systems (IDS). It consists of a
 domain specific language (DSL) that allows formally describing ID algorithms on
 a functional level. A code generator then fuses these algorithms and produces
-more optimally organised source code. This way, \NAME addresses the
+more optimally organized source code. This way, \NAME addresses the
 heterogeneity of both the IoT and ID, as well as the limited resources of IoT
 devices. A side-by-side comparison shows that generated code reduces memory
 footprint, message passing overhead and execution time in comparison to a
@@ -116,7 +116,7 @@ In mobile ad hoc networks (MANET), which make up an important part of the IoT,
 it is not possible to have this single point in the network that can oversee
 all traffic \cite{zhang2000intrusion, mishra2004intrusion}. If the outer
 security perimeter diminishes, every device has to implement its own lines of
-defence. Making the IDS a local service on each device requires resources,
+defense. Making the IDS a local service on each device requires resources,
 which are another important constraint: IoT devices typically have limited
 batteries, little processing power and memory is restricted to the bare minimum.
 
@@ -125,7 +125,7 @@ batteries, little processing power and memory is restricted to the bare minimum.
 Current developments in ID focus on programming frameworks to structure the
 implementation of different algorithms \cite{valero2012di} and offer the
 required basic functional components to implement actual algorithms
-\cite{krontiris2008lidea}, but don't offer a way to optimise the usage of
+\cite{krontiris2008lidea}, but don't offer a way to optimize the usage of
 resources. They also don't support systematic reuse to create different
 configurations for different nodes or evolution in time.
 
@@ -154,7 +154,7 @@ both the IoT, as a hardware and software platform, and ID algorithms.
 % 2. FCF to optimise
 
 The second contribution introduces functional code fusion (FCF) as a generation
-paradigm. FCF identifies common data and functions, and organises code in such
+paradigm. FCF identifies common data and functions, and organizes code in such
 a way that redundant iterations, tests and computations are eliminated. Our
 results show substantially improved memory usage, execution time and usage of
 the wireless radio, reducing energy consumption.
@@ -168,7 +168,7 @@ construct the framework, its domain specific language (DSL) and code generator.
 Section \ref{evaluation} evaluates an implementation and application of the
 framework. Section \ref{related} explores related work in the field of DSLs for
 ID and code generation for the IoT. Finally, section \ref{conclusion}
-summarises our findings, draws conclusions and identifies topics for future
+summarizes our findings, draws conclusions and identifies topics for future
 work.
 
 \section{Background}
@@ -212,7 +212,7 @@ listing \ref{alg:id-algo-pattern}.
   \Require{nodes, global storage for information about nodes}
   \Function{process\_message}{$msg$}
     \ForEach{$byte \in msg$} \label{alg:id-algo-pattern-loop1}
-     \State \dots \Comment{analyse byte-sequences}
+     \State \dots \Comment{analyze byte-sequences}
     \EndFor
     \Let{$nodes_x$}{value}  \Comment{optionally update node info}
     \State \Call{send}{$nodes_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send1}
@@ -277,7 +277,7 @@ serving only a fraction of the heterogeneous IoT.
 
 \subsection{Situation Summary}
 
-Starting from scratch allows optimising the implementation of an IDS, but
+Starting from scratch allows optimizing the implementation of an IDS, but
 doesn't scale. Reusing existing implementations also doesn't help, due to the
 far from optimal sequential execution of the algorithms and the redundant
 storage of common data. Software libraries can solve many of the issues, but
@@ -367,7 +367,7 @@ CodeDom\cite{dollard2004code}, we believe that for the level of functional
 transformations that need to be performed, a richer model is required.
 
 A semantic model \cite{fowler2010domain}, tied closely to the DSL itself, can
-fulfil this role. Semantic transformations can now be applied to create a
+fulfill this role. Semantic transformations can now be applied to create a
 code-oriented model, comparable to the idea of CodeDom. From there on,
 syntactic transformations an emit actual source code. Figure
 \ref{fig:code-generation} shows the overall procedure.
@@ -431,18 +431,18 @@ The DSL is parsed and imported into a semantic model. Based on the minimal type
 information present in the model, all remaining types are inferred. Through a
 series of semantic transformations, the model evolves from the functional to a
 more technical one, a code model. This code model can be considered as a rich
-AST with an extensive set of language constructs. Syntactic transformations now
-lower this level of expressiveness according to the desired platform and
-language. In the end the code model can be directly emitted to the target
-language.
+abstract syntax tree (AST) with an extensive set of language constructs.
+Syntactic transformations now lower this level of expressiveness according to
+the desired platform and language. In the end the code model can be directly
+emitted to the target language.
 
 \subsection{Semantic Model}
 
 The semantic model is the core of the solution. It offers a way to describe ID
 algorithms in a way that allows semantic reinterpretation. This way, the
-functionality of different algorithms can be reorganised to allow for more
+functionality of different algorithms can be reorganized to allow for more
 optimal execution and memory usage. Hence the name \NAME of the framework:
-intrusion detection functionality organisation optimisation.
+intrusion detection functionality organization optimization.
 
 Figure \ref{fig:meta-model} shows the central part of the semantic model as
 implemented for \NAME.
@@ -646,13 +646,13 @@ overhead, or 15\% in this simple case, this impact is affordable.
 
 From a functional point of view, the generated code lives up to the
 expectations: both the number of frames as the bytes sent benefit from well
-organised code and reuse of a common software library.
+organized code and reuse of a common software library.
 
 Finally we see that both algorithms by itself add an equal amount of time to
 the processing of a single event loop cycle, but when combined, the event loop
 is about 7\% faster compared to the manual case.
 
-Without any effort to optimise the software library, nor leveraging knowledge
+Without any effort to optimize the software library, nor leveraging knowledge
 about the specific algorithms, this very basic generated code shows that the
 proposed principles are not only theoretically feasible but actually result in
 interesting improvements.
