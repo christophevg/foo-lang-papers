@@ -255,13 +255,68 @@ most ingenious algorithm to perform software-based attestation.
 \section{A Design Pattern for ID Algorithms}
 \label{pattern}
 
+Given this classification, we now introduce a design pattern, common to these
+algorithms. It will allow us to define a strategy for optimizing the
+combination of these algorithms.
+
+From the classification and survey of several algorithms, we can extract two
+activities common to most algorithms: the inspection of network traffic and the
+evaluation of thresholds.
+
+The former is rather trivial. Network traffic is the carrier along which
+malicious payloads reach the device or where patterns of communication can be
+observed when other devices in the vicinity are affected by such payloads.
+
+The latter is more complex. An algorithm based on signature or misuse detection
+can sometimes undeniably be sure if an attack is real or not. But when dealing
+with anomaly detection this line might not be that crisp. Especially in
+distributed situations where even a neighbouring device can not be trusted,
+detecting intrusion is no absolute science. In this case one has to rely on
+statistics and thresholds to decide when to drop trust in a given device.
+
+Simply checking a threshold after updating a counter, is also not always a good
+strategy. A simple example is that of a watchdog\cite{mishra2004intrusion},
+observing the actions of other devices. There are valid reasons why a devices
+might miss its theoretical window in which certain actions are expected. Simply
+reacting on such basic threshold might result in false positives. A way to
+overcome this is to decouple the detection of problems and the decision what to
+do about it.
+
+This decoupling of detection and decision is the core of the design pattern for
+ID algorithms. Listing \ref{alg:id-algo-pattern} presents the design pattern in
+pseudo-code.
+
+\begin{figure}[!ht]
+\captionof{lstlisting}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
+\begin{algorithmic}[1]
+  \Require{nodes, global storage for information about nodes}
+  \Function{process\_message}{$msg$}
+    \ForEach{$byte \in msg$} \label{alg:id-algo-pattern-loop1}
+     \State \dots \Comment{analyze byte-sequences}
+    \EndFor
+    \Let{$nodes_x$}{value}  \Comment{optionally update node info}
+    \State \Call{send}{$nodes_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send1}
+  \EndFunction
+  \State
+  \Function{do\_housekeeping}{}
+    \ForEach{$node \in nodes$} \label{alg:id-algo-pattern-loop2} \label{alg:id-algo-pattern-common-data}
+      \If{$node > \dots$} \Comment{validate recorded value}
+        \State \dots \Comment{take actions}
+        \State \Call{send}{$node$, ``info''} \Comment{e.g. communicate} \label{alg:id-algo-pattern-send2}
+      \EndIf
+    \EndFor
+  \EndFunction
+  \State
+\end{algorithmic}
+\end{figure}
+
 \TODO
 
 In literature, many ID algorithm are described, but hardly any are implemented.
 If implementations would be available, one would typically apply a pattern as
 shown in listing \ref{alg:id-algo-application}.
 
-\begin{figure}[H]
+\begin{figure}[!ht]
 \captionof{lstlisting}{Sequential implementation of ID algorithms\label{alg:id-algo-application}}
 \begin{algorithmic}[1]
   \Let{$msg$}{$network$} \Comment{all observed messages}
@@ -285,29 +340,7 @@ This duality is a common design pattern of ID algorithms targeting MANETs. The
 internals of the pattern reveal more common structures, as illustrated in
 listing \ref{alg:id-algo-pattern}.
 
-\begin{figure}[H]
-\captionof{lstlisting}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
-\begin{algorithmic}[1]
-  \Require{nodes, global storage for information about nodes}
-  \Function{process\_message}{$msg$}
-    \ForEach{$byte \in msg$} \label{alg:id-algo-pattern-loop1}
-     \State \dots \Comment{analyze byte-sequences}
-    \EndFor
-    \Let{$nodes_x$}{value}  \Comment{optionally update node info}
-    \State \Call{send}{$nodes_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send1}
-  \EndFunction
-  \State
-  \Function{do\_housekeeping}{}
-    \ForEach{$node \in nodes$} \label{alg:id-algo-pattern-loop2} \label{alg:id-algo-pattern-common-data}
-      \If{$node > \dots$} \Comment{validate recorded value}
-        \State \dots \Comment{take actions}
-        \State \Call{send}{$node$, ``info''} \Comment{e.g. communicate} \label{alg:id-algo-pattern-send2}
-      \EndIf
-    \EndFor
-  \EndFunction
-  \State
-\end{algorithmic}
-\end{figure}
+
 
 The parts of interest here are the loops at lines
 \ref{alg:id-algo-pattern-loop1} and \ref{alg:id-algo-pattern-loop2}, the common
