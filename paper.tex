@@ -310,11 +310,9 @@ pseudo-code.
 \end{algorithmic}
 \end{figure}
 
-\TODO
-
-In literature, many ID algorithm are described, but hardly any are implemented.
-If implementations would be available, one would typically apply a pattern as
-shown in listing \ref{alg:id-algo-application}.
+We now extend the scope of the design pattern, to include its application. When
+implementing different algorithms, one will typically encounter a pattern such
+as describes in listing \ref{alg:id-algo-application}.
 
 \begin{figure}[!ht]
 \captionof{lstlisting}{Sequential implementation of ID algorithms\label{alg:id-algo-application}}
@@ -331,70 +329,45 @@ shown in listing \ref{alg:id-algo-application}.
 \end{algorithmic}
 \end{figure}
 
-The implementations would be linked and called in a sequential way, when new
-messages are observed on the network and at a regular interval to allow them to
-do internal housekeeping. This includes processing the information extracted
-from the network traffic, often in a statistical way.
+The different implementations would be linked and called in a sequential way,
+when new messages are observed on the network and at a regular interval to
+allow them to do internal housekeeping. 
 
-This duality is a common design pattern of ID algorithms targeting MANETs. The
-internals of the pattern reveal more common structures, as illustrated in
-listing \ref{alg:id-algo-pattern}.
-
-
-
-The parts of interest here are the loops at lines
-\ref{alg:id-algo-pattern-loop1} and \ref{alg:id-algo-pattern-loop2}, the common
-\emph{nodes} data on line \ref{alg:id-algo-pattern-common-data} and the
-interaction with the network at lines \ref{alg:id-algo-pattern-send1} and
-\ref{alg:id-algo-pattern-send2}.
+Given these patterns, we can now identify the problem areas that tend to result
+in suboptimal code when combining multiple ID algorithms.
 
 \subsection{Loops and Common Data}
 
-Given several ID algorithms, that all execute the same parsing loop, over the
-same byte stream, performing comparable operations to find similar patterns,
-one would clearly benefit from combining these loops, avoiding redundant
-reevaluation of the same byte patterns.
+Two issues arise from the nested loops that originate from the combination of
+the ID algorithm patterns and its application pattern. First, each algorithm,
+by itself, will parse each observed message on the network, processing the same
+byte stream, performing comparable operation to find similar patterns.
 
-The same goes for common data. Each algorithm not only has to parse the same
-message, it also has to store information about nodes within its own scope,
-resulting in a lot of duplicated information in memory.
+Second, there is common data: Each algorithm also has to store information
+about nodes within its own scope, resulting in a lot of duplicated information
+in memory.
 
-The only way to solve this, would be to change the provided implementation,
-pulling up the loops over the message and the nodes to a level above the loop
-over the algorithms. But this comes at a development cost. This cost typically
-isn't a one-time cost, e.g. in case a new version of the algorithm is released,
-or simply when a different set of algorithms is selected due to a changing risk
-analysis. Finally, changing, or simply implementing the algorithms from
-scratch, also holds the risk of making mistakes.
+Reimplementing the algorithms to eliminate these issues is not a valid option.
+This development cost typically isn't a one-time cost, e.g. in case a new
+version of the algorithm is released, or simply when a different set of
+algorithms is selected due to a changing risk analysis. Finally, changing, or
+simply implementing the algorithms from scratch, also holds the risk of making
+mistakes.
 
 \subsection{Network Usage}
 
-But there are hardly any implementations readily available. Probably the main
-reason for this is the heterogeneity of the IoT. A prime example is the
-\ttt{SEND} function. Different software stacks will have different application
-programming interfaces (APIs) for accessing the network. Simple, macro-like
-solutions can overcome this, but the dispersion of the calls to access the
-network is causing the wireless radio to be on a lot more that one would hope
-for.
+A third issue is hidden in the use of the network. The calls to the \ttt{SEND}
+function are scattered around the algorithm, causing the wireless radio to be
+accessed multiple times, keeping it active and energy consuming.
 
-A valid solution would try to combine messages in a single instance, reducing
-the access to the network and even sharing some network overhead. The impact to
-implement this manually will again outweigh the gain. An option would be to use
-a software library, that provides a unified API for accessing the network and
-collects individual calls and combines them in a single network message.
+The heterogeneity of the IoT devices, results in many different software
+stacks, each with their own network API. This also explains why there are very
+few implementations readily available to developers, their is no common
+platform to target.
 
-Besides the fact that all researchers would have to use the same library in a
-consistent way, they would limit their operational scope to a single language,
-serving only a fraction of the heterogeneous IoT.
-
-\subsection{Situation Summary}
-
-Starting from scratch allows optimizing the implementation of an IDS, but
-doesn't scale. Reusing existing implementations also doesn't help, due to the
-far from optimal sequential execution of the algorithms and the redundant
-storage of common data. Software libraries can solve many of the issues, but
-only cover parts of the entire spectrum, due to their tie-in with languages and
-frameworks.
+Even using a unified software library would not only require a consistent
+implementation of it, but would also limit the operational scope of the
+research implementation, still restricting it to a single language.
 
 \section{Design}
 \label{design}
