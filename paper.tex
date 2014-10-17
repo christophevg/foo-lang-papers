@@ -60,8 +60,8 @@
 \expandafter\def\csname PY@tok@err\endcsname{}
 
 \title{
-Introducing the \NAME Framework\\
-for Efficient Intrusion Detection\\
+The \NAME Framework:\\
+Efficient Intrusion Detection\\
 in the Internet of Things
 }
 
@@ -96,10 +96,15 @@ straightforward sequential implementation of the same algorithms.
 
 % IoT + threat
 
-Along with its potential, the IoT also presents a significant threat: by
-opening our smart homes \cite{aldrich2003smart} and personal data to all these
+The IoT presents a great potential to positively influence our daily work and
+life: domotics, assisted living, e-health and enhanced learning are only a few
+examples\cite{atzori2010internet}. But with this potential the IoT also
+presents a significant threat: by opening our smart homes
+\cite{aldrich2003smart} and personal data\cite{weber2010internet} to all these
 interconnected devices, we also open them to everyone who is able to break
-these new, virtual locks, often without leaving a trace.
+these new, virtual locks. IoT devices typically have limited batteries, little
+processing power and memory is restricted to the bare minimum. These properties
+make it hard to add any additional service, including security.
 
 % classic networks: fw and central ids
 
@@ -108,17 +113,16 @@ filtering unwanted packets and protecting the entire internal network. But
 attacks on flaws in services can pass unnoticed. This is where intrusion
 detection (ID) steps in: an ID probe monitors all traffic that passes through
 the firewall, looking for patterns and optionally alerting the firewall if a
-malicious pattern is detected \cite{denning1987intrusion}.
+malicious pattern is detected\cite{denning1987intrusion}.
 
 % manet: local ids -> localize -> limited resources
 
-In mobile ad hoc networks (MANET), which make up an important part of the IoT,
-it is not possible to have this single point in the network that can oversee
-all traffic \cite{zhang2000intrusion, mishra2004intrusion}. If the outer
-security perimeter diminishes, every device has to implement its own lines of
-defense. Making the IDS a local service on each device requires resources,
-which are another important constraint: IoT devices typically have limited
-batteries, little processing power and memory is restricted to the bare minimum.
+In wireless networks of resource constraint devices, which make up an important
+part of the IoT, it is not possible to have this single point in the network
+that can oversee all traffic \cite{zhang2000intrusion, mishra2004intrusion}. If
+the outer security perimeter diminishes, every device has to implement its own
+lines of defense. Making the IDS a local service on each device requires
+resources, which are already very constraint.
 
 % gap analysis
 
@@ -133,12 +137,10 @@ configurations for different nodes or evolution in time.
 
 The IoT is a heterogeneous environment, both in hardware and software.
 Addressing this in a transparent and automated way is a key success factor for
-any kind of development in this area. For a non-functional layer, such as ID,
-this aspect becomes even more paramount.
-
-A solution that supports the integration of multiple algorithms on IoT devices
-needs to consider the impact on their resources. Different algorithms should be
-merged to avoid accumulating their impact.
+any kind of development in this area. A solution that supports the integration
+of multiple algorithms on IoT devices needs to consider the impact on their
+resources. Different algorithms should be merged to avoid accumulating their
+impact.
 
 % my approach merged into ...
 % scientific contribution
@@ -161,22 +163,125 @@ the wireless radio, reducing energy consumption.
 
 % structure
 
-The remainder of this paper proceeds as follows: section \ref{background}
-details some of the ideas behind FCF and identifies the different aspects of
-the problem space. Section \ref{design} describes the design we applied to
-construct the framework, its domain specific language (DSL) and code generator.
-Section \ref{evaluation} evaluates an implementation and application of the
-framework. Section \ref{related} explores related work in the field of DSLs for
-ID and code generation for the IoT. Finally, section \ref{conclusion}
-summarizes our findings, draws conclusions and identifies topics for future
-work.
+The remainder of this paper proceeds as follows: section \ref{landscape} takes
+a look at ID algorithms and classifies them. Section \ref{analysis} looks for
+patterns in the implementation of these classes of algorithms, details some of
+the ideas behind FCF and identifies the different aspects of the problem space.
+Section \ref{design} describes the design we applied to construct the
+framework, its domain specific language (DSL) and code generator. Section
+\ref{evaluation} evaluates an implementation and application of the framework.
+Section \ref{related} explores related work in the field of DSLs for ID and
+code generation for the IoT. Finally, section \ref{conclusion} summarizes our
+findings, draws conclusions and identifies topics for future work.
 
-\section{Background}
-\label{background}
+\section{Landscape of ID Algorithms}
+\label{landscape}
 
-The underlying problem addressed in this paper is of an economic nature: adding
-ID doesn't add functionality, so its impact should be reduced as much as
-possible.
+Research into ID in wireless networks typically focuses on two major topics
+that complement the architecture: the devices as single entities and the
+network as a group of such devices. Both are important because the group cannot
+make a decision without members that detect malicious behavior and a
+group-based decision is often needed because nodes can easily miss out on
+certain events that could indicate intrusions, due to their wireless and
+not-always-on nature.
+
+\subsection{Detecting Intrusions}
+\label{subsection:detecting}
+
+There are different ways to construct a taxonomy for intrusion detection, but
+common themes do appear. According to \cite{mishra2004intrusion} and
+\cite{ioannis2007towards} there are three major categories: anomaly detection,
+signature or misuse detection, and specification-based detection. In
+\cite{alrajeh2013intrusion} the authors mostly agree with this topology, but
+add the notion of hybrid intrusion detection systems and cross layer intrusion
+detection systems as recent advances in research. Although these additional
+categories offer very interesting prospects, the authors have to admit that the
+impact on the resource-constrained sensor nodes might still be too high.
+
+The meshed network topology of WSNs and its routing protocols have produced
+many related attacks and each of these attacks has been the focus of many
+research papers presenting algorithms to detect them. In the following
+paragraphs we take a look at some popular ones.
+
+In a wormhole attack, an artificial low-latency link is created between two
+distant nodes in the network. This causes the routing protocol to divert more
+traffic through this link, offering the attacker an abundance of packets to
+inspect. In \cite{maheshwari2007detecting} an algorithm is proposed to allow
+nodes to determine if a wormhole is actively present. In essence, the algorithm
+relies on the exchange of neighbour lists to allow nodes to determine if
+unexpected substructures are present in the graph representing the network.
+
+Another attack that is related to the wormhole is the sinkhole. When launching
+a sinkhole attack, as described in \cite{krontiris2008launching}, the attacker
+first needs to compromise an existing node. Being in control of the node, the
+attacker can make his captured node look more \emph{attractive} to the
+surrounding nodes and thus draw more traffic to itself. The sinkhole attack is
+typically a foundation for other routing level attacks, such as selective
+forwarding, modification of packets or even dropping them altogether. In its
+simplest form, the sinkhole offers the attacker with lots of packets to analyze
+and use to gather information about the network and its functionality.
+
+Detecting sinkholes is very hard and is often only possible based on other
+attacks that are supported by the sinkhole. When the sinkhole is used to
+implement selective forwarding, \cite{ngai2006intruder} proposes an algorithm
+that allows a base station, the aggregating master node to which all nodes
+typically send their information, to observe missing data from nodes in the
+same area in a statistical way.
+
+More typical attacks such as flooding, the sybil attack, rushing\dots are
+amongst others presented in \cite{wood2002denial} and \cite{djenouri2005survey}.
+
+\subsection{Cooperative Decision Making}
+\label{subsection:coorperative}
+
+As in many other situations, a group is often stronger than the sum of its
+individual components. This is surely the case for WSNs. Because not all nodes
+are always actively participating in the network, some nodes might miss clues
+that would otherwise lead them to detect intrusions. It is hardly impossible
+for a single node to detect a complex attack by itself. Therefore a second
+important research topic consists of cooperative algorithms to combine
+information from single nodes into a group-based decision about alleged
+intrusions.
+
+In \cite{krontiris2009cooperative}, the authors first present a theoretical
+foundation to analyze cooperative algorithms. Given these foundations they
+continue to present an algorithm consisting of 5 phases. It essentially
+implements a voting system based on the Guy Fawkes protocol
+\cite{anderson1998new} to identify an intruder. It enables the exchange of
+suspected intruder information and allows distributed authentication of those
+\emph{votes}. Based on these authenticated votes, a distributed decision can be
+made about the commonly identified intruder.
+
+A distributed, cooperative algorithm can sometimes be implemented locally. This
+is illustrated by the reputation-based detection algorithm introduced in
+\cite{ganeriwal2008reputation}. Using this algorithm, nodes can exchange
+information about the reputation of other nodes. Combining this information
+allows them to decide about their trust in a given node, based on more than
+their own, often partial, observations.
+
+\subsection{Software Attestation}
+\label{subsection:attestation}
+
+A research topic that exists in parallel to the detection and cooperation
+duality is software attestation. Software attestation offers algorithms for
+exchanging information about the software that is running on a node, and aims
+to identify nodes that can no longer prove that their content is unaltered.
+Examples of evolving algorithms to implement this functionality include SWATT
+\cite{seshadri2004swatt}, ICE/SCUBA \cite{seshadri2006scuba} and SAKE
+\cite{seshadri2008sake}.
+
+Software attestation is hard and many details can cause an algorithm to fail.
+Interesting is the discussion surrounding this topic that was started by
+\cite{castelluccia2009difficulty}, in response to the previously mentioned
+papers. In \cite{perrig2010refutation} the authors of the original papers
+counter many of the objections made to their work, but the general feeling is
+that even in the best conditions, there is always a way to circumvent even the
+most ingenious algorithm to perform software-based attestation.
+
+\section{Analysis of ID Algorithms}
+\label{analysis}
+
+\TODO
 
 In literature, many ID algorithm are described, but hardly any are implemented.
 If implementations would be available, one would typically apply a pattern as
