@@ -187,6 +187,12 @@ group-based decision is often needed because nodes can easily miss out on
 certain events that could indicate intrusions, due to their wireless and
 not-always-on nature.
 
+These two topics lead to the first two classes: detecting intrusions and
+cooperative decision making. We also identify software attestation as a third
+class. Although it can be considered as a special case of a combination of both
+other classes, its focus is not on the detection of intrusions, but on the
+effect of an intrusion on the system itself.
+
 \subsection{Detecting Intrusions}
 \label{detection}
 
@@ -198,14 +204,38 @@ signature or misuse detection, and specification-based detection. In
 add the notion of hybrid intrusion detection systems and cross layer intrusion
 detection systems as recent advances in research. Although these additional
 categories offer very interesting prospects, the authors have to admit that the
-impact on the resource-constrained sensor nodes might still be too high.
+impact on the resource-constrained devices might still be too much. We
+therefore focus on the three categories agreed upon by most sources.
+
+\begin{LaTeXdescription}
+  
+  \item[Anomaly detection] considers a baseline profile and evaluates all
+  activity according to this profile. Aberrant behavior is flagged as a
+  possible intrusion, but this is no exact science. The baseline profile can
+  evolve over time, especially in wireless and mobile environments. The flagged
+  incidents should therefore also be handled with care and no absolute
+  decisions can be made from single events.
+  
+  \item[Signature or misuse detection] starts with known patterns of attacks
+  and tries to find evidence in the actions of and communication with a device.
+  Because many attacks use valid ways to communicate with services on the
+  devices, this can also produce false positives and offers no black and white
+  certainty.
+  
+  \item[Specification-based detection] uses constraints that describe the
+  correct behavior of the system. Although that this approach can detect
+  previously unknown attacks, it can sometimes not detect specific attacks that
+  can be detected by anomaly or misuse detection.
+  
+\end{LaTeXdescription}
 
 \subsection{Cooperative Decision Making}
 \label{coorperative}
 
 These taxonomies focus on the act of detecting intrusions themselves. In a
 highly distributed environment, an orthogonal categorization, dealing with the
-distributed nature of the network, may be even more important.
+distributed nature of the network and its ways of communicating, may be even
+more important.
 
 As in many other situations, a group is often stronger than the sum of its
 individual components. Because not all devices are always actively
@@ -214,24 +244,32 @@ them to detect intrusions. It is hardly impossible for a single device to
 detect a complex attack by itself. Therefore a second important research topic
 consists of cooperative algorithms to combine information from single
 identities into a group-based decision about alleged
-intrusions\cite{zhang2000intrusion}.
+intrusions\cite{zhang2000intrusion}. We identify two ways by which this
+cooperative decision making can be constructed and focus on the way
+participants exchange information: broadcasting and interactive.
 
-A distributed, cooperative algorithm can sometimes be implemented locally. This
-is illustrated by the reputation-based detection algorithm introduced in
-\cite{ganeriwal2008reputation}, based on the same principle of a watchdog also
-found in \cite{mishra2004intrusion} Using this algorithm, nodes can exchange
-information about the reputation of other nodes. Combining this information
-allows them to decide about their trust in a given node, based on more than
-their own, often partial, observations alone.
+\begin{LaTeXdescription}
 
-In \cite{krontiris2009cooperative}, the authors first present a theoretical
-foundation to analyze cooperative algorithms. Given these foundations they
-continue to present an algorithm consisting of 5 phases. It essentially
-implements a voting system based on the Guy Fawkes
-protocol\cite{anderson1998new} to identify an intruder. It enables the exchange
-of suspected intruder information and allows distributed authentication of
-those \emph{votes}. Based on these authenticated votes, a distributed decision
-can be made about the commonly identified intruder.
+  \item[Broadcasting] can sometimes allow a distributed, cooperative algorithm
+  to be implemented locally. This is illustrated by the reputation-based
+  detection algorithm introduced in \cite{ganeriwal2008reputation}, based on
+  the same principle of a watchdog also found in \cite{mishra2004intrusion}
+  Using this algorithm, nodes can exchange information about the reputation of
+  other nodes, using only broadcasted messages. Combining this information
+  allows them to decide about their trust in a given node, based on more than
+  their own, often partial, observations alone.
+
+  \item[Interactive] communication allows algorithms to exchange information to
+  reach a consensus. In \cite{krontiris2009cooperative}, the authors first
+  present a theoretical foundation to analyze cooperative algorithms. Given
+  these foundations they continue to present an algorithm consisting of 5
+  phases. It essentially implements a voting system based on the Guy Fawkes
+  protocol\cite{anderson1998new} to identify an intruder. It enables the
+  exchange of suspected intruder information and allows distributed
+  authentication of those \emph{votes}. Based on these authenticated votes, a
+  distributed decision can be made about the commonly identified intruder.
+
+\end{LaTeXdescription}
 
 \subsection{Software Attestation}
 \label{subsection:attestation}
@@ -244,43 +282,67 @@ family of algorithms to implement this functionality are
 SWATT\cite{seshadri2004swatt}, ICE/SCUBA\cite{seshadri2006scuba} and
 SAKE\cite{seshadri2008sake}.
 
-Software attestation is hard and many details can cause an algorithm to fail.
-Interesting is the discussion surrounding this topic that was started by
-\cite{castelluccia2009difficulty}, in response to the previously mentioned
-papers. In \cite{perrig2010refutation} the authors of the original papers
-counter many of the objections made to their work, but the general feeling is
-that even in the best conditions, there is always a way to circumvent even the
-most ingenious algorithm to perform software-based attestation.
+Software attestation is hard and many details can cause an algorithm to fail. A
+discussion surrounding this topic, started by \cite{castelluccia2009difficulty}
+in response to the previously mentioned papers, illustrates this. In
+\cite{perrig2010refutation} the authors of the original papers counter many of
+the objections made to their work, but the general feeling is that even in the
+best conditions, there is always a way to circumvent the most ingenious
+algorithm to perform software-based attestation.
+
+Within the context of this paper, we will not consider software attestation as
+a special class and exclude it from our scope, only focusing on detecting
+intrusions and distributed decision making.
+
+Figure \ref{fig:classification} gives a visual overview of the classification
+presented above.
+
+\begin{figure}[!ht]
+  \centering
+  \scalebox{.85}{
+\begin{tikzpicture}[
+  sibling distance=20mm,node distance=40mm
+  ]
+  \node (detection)             [align=center] {Detecting\\Intrusions}
+    child {node (anomaly)       [align=center] {Anomaly}}
+    child {node (signature)     [align=center] {Signature\\Misuse}}
+    child {node (specification) [align=center] {Specification}};
+  \node (decision)              [align=center,right=of detection] {Decision\\Making}
+    child {node (broadcasting)  [align=center] {Broadcasting}}
+    child {node (interactive)   [align=center] {Interactive}};
+\end{tikzpicture}
+}
+  \caption{Classification of ID Algorithms}
+  \label{fig:classification}
+\end{figure}
 
 \section{A Design Pattern for ID Algorithms}
 \label{pattern}
 
-Given this classification, we now introduce a design pattern, common to these
-algorithms. It will allow us to define a strategy for optimizing the
-combination of these algorithms.
+Given this classification, we now introduce a design pattern that identifies
+common aspects of these algorithms. It will allow us to define a strategy for
+optimizing the combination of these algorithms. From the classification and
+survey of several algorithms, we extract two activities common to most
+algorithms: the inspection of network traffic and the evaluation of thresholds.
 
-From the classification and survey of several algorithms, we can extract two
-activities common to most algorithms: the inspection of network traffic and the
-evaluation of thresholds.
+The former is trivial: network traffic is the carrier along which malicious
+payloads reach the device or where patterns of communication can be observed
+when other devices in the vicinity are affected by such payloads.
 
-The former is rather trivial. Network traffic is the carrier along which
-malicious payloads reach the device or where patterns of communication can be
-observed when other devices in the vicinity are affected by such payloads.
-
-The latter is more complex. An algorithm based on signature or misuse detection
-can sometimes undeniably be sure if an attack is real or not. But when dealing
-with anomaly detection this line might not be that crisp. Especially in
-distributed situations where even a neighbouring device can not be trusted,
+The latter is more complex: an algorithm based on signature or misuse detection
+maybe sometimes can undeniably decide if an attack is real or not. But when
+dealing with anomaly detection this line surely isn't that crisp. Especially in
+distributed situations where even a neighboring device can not be trusted,
 detecting intrusion is no absolute science. In this case one has to rely on
 statistics and thresholds to decide when to drop trust in a given device.
 
-Simply checking a threshold after updating a counter, is also not always a good
-strategy. A simple example is that of a watchdog\cite{mishra2004intrusion},
-observing the actions of other devices. There are valid reasons why a devices
-might miss its theoretical window in which certain actions are expected. Simply
-reacting on such basic threshold might result in false positives. A way to
-overcome this is to decouple the detection of problems and the decision what to
-do about it.
+Simply checking a threshold after updating some counter, is also not always a
+good strategy. A simple example is that of a
+watchdog\cite{mishra2004intrusion}, observing the actions of other devices.
+There are valid reasons why a devices might miss the theoretical window in
+which certain actions are expected. Simply reacting on such basic threshold
+might result in false positives. A way to overcome this is to decouple the
+detection of problems and the decision what to do about them.
 
 This decoupling of detection and decision is the core of the design pattern for
 ID algorithms. Listing \ref{alg:id-algo-pattern} presents the design pattern in
@@ -310,9 +372,10 @@ pseudo-code.
 \end{algorithmic}
 \end{figure}
 
-We now extend the scope of the design pattern, to include its application. When
-implementing different algorithms, one will typically encounter a pattern such
-as describes in listing \ref{alg:id-algo-application}.
+We now extend the scope of the design pattern, to include its application in
+the context of multiple algorithms. When implementing different algorithms, one
+will typically encounter a pattern such as describes in listing
+\ref{alg:id-algo-application}.
 
 \begin{figure}[!ht]
 \captionof{lstlisting}{Sequential implementation of ID algorithms\label{alg:id-algo-application}}
@@ -331,7 +394,7 @@ as describes in listing \ref{alg:id-algo-application}.
 
 The different implementations would be linked and called in a sequential way,
 when new messages are observed on the network and at a regular interval to
-allow them to do internal housekeeping. 
+allow them to do internal housekeeping, such as threshold evaluation. 
 
 Given these patterns, we can now identify the problem areas that tend to result
 in suboptimal code when combining multiple ID algorithms.
@@ -347,14 +410,14 @@ Second, there is common data: Each algorithm also has to store information
 about nodes within its own scope, resulting in a lot of duplicated information
 in memory.
 
-Reimplementing the algorithms to eliminate these issues is not a valid option.
-This development cost typically isn't a one-time cost, e.g. in case a new
-version of the algorithm is released, or simply when a different set of
+Reimplementing the algorithms manually to eliminate these issues is not a valid
+option. This development cost typically isn't a one-time cost, e.g. in case a
+new version of the algorithm is released, or simply when a different set of
 algorithms is selected due to a changing risk analysis. Finally, changing, or
 simply implementing the algorithms from scratch, also holds the risk of making
 mistakes.
 
-\subsection{Network Usage}
+\subsection{Network Usage and Heterogeneity}
 
 A third issue is hidden in the use of the network. The calls to the \ttt{SEND}
 function are scattered around the algorithm, causing the wireless radio to be
@@ -362,8 +425,8 @@ accessed multiple times, keeping it active and energy consuming.
 
 The heterogeneity of the IoT devices, results in many different software
 stacks, each with their own network API. This also explains why there are very
-few implementations readily available to developers, their is no common
-platform to target.
+few implementations readily available to developers: there is no common
+platform to target for researchers.
 
 Even using a unified software library would not only require a consistent
 implementation of it, but would also limit the operational scope of the
@@ -432,18 +495,19 @@ opportunities of such a formal description include generation of code in a
 variety of languages, each with possibly different types, also results the need
 for a more functional approach to types.
 
-Listing \ref{lst:heartbeat} illustrates some of the features mentioned above,
-using a small but representative example of an algorithm: a heartbeat. Using a
-heartbeat, nodes can broadcast a message at a regular interval, allowing other
-nodes to monitor its availability. Missing heartbeats could indicate problems,
-such as physical capturing of a certain node.
+Listing \ref{lst:watchdog} illustrates some of the features mentioned above,
+using a small but representative example of an algorithm: a
+watchdog\cite{mishra2004intrusion}. Using a heartbeat, nodes can broadcast a
+message at a regular interval, allowing other nodes to monitor its
+availability. Missing heartbeats could indicate problems, such as physical
+capturing of a certain node.
 
 \lstinputlisting[
   float,
   basicstyle=\small\ttfamily,
-  label=lst:heartbeat,
+  label=lst:watchdog,
   caption=Heartbeat in \NAME
-]{src/heartbeat.foo}
+]{src/watchdog.foo}
 
 \subsection{Code Generator}
 

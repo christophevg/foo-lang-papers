@@ -18,6 +18,7 @@ extend nodes with {
   fail_count : byte      = 0
   sane       : boolean   = true
 }
+
 // validation
 @every(validation_interval)
 with nodes do function(node) {
@@ -30,23 +31,18 @@ with nodes do function(node) {
 }
 
 // handle all network traffic
-after nodes receive do
-function(me, sender, from, hop, to, payload) {
-  // "parse" using pattern matching
-  case payload {
-    contains([ #heartbeat, time:timestamp,
-               seq, signature:byte[20] ])
-    {
-      if(from == me ) { return }
-      if(! from.sane) { return }
-      // check signature
-      if(sha1_cmp(signature, [seq, time])) {
-        from.last_seen = now()
-        from.sequence  = seq
-      } else {
-        from.fail_count++
-      }
-    }
+after nodes receive message
+containing [ #heartbeat, time:timestamp,
+             seq, signature:byte[20] ]
+do function(me, sender, from, hop, to, payload) {
+  if(from == me ) { return }
+  if(! from.sane) { return }
+  // check signature
+  if(sha1_cmp(signature, [seq, time])) {
+    from.last_seen = now()
+    from.sequence  = seq
+  } else {
+    from.fail_count++
   }
 }
 
