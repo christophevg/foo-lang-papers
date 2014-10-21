@@ -1,17 +1,16 @@
 // group functions and definitions
-module heartbeat
+module watchdog
 
 const hb_interval         = 3000  // ms
 const validation_interval = 5000  // ms
 const max_fail_count      =    3
 
-// import external functionality
+// external functionality
 from crypto import sha1(byte*) : byte[20]
-from crypto
-  import sha1_cmp(byte*, byte*) : boolean
+from crypto import sha1_cmp(byte*, byte*) : boolean
 from time   import now() : timestamp
 
-// extend domain with custom properties
+// add custom properties to domain
 extend nodes with {
   sequence   : byte      = 0
   last_seen  : timestamp = now()
@@ -19,37 +18,42 @@ extend nodes with {
   sane       : boolean   = true
 }
 
-// validation
-@every(validation_interval)
-with nodes do function(node) {
-  if(now() - node.last_seen > hb_interval) {
-    node.fail_count++
-  }
-  if(node.fail_count > max_fail_count) {
-    node.sane = false
+// handle all network traffic
+after nodes receive message
+containing [ !!#heartbeat!!, time:timestamp,
+             seq, signature:byte[20] ]
+do function(me, sender, @@from@@, hop, to, payload) {
+  if(@@from@@ == me ) { return }
+  if(! @@from@@.sane) { return }
+  // check signature
+  if(sha1_cmp(signature, [seq, time])) {
+    @@from@@.last_seen = now()
+    @@from@@.sequence  = seq
+  } else {
+    @@from@@.fail_count++
   }
 }
 
-// handle all network traffic
-after nodes receive message
-containing [ #heartbeat, time:timestamp,
-             seq, signature:byte[20] ]
-do function(me, sender, from, hop, to, payload) {
-  if(from == me ) { return }
-  if(! from.sane) { return }
-  // check signature
-  if(sha1_cmp(signature, [seq, time])) {
-    from.last_seen = now()
-    from.sequence  = seq
-  } else {
-    from.fail_count++
-  }
+// keep track of failures
+@every(validation_interval)
+with node in nodes
+having now() - node.last_seen > hb_interval
+do function(offender) {
+  offender.fail_count++
+}
+
+// keep track of sanity
+@every(validation_interval)
+with node in nodes
+having node.fail_count > max_fail_count
+do function(offender) {
+  offender.sane = false
 }
 
 function broadcast_heartbeat(node) {
   time = now()
   nodes.broadcast([
-    #heartbeat, node.sequence,
+    !!#heartbeat!!, node.sequence,
     time, sha1([node.sequence, time])
   ])
   node.sequence++

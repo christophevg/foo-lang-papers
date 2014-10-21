@@ -501,12 +501,20 @@ watchdog\cite{mishra2004intrusion}. Using a heartbeat, nodes can broadcast a
 message at a regular interval, allowing other nodes to monitor its
 availability. Missing heartbeats could indicate problems, such as physical
 capturing of a certain node.
+\lstdefinelanguage{foo-lang}{
+  emph={module,const,from,import,extend,with,after,do,function,@every,having},
+  emphstyle={\textbf},
+  morecomment=[l]{//},
+  moredelim=[is][]{@@}{@@},       % temp solution to allow keywords without emph
+  moredelim=[is][\emph]{!!}{!!}   % temp solution to hightlight #atoms
+}
 
 \lstinputlisting[
+  language=foo-lang,
   float,
-  basicstyle=\small\ttfamily,
+  basicstyle=\footnotesize\ttfamily\color{black},
   label=lst:watchdog,
-  caption=Heartbeat in \NAME
+  caption=Watchdog in \NAME
 ]{src/watchdog.foo}
 
 \subsection{Code Generator}
