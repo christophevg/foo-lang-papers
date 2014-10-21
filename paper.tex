@@ -263,7 +263,7 @@ participants exchange information: broadcasting and interactive.
   reach a consensus. In \cite{krontiris2009cooperative}, the authors first
   present a theoretical foundation to analyze cooperative algorithms. Given
   these foundations they continue to present an algorithm consisting of 5
-  phases. It essentially implements a voting system based on the Guy Fawkes
+  phases. It essentially implements a voting system-based on the Guy Fawkes
   protocol\cite{anderson1998new} to identify an intruder. It enables the
   exchange of suspected intruder information and allows distributed
   authentication of those \emph{votes}. Based on these authenticated votes, a
@@ -443,64 +443,63 @@ consisting of a DSL, code generator and software library.
 The DSL enables researchers to formally describe their ID algorithms, without
 focusing on any specific language or platform. Given such formal descriptions
 of ID algorithms, a code generator is now able to combine these, while avoiding
-the problems arising from the sequential patterns/problems presented in
-listings \ref{alg:id-algo-application} and \ref{alg:id-algo-pattern}. It can
-also target different languages and platforms, while reusing a software library
-that provides e.g. message parsing, network access wrapping,\dots
+the problems arising from the patterns/problems presented in listings
+\ref{alg:id-algo-application} and \ref{alg:id-algo-pattern}. It can also target
+different languages and platforms, while reusing a software library that
+provides e.g. message parsing, network access wrapping,\dots
 
-\subsection{DSL}
+\subsection{The Meaning of Loops}
 
-\TODO
+From the design patterns we learned that loops are a major contributor to the
+problem of algorithm fusibility. Loops in program code are technical constructs
+and in fact often hide the actual intended functionality.
 
-The DSL component of \NAME has two major goals and one minor: (1) allow the
-description of ID algorithms in a formal way and (2) avoid that those
-descriptions contain \emph{non-fusible} logic and/or data. Besides these (3)
-the usability of the language is also taken into account.
+To illustrate this, we take the example of parsing network messages. Each
+algorithm deals with parsing in the same way: loop over the bytes in the
+payload and look for a pattern that identifies what the algorithm is looking
+for. This is in fact a technical implementation choice. The underlying
+functional goal is to react when such pattern is present in a message. The loop
+has \emph{activated} this functionality, but the real goal is to
+\emph{passively} react on an event, not \emph{actively} look for it.
 
-The first goal is covered by the construction of the language itself. Given a
-description of an ID algorithm using the DSL, the algorithm can be
-unambiguously interpreted. The DSL borrows a lot of its syntax from C-like
-languages, dropping only a small subset of its capabilities, but replacing
-those with other higher-level constructs taken from object-oriented (OO)
-languages, aspect-orientation,\dots
+This is how \NAME removes the need for loops: by introducing event handling,
+constructions with loops are transformed to their functional meaning, allowing
+much easier identification and fusion of common functionalities.
 
-The most important omission from the C syntax are basic loops. Loops are very
-generic and make it hard to identify if they deal with the same logic and/or
-data. Fusing these loops across different algorithms is often non-trivial. In
-\NAME's DSL, other constructs have been introduced to lift the definition of
-these loops to a more functional level: scheduling and scoping of the execution
-of functions, reacting to events and pattern matching are three examples that
-allow describing the actual meaning of loops in stead of simply the loop
-itself. It sometimes requires rethinking the reason behind a technical loop,
-but often results in a much clearer description.
+The same goes for actively polling some variable until it reaches a certain
+threshold. This also can be transformed to an event, eliminating the need for a
+technical loop-construction.
 
-To deal with common data, the domain provides the notion of \emph{nodes}. As
-most, if not all, ID algorithms targeting the IoT require some notion of the
-other nodes or devices in the vicinity, the DSL makes this the primary
-information carrier. All functional constructs, mentioned above, typically
-operate on the collection of known nodes, or a functionally defined subset of
-that. Each algorithm also has the possibility to \emph{extend} nodes, adding
-its own properties needed for its execution.
+\subsection{A DSL for Nodes}
 
-Based on a C-like syntax the language is also very accessible. To further
-nurture the usability, syntactic sugar from OO languages is also adopted.
-Because not everything should be implemented in such a high-level language, it
-also provides a way to \emph{import} external functionality. In the first place
-this will include a standard library of functions that can be called, but it
-can include any custom built software component. Finally it tries to limit the
-need for type information and performs as much type inference as possible. As
-it aims to be language that describes algorithms on a functional level it seeks
-to safeguard its users from these \emph{technicalities}. The fact that the
-opportunities of such a formal description include generation of code in a
-variety of languages, each with possibly different types, also results the need
-for a more functional approach to types.
+The second problem that could be observed from the patterns, was that of common
+data. All algorithms deal with information about neighboring devices. To
+centralize this information \NAME provides a unified \texttt{nodes} concept as
+part of its DSL and exposes it as an object to the implementor.
+
+Nodes can be extended with properties only available to the algorithm that
+defines them. This way only one instance for every known devices will be
+present in memory. Finally, nodes can define a scope for some function to be
+executed in. This way, nodes also offer a way to iterate all known devices,
+again without the need for a loop.
+
+\subsection{Unified Messaging}
+
+Sending and receiving of network messages is tightly integrated with the
+previously mentioned concepts of event handling and the nodes domain. An
+underlying software framework will handle all interaction with the network,
+triggering functions by means of events when new messages are parsed and
+exposing an API to send messages through the nodes domain. This approach gives
+the framework complete control over the way messages are sent, allowing
+optimized marshaling, grouping,\dots
 
 Listing \ref{lst:watchdog} illustrates some of the features mentioned above,
 using a small but representative example of an algorithm: a
-watchdog\cite{mishra2004intrusion}. Using a heartbeat, nodes can broadcast a
+watchdog\cite{mishra2004intrusion}. Like a heartbeat, nodes can broadcast a
 message at a regular interval, allowing other nodes to monitor its
 availability. Missing heartbeats could indicate problems, such as physical
-capturing of a certain node.
+capturing of a device.
+
 \lstdefinelanguage{foo-lang}{
   emph={module,const,from,import,extend,with,after,do,function,@every,having},
   emphstyle={\textbf},
@@ -519,9 +518,9 @@ capturing of a certain node.
 
 \subsection{Code Generator}
 
-To convert the DSL based ID algorithms into production-ready code, we propose
+To convert the DSL-based ID algorithms into production-ready code, we propose
 the use of a code generator. Although many approaches here are applicable, like
-template based text expansion, XSLT transformations or even using the
+template-based text expansion, XSLT transformations or even using the
 CodeDom\cite{dollard2004code}, we believe that for the level of functional
 transformations that need to be performed, a richer model is required.
 
@@ -685,12 +684,12 @@ transform them into calls into the \NAME software library.
 
 \subsection{Software Library}
 
-\TODO
-
-- incoming message parsing
-- outgoing message grouping
-- execution of schedules
-- standard library: high-level conceptual functions (e.g. now(), sha1,...)
+We already touched upon the underlying software library when discussing the
+unified messaging framework: incoming messages are parsed, outgoing messages
+grouped. Besides these examples, other common functionality also isn't
+generated. The execution of functions based on a schedule or the implementation
+of higher level conceptual functions, such as \texttt{now} and \texttt{sha1},
+are calls into the standard software library that supports the code generator.
 
 \section{Implementation and Evaluation}
 \label{evaluation}
