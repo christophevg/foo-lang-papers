@@ -776,8 +776,8 @@ preliminary estimation of the effect of our proposed solution.
 
 Tables \ref{tbl:manual} and \ref{tbl:generated} show the collected data
 respectively for the manual and the generated implementation. The base case is
-presented in absolute values, while the implementations with the added
-algorithms are presented as relative values.
+presented in absolute values, while the implementations with the ID algorithms
+added are presented as relative values.
 
 \begin{table}[H]
   \centering
@@ -851,7 +851,9 @@ presented.
 
 When comparing the results of both implementations we first can conclude that
 the generator produces exactly the same code for the base case. We couldn't
-measure any real differences between both implementations.
+measure any real differences between both implementations. It's important to
+validate this aspect to ensure that both implementations are structurally
+comparable.
 
 Secondly, we see that the software library that comes with the generated code
 adds to the size of the resulting image. But the cost is almost constant and is
