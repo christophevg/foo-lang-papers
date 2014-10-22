@@ -195,7 +195,7 @@ class. Although it can be considered as a special case of a combination of both
 other classes, its focus is not on the detection of intrusions, but on the
 effect of an intrusion on the system itself.
 
-\subsection{Detecting Intrusions}
+\subsection*{Detecting Intrusions}
 \label{detection}
 
 There are different ways to construct a taxonomy for intrusion detection, but
@@ -231,7 +231,7 @@ therefore focus on the three categories agreed upon by most sources.
   
 \end{LaTeXdescription}
 
-\subsection{Cooperative Decision Making}
+\subsection*{Cooperative Decision Making}
 \label{coorperative}
 
 These taxonomies focus on the act of detecting intrusions themselves. In a
@@ -273,7 +273,7 @@ participants exchange information: broadcasting and interactive.
 
 \end{LaTeXdescription}
 
-\subsection{Software Attestation}
+\subsection*{Software Attestation}
 \label{subsection:attestation}
 
 A research topic that exists in parallel to the detection and cooperation
@@ -401,7 +401,7 @@ allow them to do internal housekeeping, such as threshold evaluation.
 Given these patterns, we can now identify the problem areas that tend to result
 in suboptimal code when combining multiple ID algorithms.
 
-\subsection{Loops and Common Data}
+\subsection*{Loops and Common Data}
 
 Two issues arise from the nested loops that originate from the combination of
 the ID algorithm patterns and its application pattern. First, each algorithm,
@@ -419,7 +419,7 @@ algorithms is selected due to a changing risk analysis. Finally, changing, or
 simply implementing the algorithms from scratch, also holds the risk of making
 mistakes.
 
-\subsection{Network Usage and Heterogeneity}
+\subsection*{Network Usage and Heterogeneity}
 
 A third issue is hidden in the use of the network. The calls to the \ttt{SEND}
 function are scattered around the algorithm, causing the wireless radio to be
@@ -450,7 +450,7 @@ the problems arising from the patterns/problems presented in listings
 different languages and platforms, while reusing a software library that
 provides e.g. message parsing, network access wrapping,\dots
 
-\subsection{The Meaning of Loops}
+\subsection*{The Meaning of Loops}
 
 From the design patterns we learned that loops are a major contributor to the
 problem of algorithm fusibility. Loops in program code are technical constructs
@@ -472,7 +472,7 @@ The same goes for actively polling some variable until it reaches a certain
 threshold. This also can be transformed to an event, eliminating the need for a
 technical loop-construction.
 
-\subsection{A DSL for Nodes}
+\subsection*{A DSL for Nodes}
 
 The second problem that could be observed from the patterns, was that of common
 data. All algorithms deal with information about neighboring devices. To
@@ -485,7 +485,7 @@ present in memory. Finally, nodes can define a scope for some function to be
 executed in. This way, nodes also offer a way to iterate all known devices,
 again without the need for a loop.
 
-\subsection{Unified Messaging}
+\subsection*{Unified Messaging}
 
 Sending and receiving of network messages is tightly integrated with the
 previously mentioned concepts of event handling and the nodes domain. An
@@ -518,7 +518,7 @@ capturing of a device.
   caption=Watchdog in \NAME
 ]{src/watchdog.foo}
 
-\subsection{Code Generator}
+\subsection*{Code Generator}
 
 To convert the DSL-based ID algorithms into production-ready code, we propose
 the use of a code generator. Although many approaches here are applicable, like
@@ -577,7 +577,7 @@ Syntactic transformations now lower this level of expressiveness according to
 the desired platform and language. In the end the code model can be directly
 emitted to the target language.
 
-\subsection{Semantic Model}
+\subsection*{Semantic Model}
 
 The semantic model is the core of the solution. It offers a way to describe ID
 algorithms in a way that allows semantic reinterpretation. This way, the
@@ -623,7 +623,7 @@ to the \emph{Execution Strategy}. This structure surrounds the actual
 \emph{Function}s and underlying \emph{Statement}s and allows for interpretation
 and fusion of the algorithms.
 
-\subsection{Functional Code Fusion}
+\subsection*{Functional Code Fusion}
 
 Thanks to the functional description of events and the effects that are
 triggered by them, the code generator is able to identify the same actions
@@ -637,7 +637,7 @@ Semantic transformations are performed on the semantic model itself and end
 with a transformation of the semantic model into a code model, which encodes
 the semantics into technical code constructs.
 
-\subsection{Code Model}
+\subsection*{Code Model}
 
 The code model can be compared to an AST for a very expressive language. It
 contains constructs found in certain languages, but not in others. Therefore a
@@ -651,7 +651,7 @@ self-containing code. The generator then uses a software library to perform
 these tasks. It will look for patterns that indicate any of these actions and
 transform them into calls into the \NAME software library.
 
-\subsection{Software Library}
+\subsection*{Software Library}
 
 We already touched upon the underlying software library when discussing the
 unified messaging framework: incoming messages are parsed, outgoing messages
@@ -669,7 +669,7 @@ consider the impact it has from a development point of view. Next we use this
 implementation to quantify its merits using a side-by-side comparison of
 generated code versus a manual implementation.
 
-\subsection{Architecture}
+\subsection*{Architecture}
 
 Figure \ref{fig:architecture} shows the architecture of the implementation. It
 illustrates the generation of the DSL into compilable code, using the Nodes
@@ -720,7 +720,7 @@ complete rewrite of the software library and a partial rewrite of the language
 description of the generator. Although this is a one-time effort, it is
 important in relation to the scalability of the framework.
 
-\subsection{Implementation}
+\subsection*{Implementation}
 
 To evaluate the prototype we chose to use a system based on the Atmel
 ATMEGA1284p micro-controller \cite{datasheet:atmega1284p} and the Digi XBee S2
@@ -751,7 +751,7 @@ algorithm\cite{ganeriwal2008reputation}, that checks if a parent node is
 cooperative and actually forwards messages with a destination further down the
 network.
 
-\subsection{Experimental Results}
+\subsection*{Experimental Results}
 
 Three criteria were evaluated: the image size of the resulting compiled code,
 the network usage in number of frames and bytes and the time required to
