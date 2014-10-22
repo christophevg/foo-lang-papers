@@ -1,0 +1,39 @@
+%!TEX root=paper.tex
+
+% basics
+
+\tikzset{
+  box/.style            = { rectangle, minimum width=2cm, minimum height=1cm },
+  border/.style         = { thick, draw=black },
+  round/.style          = { rounded corners=3mm },
+}
+
+% system
+
+\tikzset{
+  artifact/.style       = { box, font=\ttfamily },
+  support/.style        = { box, font=\itshape },
+  user/.style           = { artifact, fill=black!15!white },
+  dom/.style            = { support,  fill=black!30!white },
+  platform/.style       = { support,  fill=black!55!white, text=white },
+  native/.style         = { support,  fill=black!70!white, text=white },
+  generated/.style      = { artifact, border },
+  resource/.style       = { artifact, border },
+  representation/.style = { support, border, round }
+}
+
+% UML
+
+\tikzset{
+  class/.style={
+    box,
+    border,
+    text centered,
+    text width=1.75cm
+  },
+  relation/.style       = { thick, draw=black, <-},
+  subclass/.style       = { relation, >=open triangle 60 },
+  aggregate/.style      = { relation, >=open diamond },
+  composite/.style      = { relation, >=diamond },
+  dependency/.style     = { relation, >=latex, -> }
+}

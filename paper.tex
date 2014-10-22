@@ -55,6 +55,8 @@
 \usetikzlibrary{trees}
 \usetikzlibrary{arrows}
 
+\include{tikz}
+
 \begin{document}
 
 % to avoid syntax error highlighting - e.g. foo's not js ;-)
@@ -530,25 +532,6 @@ code-oriented model, comparable to the idea of CodeDom. From there on,
 syntactic transformations an emit actual source code. Figure
 \ref{fig:code-generation} shows the overall procedure.
 
-\tikzset{
-  resource/.style={
-    rectangle,
-    minimum width=1cm,
-    minimum height=8mm,
-    thick, draw=black,
-    top color=white,
-    font=\ttfamily
-  },
-  representation/.style={
-    rectangle, rounded corners=3mm,
-    minimum width=2cm,
-    minimum height=8mm,
-    thick, draw=black,
-    top color=white,
-    font=\itshape
-  }
-}
-
 \begin{figure}[ht]
   \centering
   \scalebox{.85}{
@@ -563,20 +546,20 @@ syntactic transformations an emit actual source code. Figure
   \node (code) [resource,right=of cm]        {Code};
 
 
-  \draw [->] (dsl) -> (sm)   node [midway,above=10pt]              {parse};
-  \draw [->] (sm)  -> (cm)   node [midway,above=10pt,align=center] {semantic\\transform};
-  \draw [->] (cm)  -> (code) node [midway,above=10pt]              {emit code};
+  \draw [->] (dsl) -> (sm)   node [midway,above=15pt]              {parse};
+  \draw [->] (sm)  -> (cm)   node [midway,above=15pt,align=center] {semantic\\transform};
+  \draw [->] (cm)  -> (code) node [midway,above=15pt]              {emit code};
 
   \draw [rounded corners,->]
-        ($ (sm.east) - (5mm,4.5mm) $)
+        ($ (sm.east) - (5mm,5mm) $)
         -- ++(0,-.5)
-        -| ($ (sm.west) + (5mm,-4.5mm) $)
+        -| ($ (sm.west) + (5mm,-5mm) $)
            node [near start, below=1pt] {type inference};
 
   \draw [rounded corners,->]
-        ($ (cm.east) - (5mm,4.5mm) $)
+        ($ (cm.east) - (5mm,5mm) $)
         -- ++(0,-.5)
-        -| ($ (cm.west) + (5mm,-4.5mm) $)
+        -| ($ (cm.west) + (5mm,-5mm) $)
            node [near start, below=1pt,align=center] {syntactic\\transform};
 
 \end{tikzpicture}
@@ -604,20 +587,6 @@ intrusion detection functionality organization optimization.
 
 Figure \ref{fig:meta-model} shows the central part of the semantic model as
 implemented for \NAME.
-
-\tikzset{
-  class/.style={
-    rectangle,
-    minimum size=1cm,
-    thick, draw=black,
-    text centered,
-    text width=1.75cm,
-  },
-  subclass/.style={thick,draw=black,>=open triangle 60,<-},
-  aggregate/.style={thick,draw=black,>=open diamond,<-},
-  composite/.style={thick,draw=black,>=diamond,<-},
-  dependency/.style={thick,>=latex,->}
-}
 
 \begin{figure}[ht]
   \centering
