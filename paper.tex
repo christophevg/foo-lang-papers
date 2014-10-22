@@ -663,6 +663,48 @@ are calls into the standard software library that supports the code generator.
 \section{Implementation and Evaluation}
 \label{evaluation}
 
+In this section we discuss a prototype implementation and evaluate its
+performance. We first present the architecture of this implementation and
+consider the impact it has from a development point of view. Next we use this
+implementation to quantify its merits using a side-by-side comparison of
+generated code versus a manual implementation.
+
+\subsection{Architecture}
+
+Figure \ref{fig:architecture} shows the architecture of the implementation. 
+
+\begin{figure}[ht]
+  \centering
+  \scalebox{.85}{
+\begin{tikzpicture}[
+  node distance=10mm and 20mm,
+  ,>=stealth,thick,black!50,text=black,
+  every new ->/.style={shorten >=1pt},
+]
+  \node (dsl)      [user,align=center]                                     {DSL};
+  \node (code)     [generated,right=of dsl]                                {code};
+  \node (image)    [generated,right=of code]                               {image};
+
+  \node (nodes)    [dom,above right=of dsl,xshift=-20mm]                   {Nodes};
+  \node (platform) [platform,below right=of dsl,align=center,xshift=-20mm] {Platform \&\\Language};
+  \node (lib)      [native,below right=of code,align=center,xshift=-20mm]  {Software\\Library};
+
+  \draw [->] (dsl)  -> (code)  node [midway,above=2pt] {generation};
+  \draw [->] (code) -> (image) node [midway,above=2pt] {compilation};
+
+  \draw [->,dashed] (nodes.south)    -> ++(0,-15mm);
+  \draw [->,dashed] (platform.north) -> ++(0,15mm);
+  \draw [->,dashed] (lib.north)      -> ++(0,15mm);
+\end{tikzpicture}
+}
+  \caption{Architecture of Prototype Implementation}
+  \label{fig:architecture}
+\end{figure}
+
+\TODO
+
+\subsection{Implementation}
+
 To evaluate the prototype we chose to use a system based on the Atmel
 ATMEGA1284p micro-controller \cite{datasheet:atmega1284p} and the Digi XBee S2
 ZigBee module \cite{manual:xbee}. To drive the hardware a minimalistic library
