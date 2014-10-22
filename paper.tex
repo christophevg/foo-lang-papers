@@ -671,7 +671,19 @@ generated code versus a manual implementation.
 
 \subsection{Architecture}
 
-Figure \ref{fig:architecture} shows the architecture of the implementation. 
+Figure \ref{fig:architecture} shows the architecture of the implementation. It
+illustrates the generation of the DSL into compilable code, using the Nodes
+domain information, a platform and language description and the native software
+library. The applied grayscale indicates the components' platform dependency:
+the DSL is platform and language independent and deals with subsystems, such as
+the network, in an abstract way. The Nodes domain implements some of these
+abstracted subsystems, but still in a platform and language independent way.
+The platform and language descriptions define the actual target platform and
+language and convert the abstract constructions in actually supported code. The
+software library is written in native code targeting the platform and language.
+Finally, the code and the image are artifacts of the automated generation and
+compilation process. They aren't a product of manual work and therefore aren't
+directly dependent on the platform.
 
 \begin{figure}[ht]
   \centering
@@ -701,7 +713,12 @@ Figure \ref{fig:architecture} shows the architecture of the implementation.
   \label{fig:architecture}
 \end{figure}
 
-\TODO
+This hierarchy is important from a development effort point of view. The level
+of dependency on the platform also dictates the level of effort to implement
+changes to the platform. For example: changing the language will require a
+complete rewrite of the software library and a partial rewrite of the language
+description of the generator. Although this is a one-time effort, it is
+important in relation to the scalability of the framework.
 
 \subsection{Implementation}
 
@@ -734,7 +751,7 @@ algorithm\cite{ganeriwal2008reputation}, that checks if a parent node is
 cooperative and actually forwards messages with a destination further down the
 network.
 
-\subsection{Evaluation}
+\subsection{Experimental Results}
 
 Three criteria were evaluated: the image size of the resulting compiled code,
 the network usage in number of frames and bytes and the time required to
