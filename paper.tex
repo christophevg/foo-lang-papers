@@ -446,7 +446,7 @@ The DSL enables researchers to formally describe their ID algorithms, without
 focusing on any specific language or platform. Given such formal descriptions
 of ID algorithms, a code generator is now able to combine these, while avoiding
 the problems arising from the patterns/problems presented in listings
-\ref{alg:id-algo-application} and \ref{alg:id-algo-pattern}. It can also target
+\ref{alg:id-algo-pattern} and \ref{alg:id-algo-application}. It can also target
 different languages and platforms, while reusing a software library that
 provides e.g. message parsing, network access wrapping,\dots
 
@@ -693,7 +693,7 @@ network\cite{ganeriwal2008reputation}.
 Three criteria were evaluated: the image size of the resulting compiled code,
 the network usage in number of frames and bytes and the time required to
 perform once cycle of the event loop. These metrics were collected in four
-situations: without ID algorithms, with a heartbeat, with reputation-tracking
+situations: without ID algorithms, with a watchdog, with reputation-tracking
 and with both algorithms implemented.
 
 In case of the manual implementation, both algorithms were constructed as
@@ -720,7 +720,7 @@ algorithms are presented as relative values.
   \centering
   \begin{tabular}{lrrrr}
   \hline
-      & base & heartbeat & reputation & both\\
+      & base & watchdog & reputation & both\\
   \hline
   size (bytes) & 10500 & 148\% & 127\% & 175\%\\
   frames & 20 & 255\% & 160\% & 315\%\\
@@ -736,7 +736,7 @@ algorithms are presented as relative values.
   \centering
   \begin{tabular}{lrrrr}
   \hline
-         & base & heartbeat & reputation & both\\
+         & base & watchdog & reputation & both\\
   \hline
   size (bytes) & 10496 & 175\% & 156\% & 200\%\\
   frames & 20 & 245\% & 160\% & 275\%\\
@@ -774,7 +774,7 @@ presented.
   \centering
   \begin{tabular}{lrrrrr}
   \hline
-                & base & heartbeat & reputation & both  & result \\
+                & base & watchdog & reputation & both  & result \\
   \hline
   size (bytes)  & -4    & 2822     & 3070       & 2664  & 115\%  \\
   frames        & 0     & -2       & 0          & -8    & 87\%   \\
