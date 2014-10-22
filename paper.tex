@@ -678,17 +678,21 @@ requirements of the generator towards the platform are minimal, don't rely on
 advanced frameworks or operating systems and can therefore be applied in any
 environment, targeting any platform.
 
-For the evaluation we constructed a small meshed network consisting of three
-devices, with only one device able to talk to both other devices, requiring
-routing of messages through this device.
+For the evaluation we constructed a small meshed network. In this network, not
+all devices have direct access to one another, requiring routing through shared
+neighboring devices.
 
 We started from a basic application that measures light intensity. The
-application was written both manually and generated. On top of this baseline we
-added two intrusion detection related algorithms: a heartbeat, that allows
-nodes to validate each other's continuous presence, and a reputation-building
-algorithm that checks if a parent node is cooperative and actually forwards
-messages with a destination further down the
-network\cite{ganeriwal2008reputation}.
+application was constructed as an includable piece of code. This way it could
+be integrated in an manual implementation and merged into the generated
+solution. On top of this baseline we added two intrusion detection related
+algorithms: a watchdog\cite{mishra2004intrusion}, that allows nodes to validate
+each other's continuous presence, and a reputation-building
+algorithm\cite{ganeriwal2008reputation}, that checks if a parent node is
+cooperative and actually forwards messages with a destination further down the
+network.
+
+\subsection{Evaluation}
 
 Three criteria were evaluated: the image size of the resulting compiled code,
 the network usage in number of frames and bytes and the time required to
