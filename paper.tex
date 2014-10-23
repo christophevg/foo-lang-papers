@@ -171,8 +171,8 @@ radio, reducing energy consumption.
 
 % structure
 
-The remainder of this paper proceeds as follows: section \ref{approach}
-classifies our approach as a development strategy for wireless devices, section
+The remainder of this paper proceeds as follows: section \ref{positioning}
+positions our approach as a development strategy for wireless devices, section
 \ref{classification} takes a look at ID algorithms and classifies them. Section
 \ref{pattern} looks for patterns in the implementation of these classes of
 algorithms, details some of the ideas behind FCF and identifies the different
@@ -184,18 +184,27 @@ DSLs for ID and code generation for the IoT. Finally, section \ref{conclusion}
 summarizes our findings, draws conclusions and identifies topics for future
 work.
 
-\section{Classification of Code Generation as a Development Strategy}
-\label{approach}
+\section{\NAME as a Development Strategy}
+\label{positioning}
 
 Figure \ref{fig:approach} shows a classification of several development
 strategies that can be adopted for projects involving wireless devices.
 
+\newcommand{\ball}[5][above,yshift=+5pt]{
+\tdplottransformmainscreen{#2}{#3}{#4}
+\shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray,shading angle=-90]
+  (\tdplotresx,\tdplotresy) circle (0.20)
+  node[text=gray,font=\footnotesize,#1]{#5};
+}
+
 \begin{figure}[ht]
+  \centering
+  \scalebox{.85}{
 \tdplotsetmaincoords{110}{-10}
 \begin{tikzpicture}[scale=1,tdplot_main_coords]
   % axis
-  \draw[very thick,->] (0,0,0) -- (7,0,0) node[anchor=north east,xshift=8mm]{$flexibility$};
-  \draw[very thick,->] (0,0,0) -- (0,7,0) node[anchor=north west]{$update$};
+  \draw[very thick,->] (0,0,0) -- (7,0,0) node[anchor=north east,xshift=10mm]{$flexibility$};
+  \draw[very thick,->] (0,0,0) -- (0,7,0) node[anchor=north west]{$update cost$};
   \draw[very thick,->] (0,0,0) -- (0,0,4) node[anchor=south]{$development$};
   % points
   \coordinate (O)        at (0,0,0);
@@ -204,7 +213,7 @@ strategies that can be adopted for projects involving wireless devices.
   \coordinate (modular)  at (4,4,4);
   \coordinate (reconfig) at (4,2,4);
   \coordinate (full)     at (6,6,4);
-  \coordinate (cg)       at (6,4.5,3);
+  \coordinate (cg)       at (6,4,2.5);
   % "lines"
   \draw[dashed] (2,0,0)    -- (2,2,0) -- (0,2,0);
   \draw[dashed] (4,0,0)    -- (4,4,0) -- (0,4,0);
@@ -213,44 +222,57 @@ strategies that can be adopted for projects involving wireless devices.
   \draw[dashed] (modular)  -- (4,4,0);
   \draw[dashed] (full)     -- (6,6,0);
   \draw[dashed] (reconfig) -- (4,2,0);
-  \draw[dashed] (cg)       -- (6,4.5,0);
+  \draw[dashed] (cg)       -- (6,4,0);
   % "balls"
-  % 1. ideal
-  \tdplottransformmainscreen{6}{0}{0}
-  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
-    (\tdplotresx,\tdplotresy) circle (0.20)
-    node[above,xshift=+5pt,yshift=+5pt,text=gray]{\footnotesize ideal};
-  % 2. VM
-  \tdplottransformmainscreen{2}{2}{2}
-  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
-    (\tdplotresx,\tdplotresy) circle (0.20)
-    node[above,yshift=+7pt,text=gray]{\footnotesize virtual machine};
-  % 3. modular
-  \tdplottransformmainscreen{4}{4}{4}
-  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
-    (\tdplotresx,\tdplotresy) circle (0.20)
-    node[left,xshift=-5pt,text=gray]{\footnotesize modular native image};
-  % 4. reconfig
-  \tdplottransformmainscreen{4}{2}{4}
-  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
-    (\tdplotresx,\tdplotresy) circle (0.20)
-    node[above,yshift=+7pt,text=gray]{\footnotesize reconfigurable virtual machine};
-  % 5. full
-  \tdplottransformmainscreen{6}{6}{4}
-  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
-    (\tdplotresx,\tdplotresy) circle (0.20)
-    node[right,xshift=+5pt,text=gray]{\footnotesize full native image};
+  \ball{6}{0}{0}{ideal}
+  \ball{2}{2}{2}{virtual machine}
+  \ball[left,xshift=-5pt]{4}{4}{4}{\shortstack{modular\\native image}}
+  \ball{4}{2}{4}{\shortstack{reconfigurable\\virtual machine}}
+  \ball[right,xshift=+5pt,yshift=+5pt]{6}{6}{4}{full native image}
+  %\ball[right,xshift=+5pt,text=black]{6}{4.5}{3}{code generation};
   % 5. cg
-  \tdplottransformmainscreen{6}{4.5}{3}
+  \tdplottransformmainscreen{6}{4}{2.5}
   \shadedraw[tdplot_screen_coords, ball color=gray,draw=black]
     (\tdplotresx,\tdplotresy) circle (0.20)
-    node[right,xshift=+5pt,text=black,align=center]{\footnotesize code generation};
+    node[right,xshift=+5pt,text=black,align=center,font=\footnotesize]{code generation\\+ functional code fusion};
 \end{tikzpicture}
+}
 \caption{Classification of Development Strategies for Wireless Devices (based on \cite{sadilek2007energy})}
 \label{fig:approach}
 \end{figure}
 
-\TODO
+Three properties are used to classify the strategies\cite{sadilek2007energy}:
+flexibility, update cost and development effort. The flexibility is a measure
+for the number of applications that can be deployed on a device without
+physical access. The update cost is the energy required to deploy a new version
+of an application on a node. The development effort covers the time to write,
+test and deploy an application. The \emph{ideal} situation is that were one
+ends up with a maximal flexibility and no update nor development cost.
+
+If we consider the trade off between flexibility and update cost, we can
+distinguish two extremes: virtual machines and full native images. Virtual
+machines allow for very small updates due to their concise byte code, but at
+the same time are restricted by the limitations of their instruction set and
+predefined capabilities. A full native image on the other hand has unlimited
+flexibility, but requires a large transfer of the image over the network.
+
+Two intermediate alternatives are possible: modular native image and
+reconfigurable virtual machines. With modular native images, only modules are
+changed, limiting the update size, but the framework to support it is static
+and limits the possibilities. Reconfigurable virtual machines take this same
+approach, but apply it to virtual machines, allowing to \emph{upgrade} the
+instruction set of the virtual machine.
+
+Choosing a development strategy, with this trade off take into account, will
+also determine the development cost. Developing for a virtual machine will be
+less demanding than targeting a native image.
+
+With \NAME we opt to start from the full native image, allowing full
+flexibility, but try to reduce both the update cost and the development cost.
+Firstly, by applying code generation and functional code fusion, we optimize
+the code organisation, which has a positive effect on the code size and hence
+also on the update cost. Secondly, by enabling reuse on a functional level and
+automating the writing phase, the development cost is also lowered.
 
 \section{A Classification of ID Algorithms}
 \label{classification}
