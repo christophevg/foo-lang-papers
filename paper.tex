@@ -232,7 +232,7 @@ strategies that can be adopted for projects involving wireless devices.
   %\ball[right,xshift=+5pt,text=black]{6}{4.5}{3}{code generation};
   % 5. cg
   \tdplottransformmainscreen{6}{4}{2.5}
-  \shadedraw[tdplot_screen_coords, ball color=gray,draw=black]
+  \shadedraw[tdplot_screen_coords, ball color=gray,draw=black,shading angle=-90]
     (\tdplotresx,\tdplotresy) circle (0.20)
     node[right,xshift=+5pt,text=black,align=center,font=\footnotesize]{code generation\\+ functional code fusion};
 \end{tikzpicture}
@@ -1056,8 +1056,8 @@ seems a promising approach. By offloading the optimization to a VM and only
 compiling parts and not the whole, the solution allows updating at a very
 granular scale, thus reducing the update cost, while maintaining flexibility
 and lowering the development effort. As stated in the introduction, \NAME
-focuses on the reduction of the development effort, while preserving
-flexibility.
+focuses on the reduction of the development effort and update cost, while
+preserving flexibility.
 
 Finally, applying code generation to IDS, typically tries to generate native
 code to avoid the interpretation of the description of patterns.
