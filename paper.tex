@@ -941,23 +941,35 @@ it can optimize a development process, reducing the amount of code that needs
 to be constructed or it can be used to systematically create better code. 
 
 Embedded systems are a prime example of an environment where code needs to be
-of a high quality.
+of a high quality. Focus on size and performance are a logical choice when
+dealing with limited storage and processing power. Different techniques are
+described in literature and implemented in compilers, starting at the lowest
+level\cite{leupers2000code, marwedel2002code}.
 
-Code Generation for embedded systems/WSNs \cite{leupers2000code,marwedel2002code}
+Optimizing for power efficiency however proves to be concurrent to size and
+performance optimization. Different strategies are needed. Data and memory
+optimizations \cite{panda2001data} can result in interesting improvements on a
+lower level. But to really preserve energy higher-level strategies are
+required, targeting architecture, radio handling, efficient
+software,\dots\cite{naik2001software}. Most of these are beyond the control of
+the compiler and show that a higher level of abstraction is required to address
+them.
 
-Code Optimization for embedded systems/WSNs \cite{panda2001data,naik2001software}
+DSLs are a solution here, but other paradigms are possible. A mixed framework
+consisting of a virtual machine (VM) and native code
+extension\cite{sadilek2007energy}, combined with energy-aware compilation,
+seems a promising approach. By offloading the optimization to a VM and only
+compiling parts and not the whole, the solution allows updating at a very
+granular scale, thus reducing the update cost, while maintaining flexibility
+and lowering the development effort. As stated in the introduction, \NAME
+focuses on the reduction of the development effort, while preserving
+flexibility.
 
-Code Generation for IDS \cite{charitakis2003code}
-
-% manet: IDS algorithms -> coorporation, trust
-
-More than in a classic network IDS, ID algorithms for MANETS operate with a
-large degree of uncertainty. They often have to collaborate with other devices
-in the network \cite{marchang2008collaborative,krontiris2009cooperative}, which
-increases the level of uncertainty, because no other device can fully be
-trusted. An IDS on an IoT device will be able to provide the services with
-information about the reputation \cite{ganeriwal2008reputation} of other nodes
-in the network.
+Finally, applying code generation to IDS, typically tries to generate native
+code to avoid the interpretation of the description of patterns.
+I2S\cite{charitakis2003code} is an example that generates code for
+SNORT\cite{roesch1999snort} rules. To optimise this highly efficient code, it
+often targets a specific platform.
 
 \section{Conclusion and Future Work}
 \label{conclusion}
