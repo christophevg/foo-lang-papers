@@ -55,6 +55,8 @@
 \usetikzlibrary{trees}
 \usetikzlibrary{arrows}
 
+\usepackage{tikz-3dplot}
+
 \include{tikz}
 
 \usepackage[autostyle]{csquotes}
@@ -169,16 +171,86 @@ radio, reducing energy consumption.
 
 % structure
 
-The remainder of this paper proceeds as follows: section \ref{classification}
-takes a look at ID algorithms and classifies them. Section \ref{pattern} looks
-for patterns in the implementation of these classes of algorithms, details some
-of the ideas behind FCF and identifies the different aspects of the problem
-space. Section \ref{design} describes the design we applied to construct the
-framework, its domain specific language (DSL) and code generator. Section
-\ref{evaluation} evaluates an implementation and application of the framework.
-Section \ref{related} explores related work in the field of DSLs for ID and
-code generation for the IoT. Finally, section \ref{conclusion} summarizes our
-findings, draws conclusions and identifies topics for future work.
+The remainder of this paper proceeds as follows: section \ref{approach}
+classifies our approach as a development strategy for wireless devices, section
+\ref{classification} takes a look at ID algorithms and classifies them. Section
+\ref{pattern} looks for patterns in the implementation of these classes of
+algorithms, details some of the ideas behind FCF and identifies the different
+aspects of the problem space. Section \ref{design} describes the design we
+applied to construct the framework, its domain specific language (DSL) and code
+generator. Section \ref{evaluation} evaluates an implementation and application
+of the framework. Section \ref{related} explores related work in the field of
+DSLs for ID and code generation for the IoT. Finally, section \ref{conclusion}
+summarizes our findings, draws conclusions and identifies topics for future
+work.
+
+\section{Classification of Code Generation as a Development Strategy}
+\label{approach}
+
+Figure \ref{fig:approach} shows a classification of several development
+strategies that can be adopted for projects involving wireless devices.
+
+\begin{figure}[ht]
+\tdplotsetmaincoords{110}{-10}
+\begin{tikzpicture}[scale=1,tdplot_main_coords]
+  % axis
+  \draw[very thick,->] (0,0,0) -- (7,0,0) node[anchor=north east,xshift=8mm]{$flexibility$};
+  \draw[very thick,->] (0,0,0) -- (0,7,0) node[anchor=north west]{$update$};
+  \draw[very thick,->] (0,0,0) -- (0,0,4) node[anchor=south]{$development$};
+  % points
+  \coordinate (O)        at (0,0,0);
+  \coordinate (ideal)    at (6,0,0);
+  \coordinate (vm)       at (2,2,2);
+  \coordinate (modular)  at (4,4,4);
+  \coordinate (reconfig) at (4,2,4);
+  \coordinate (full)     at (6,6,4);
+  \coordinate (cg)       at (6,4.5,3);
+  % "lines"
+  \draw[dashed] (2,0,0)    -- (2,2,0) -- (0,2,0);
+  \draw[dashed] (4,0,0)    -- (4,4,0) -- (0,4,0);
+  \draw[dashed] (6,0,0)    -- (6,6,0) -- (0,6,0);
+  \draw[dashed] (vm)       -- (2,2,0);
+  \draw[dashed] (modular)  -- (4,4,0);
+  \draw[dashed] (full)     -- (6,6,0);
+  \draw[dashed] (reconfig) -- (4,2,0);
+  \draw[dashed] (cg)       -- (6,4.5,0);
+  % "balls"
+  % 1. ideal
+  \tdplottransformmainscreen{6}{0}{0}
+  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
+    (\tdplotresx,\tdplotresy) circle (0.20)
+    node[above,xshift=+5pt,yshift=+5pt,text=gray]{\footnotesize ideal};
+  % 2. VM
+  \tdplottransformmainscreen{2}{2}{2}
+  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
+    (\tdplotresx,\tdplotresy) circle (0.20)
+    node[above,yshift=+7pt,text=gray]{\footnotesize virtual machine};
+  % 3. modular
+  \tdplottransformmainscreen{4}{4}{4}
+  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
+    (\tdplotresx,\tdplotresy) circle (0.20)
+    node[left,xshift=-5pt,text=gray]{\footnotesize modular native image};
+  % 4. reconfig
+  \tdplottransformmainscreen{4}{2}{4}
+  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
+    (\tdplotresx,\tdplotresy) circle (0.20)
+    node[above,yshift=+7pt,text=gray]{\footnotesize reconfigurable virtual machine};
+  % 5. full
+  \tdplottransformmainscreen{6}{6}{4}
+  \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray]
+    (\tdplotresx,\tdplotresy) circle (0.20)
+    node[right,xshift=+5pt,text=gray]{\footnotesize full native image};
+  % 5. cg
+  \tdplottransformmainscreen{6}{4.5}{3}
+  \shadedraw[tdplot_screen_coords, ball color=gray,draw=black]
+    (\tdplotresx,\tdplotresy) circle (0.20)
+    node[right,xshift=+5pt,text=black,align=center]{\footnotesize code generation};
+\end{tikzpicture}
+\caption{Classification of Development Strategies for Wireless Devices (based on \cite{sadilek2007energy})}
+\label{fig:approach}
+\end{figure}
+
+\TODO
 
 \section{A Classification of ID Algorithms}
 \label{classification}
