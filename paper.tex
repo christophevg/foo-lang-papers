@@ -57,6 +57,8 @@
 
 \include{tikz}
 
+\usepackage[autostyle]{csquotes}
+
 \begin{document}
 
 % to avoid syntax error highlighting - e.g. foo's not js ;-)
@@ -877,15 +879,69 @@ interesting improvements.
 \section{Related Work}
 \label{related}
 
-\TODO
+Section \ref{classification} introduced some ID
+algorithms\cite{ganeriwal2008reputation,mishra2004intrusion,krontiris2009cooperative}
+and presented a classification\cite{mishra2004intrusion,ioannis2007towards,alrajeh2013intrusion}
+based on their detection approach and interaction style.
 
-IDS in WSN \cite{perrig2004security,mishra2004intrusion}
+This section now focuses on related work in the field of domain specific
+languages and code generation, both in relation to wireless networks of
+resource constraint devices. These two components are the core of the \NAME
+framework and the solution it proposes. We also look at the more general scope,
+how these concepts are applied in other disciplines and evaluate their
+relevance in the scope of intrusion detection in the IoT and the proposed \NAME
+framework.
 
-DSL \cite{fowler2010domain,mernik2005and}
+\subsection{Domain Specific Languages}
 
-DSL for WSN \cite{naumowicz2009prototyping,levis2004tinyscript}
+Using a DSL, and especially an external DSL, as a foundation for any solution
+requires special care. It's important to remember that a DSL is merely a
+\emph{thin veneer over a (semantic) model}\cite{fowler2010domain}. Its sole
+purpose should be the easing of filling out the model. In the case of \NAME the
+reasons to implement a DSL are valid: the key goal is to remove any technical
+restrictions from a formal description of ID algorithms, allowing domain
+experts to produce these specifications\cite{mernik2005and}.
 
-DSL for IDS \cite{sekar1999high} \cite{uppuluri2001experiences} \cite{eckmann2002statl} \cite{vigna2003designing}
+Zooming in on wireless networks of resource constraint devices, we see that
+DSLs are indeed introduced \enquote{to shorten the development cycles
+dramatically during deployments, to reduce the dependency on hardware and
+software engineers, and to lead to a wider adoption outside the computer
+science field}\cite{sadilek2008domain,naumowicz2009prototyping}.
+
+TinyScript\cite{levis2004tinyscript} is an example of a language for wireless
+sensor networks. It's a complete programing language that aims to ease the
+description of algorithms in general. The Basic-like syntax does enable more
+productive development. But this approach doesn't address the underlying
+resource problems inherently connected to the context.
+
+SEAL\cite{elsts2013seal} is a novel complete programming language that focuses
+on novice programmers. It is a clear fit for \emph{sense-and-send} type of
+applications, and doesn't pretend to be the best choice for any type of
+application. It does however share the idea of event to overcome the technical
+nature of loops.
+
+Shifting the scope to intrusion detection, we learn that DSLs are predominantly
+used to describe patterns of events found in network
+packets\cite{sekar1999high,roesch1999snort} in a concise way.
+
+BMSL\cite{uppuluri2001experiences} is a DSL that allows the specification of
+patterns and actions. Patterns can contain events extracted from log files,
+system calls and network packets.
+
+The STAT framework with its STATL
+language\cite{eckmann2002statl,vigna2003designing} are not intrusion detection
+specific, but through extensions they allow to model attack scenarios using
+state machines. This is an interesting approach that shares the same ideas as
+our event-driven concept. The framework generates C++.
+
+\subsection{Code Generation}
+
+Code generation can be applied for a number reasons. In combination with a DSL
+it can optimize a development process, reducing the amount of code that needs
+to be constructed or it can be used to systematically create better code. 
+
+Embedded systems are a prime example of an environment where code needs to be
+of a high quality.
 
 Code Generation for embedded systems/WSNs \cite{leupers2000code,marwedel2002code}
 
