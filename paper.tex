@@ -296,7 +296,7 @@ Within the context of this paper, we will not consider software attestation as
 a special class and exclude it from our scope, only focusing on detecting
 intrusions and distributed decision making.
 
-Figure \ref{fig:classification} gives a visual overview of the classification
+Figure \ref{fig:classification} visually summarizes the dual classification
 presented above.
 
 \begin{figure}[!ht]
@@ -350,7 +350,7 @@ This decoupling of detection and decision is the core of the design pattern for
 ID algorithms. Listing \ref{alg:id-algo-pattern} presents the design pattern in
 pseudo-code.
 
-\begin{figure}[!ht]
+\begin{figure}[b]
 \captionof{lstlisting}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
 \begin{algorithmic}[1]
   \Require{nodes, global storage for information about nodes}
@@ -714,11 +714,12 @@ directly dependent on the platform.
 \end{figure}
 
 This hierarchy is important from a development effort point of view. The level
-of dependency on the platform also dictates the level of effort to implement
-changes to the platform. For example: changing the language will require a
-complete rewrite of the software library and a partial rewrite of the language
-description of the generator. Although this is a one-time effort, it is
-important in relation to the scalability of the framework.
+of dependency on the targeted platform also dictates the level of effort to
+implement changes to that platform. For example: to emit a different language
+will require a complete rewrite of the software library and a partial rewrite
+of the language description of the generator. Although this is a reusable,
+one-time effort, it is important in relation to the scalability of the
+framework.
 
 \subsection*{Implementation}
 
