@@ -1,0 +1,7 @@
+\lstdefinelanguage{foo-lang}{
+  emph={module,const,from,import,extend,with,after,do,function,@every,having,if,return},
+  emphstyle={\textbf},
+  morecomment=[l]{//},
+  moredelim=[is][]{@@}{@@},       % temp solution to allow keywords without emph
+  moredelim=[is][\emph]{!!}{!!}   % temp solution to hightlight #atoms
+}

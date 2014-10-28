@@ -58,6 +58,7 @@
 \usepackage{tikz-3dplot}
 
 \include{tikz}
+\include{foo-lang}
 
 \usepackage[autostyle]{csquotes}
 
@@ -82,16 +83,17 @@ Huygens, Danny Hughes, Wouter Joosen}%
 
 \begin{abstract}
 
-Supporting multiple intrusion detection (ID) algorithms imposes significant
-overhead on Internet of Things (IoT) devices. Fusion of the underlying
-algorithms can alleviate this, yet, proves to be time-consuming, repetitive and
+When intrusion prevention fails, intrusion detection serves as a second layer
+of defense. It looks for patterns, anomalies,\dots that can indicate malicious
+behavior. But supporting these intrusion detection algorithms imposes
+significant overhead on resource-restricted devices such as those targeting the
+Internet of Things. Fusion of the algorithms, to optimize the use of the shared
+resources, can alleviate this, yet, proves to be time-consuming, repetitive and
 error-prone. To address this problem we introduce \NAME, a framework for the
-development of efficient intrusion detection systems (IDS). It consists of a
-domain specific language (DSL) that allows formally describing ID algorithms on
-a functional level. A code generator then fuses these algorithms and produces
-more optimally organized source code. This way, \NAME addresses the
-heterogeneity of both the IoT and ID, as well as the limited resources of IoT
-devices. A side-by-side comparison shows that generated code reduces memory
+development of efficient intrusion detection systems. It consists of a domain
+specific language, to formally describing intrusion detection algorithms on a
+functional level, and a code generator to produce more optimally organized
+source code. A side-by-side comparison shows that generated code reduces memory
 footprint, message passing overhead and execution time in comparison to a
 straightforward sequential implementation of the same algorithms.
 
@@ -103,15 +105,15 @@ straightforward sequential implementation of the same algorithms.
 
 % IoT + threat
 
-The IoT presents a great potential to positively influence our daily work and
-life: domotics, assisted living, e-health and enhanced learning are only a few
-examples\cite{atzori2010internet}. But with this potential the IoT also
-presents a significant threat: by opening our smart homes
-\cite{aldrich2003smart} and personal data\cite{weber2010internet} to all these
-interconnected devices, we also open them to everyone who is able to break the
-virtual locks that protect them. IoT devices typically have limited batteries,
-little processing power and memory is restricted to the bare minimum. These
-properties make it hard to add any additional service, including security.
+The internet of things (IoT) presents a great potential to positively influence
+our daily work and life: domotics, assisted living, e-health and enhanced
+learning are only a few examples\cite{atzori2010internet}. But with this
+potential the IoT also presents a significant threat: by opening our smart
+homes and personal data to all these interconnected devices, we also open them
+to everyone who is able to break the virtual locks that protect them. IoT
+devices typically have limited batteries, little processing power and memory is
+restricted to the bare minimum. These properties make it hard to add any
+additional service, including security.
 
 % classic networks: fw and central ids
 
@@ -126,30 +128,26 @@ malicious pattern is detected\cite{denning1987intrusion}.
 
 In wireless networks of resource constraint devices, which make up an
 significant part of the IoT, it is not possible to have this single point in
-the network that can oversee all traffic\cite{zhang2000intrusion,
-mishra2004intrusion}. If the outer security perimeter diminishes, every device
-has to implement its own lines of defense. But making the IDS a local service
-on each device requires local resources, which are the scarce commodity to IoT
-devices.
+the network that can oversee all traffic\cite{mishra2004intrusion}. If the
+outer security perimeter diminishes, every device has to implement its own
+lines of defense. But making the IDS a local service on each device requires
+local resources, which are the scarce commodity to IoT devices.
 
 % gap analysis
 
 Current developments in ID focus on programming frameworks to structure the
 implementation of algorithms\cite{valero2012di} and offer the required basic
-functional components to implement them\cite{krontiris2008lidea}. But they
-don't offer a way to optimize the usage of resources. Nor do they support
-systematic reuse to create different configurations for different devices.
+functional components to implement them\cite{krontiris2008lidea}. The first
+aspect that is missing, is that they don't offer a way to optimize the usage of
+resources. A solution that supports the integration of multiple algorithms on
+IoT devices needs to consider the impact on their resources and avoid
+accumulating their impact.
 
-% problem -> requirements for solution
-
-The IoT is a heterogeneous environment, both in hardware and software.
+Secondly, they don't support systematic reuse to create different
+configurations for different devices, both dealing with hard- and software.
 Addressing this in a transparent and automated way is a key success factor for
-any kind of development in this area. A solution that supports the integration
-of multiple algorithms on IoT devices needs to consider the impact on their
-resources. Different algorithms should be merged somehow to avoid accumulating
-their impact.
+any kind of development in this area.
 
-% my approach merged into ...
 % scientific contribution
 
 % 1. framework: language + code generator
@@ -165,114 +163,22 @@ both the IoT and ID algorithms.
 The second contribution introduces functional code fusion (FCF) as a generation
 paradigm to solve the problem of hard to reuse and combine ID algorithms. FCF
 identifies common data and functions, and organizes code in such a way that
-redundant iterations, tests and computations are eliminated. Our results show
+redundant iterations, tests and computations are eliminated. Results show
 substantially improved memory usage, execution time and usage of the wireless
 radio, reducing energy consumption.
 
 % structure
 
-The remainder of this paper proceeds as follows: section \ref{positioning}
-positions our approach as a development strategy for wireless devices, section
-\ref{classification} takes a look at ID algorithms and classifies them. Section
-\ref{pattern} looks for patterns in the implementation of these classes of
-algorithms, details some of the ideas behind FCF and identifies the different
-aspects of the problem space. Section \ref{design} describes the design we
-applied to construct the framework, its domain specific language (DSL) and code
-generator. Section \ref{evaluation} evaluates an implementation and application
-of the framework. Section \ref{related} explores related work in the field of
-DSLs for ID and code generation for the IoT. Finally, section \ref{conclusion}
-summarizes our findings, draws conclusions and identifies topics for future
-work.
-
-\section{\NAME as a Development Strategy}
-\label{positioning}
-
-Figure \ref{fig:approach} shows a classification of several development
-strategies that can be adopted for projects involving wireless devices.
-
-\newcommand{\ball}[5][above,yshift=+5pt]{
-\tdplottransformmainscreen{#2}{#3}{#4}
-\shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray,shading angle=-90]
-  (\tdplotresx,\tdplotresy) circle (0.20)
-  node[text=gray,font=\footnotesize,#1]{#5};
-}
-
-\begin{figure}[ht]
-  \centering
-  \scalebox{.85}{
-\tdplotsetmaincoords{110}{-10}
-\begin{tikzpicture}[scale=1,tdplot_main_coords]
-  % axis
-  \draw[very thick,->] (0,0,0) -- (7,0,0) node[anchor=north east,xshift=10mm]{$flexibility$};
-  \draw[very thick,->] (0,0,0) -- (0,7,0) node[anchor=north west]{$update cost$};
-  \draw[very thick,->] (0,0,0) -- (0,0,4) node[anchor=south]{$development$};
-  % points
-  \coordinate (O)        at (0,0,0);
-  \coordinate (ideal)    at (6,0,0);
-  \coordinate (vm)       at (2,2,2);
-  \coordinate (modular)  at (4,4,4);
-  \coordinate (reconfig) at (4,2,4);
-  \coordinate (full)     at (6,6,4);
-  \coordinate (cg)       at (6,4,2.5);
-  % "lines"
-  \draw[dashed] (2,0,0)    -- (2,2,0) -- (0,2,0);
-  \draw[dashed] (4,0,0)    -- (4,4,0) -- (0,4,0);
-  \draw[dashed] (6,0,0)    -- (6,6,0) -- (0,6,0);
-  \draw[dashed] (vm)       -- (2,2,0);
-  \draw[dashed] (modular)  -- (4,4,0);
-  \draw[dashed] (full)     -- (6,6,0);
-  \draw[dashed] (reconfig) -- (4,2,0);
-  \draw[dashed] (cg)       -- (6,4,0);
-  % "balls"
-  \ball{6}{0}{0}{ideal}
-  \ball{2}{2}{2}{virtual machine}
-  \ball[left,xshift=-5pt]{4}{4}{4}{\shortstack{modular\\native image}}
-  \ball{4}{2}{4}{\shortstack{reconfigurable\\virtual machine}}
-  \ball[right,xshift=+5pt,yshift=+5pt]{6}{6}{4}{full native image}
-  %\ball[right,xshift=+5pt,text=black]{6}{4.5}{3}{code generation};
-  % 5. cg
-  \tdplottransformmainscreen{6}{4}{2.5}
-  \shadedraw[tdplot_screen_coords, ball color=gray,draw=black,shading angle=-90]
-    (\tdplotresx,\tdplotresy) circle (0.20)
-    node[right,xshift=+5pt,text=black,align=center,font=\footnotesize]{code generation\\+ functional code fusion};
-\end{tikzpicture}
-}
-\caption{Classification of Development Strategies for Wireless Devices (based on \cite{sadilek2007energy})}
-\label{fig:approach}
-\end{figure}
-
-Three properties are used to classify the strategies\cite{sadilek2007energy}:
-flexibility, update cost and development effort. The flexibility is a measure
-for the number of applications that can be deployed on a device without
-physical access. The update cost is the energy required to deploy a new version
-of an application on a node. The development effort covers the time to write,
-test and deploy an application. The \emph{ideal} situation is that were one
-ends up with a maximal flexibility and no update nor development cost.
-
-If we consider the trade off between flexibility and update cost, we can
-distinguish two extremes: virtual machines and full native images. Virtual
-machines allow for very small updates due to their concise byte code, but at
-the same time are restricted by the limitations of their instruction set and
-predefined capabilities. A full native image on the other hand has unlimited
-flexibility, but requires a large transfer of the image over the network.
-
-Two intermediate alternatives are possible: modular native image and
-reconfigurable virtual machines. With modular native images, only modules are
-changed, limiting the update size, but the framework to support it is static
-and limits the possibilities. Reconfigurable virtual machines take this same
-approach, but apply it to virtual machines, allowing to \emph{upgrade} the
-instruction set of the virtual machine.
-
-Choosing a development strategy, with this trade off take into account, will
-also determine the development cost. Developing for a virtual machine will be
-less demanding than targeting a native image.
-
-With \NAME we opt to start from the full native image, allowing full
-flexibility, but try to reduce both the update cost and the development cost.
-Firstly, by applying code generation and functional code fusion, we optimize
-the code organisation, which has a positive effect on the code size and hence
-also on the update cost. Secondly, by enabling reuse on a functional level and
-automating the writing phase, the development cost is also lowered.
+The remainder of this paper proceeds as follows: section \ref{classification}
+takes a look at ID algorithms and classifies them. Section \ref{pattern} looks
+for patterns in the implementation of these classes of algorithms, details some
+of the ideas behind FCF and identifies the different aspects of the problem
+space. Section \ref{design} describes the design we applied to construct the
+framework, its domain specific language (DSL) and code generator. Section
+\ref{evaluation} evaluates an implementation and application of the framework.
+Section \ref{related} explores related work in the field of DSLs for ID and
+code generation for the IoT. Finally, section \ref{conclusion} summarizes our
+findings, draws conclusions and identifies topics for future work.
 
 \section{A Classification of ID Algorithms}
 \label{classification}
@@ -341,19 +247,18 @@ participating in the network, some might miss clues that would otherwise lead
 them to detect intrusions. It is hardly impossible for a single device to
 detect a complex attack by itself. Therefore a second important research topic
 consists of cooperative algorithms to combine information from single
-identities into a group-based decision about alleged
-intrusions\cite{zhang2000intrusion}. We identify two ways by which this
-cooperative decision making can be constructed and focus on the way
-participants exchange information: broadcasting and interactive.
+identities into a group-based decision about alleged intrusions. We identify
+two ways by which this cooperative decision making can be constructed and focus
+on the way participants exchange information: broadcasting and interactive.
 
 \begin{LaTeXdescription}
 
   \item[Broadcasting] can sometimes allow a distributed, cooperative algorithm
   to be implemented locally. This is illustrated by the reputation-based
   detection algorithm introduced in \cite{ganeriwal2008reputation}, based on
-  the same principle of a watchdog also found in \cite{mishra2004intrusion}
+  the same principle of a watchdog also found in \cite{mishra2004intrusion}.
   Using this algorithm, nodes can exchange information about the reputation of
-  other nodes, using only broadcasted messages. Combining this information
+  other nodes, solely with broadcasted messages. Combining this information
   allows them to decide about their trust in a given node, based on more than
   their own, often partial, observations alone.
 
@@ -365,7 +270,7 @@ participants exchange information: broadcasting and interactive.
   protocol\cite{anderson1998new} to identify an intruder. It enables the
   exchange of suspected intruder information and allows distributed
   authentication of those \emph{votes}. Based on these authenticated votes, a
-  distributed decision can be made about the commonly identified intruder.
+  distributed decision can be made about the jointly identified intruder.
 
 \end{LaTeXdescription}
 
@@ -376,26 +281,19 @@ A research topic that exists in parallel to the detection and cooperation
 duality is software attestation. It offers algorithms for exchanging
 information about the software that is running on a device, and aims to
 identify devices that can no longer prove that their content is unaltered. A
-family of algorithms to implement this functionality are
-SWATT\cite{seshadri2004swatt}, ICE/SCUBA\cite{seshadri2006scuba} and
-SAKE\cite{seshadri2008sake}.
+good example is SAKE\cite{seshadri2008sake}.
 
-Software attestation is hard and many details can cause an algorithm to fail. A
-discussion surrounding this topic, started by \cite{castelluccia2009difficulty}
-in response to the previously mentioned papers, illustrates this. In
-\cite{perrig2010refutation} the authors of the original papers counter many of
-the objections made to their work, but the general feeling is that even in the
-best conditions, there is always a way to circumvent the most ingenious
-algorithm to perform software-based attestation.
+Software attestation is hard and many details can cause an algorithm to fail.
+The general feeling is that even in the best conditions, there is always a way
+to circumvent the most ingenious algorithm to perform software-based
+attestation.
 
 Within the context of this paper, we will not consider software attestation as
 a special class and exclude it from our scope, only focusing on detecting
-intrusions and distributed decision making.
+intrusions and distributed decision making. Figure \ref{fig:classification}
+visually summarizes this dual classification.
 
-Figure \ref{fig:classification} visually summarizes the dual classification
-presented above.
-
-\begin{figure}[!ht]
+\begin{figure}[ht]
   \centering
   \scalebox{.85}{
 \begin{tikzpicture}[
@@ -428,25 +326,25 @@ payloads reach the device or where patterns of communication can be observed
 when other devices in the vicinity are affected by such payloads.
 
 The latter is more complex: an algorithm based on signature or misuse detection
-maybe sometimes can undeniably decide if an attack is real or not. But when
-dealing with anomaly detection this line surely isn't that crisp. Especially in
-distributed situations where even a neighboring device can not be trusted,
-detecting intrusion is no absolute science. In this case one has to rely on
-statistics and thresholds to decide when to drop trust in a given device.
+can maybe undeniably decide if an attack is real or not. But when dealing with
+anomaly detection this line surely isn't that crisp. Especially in distributed
+situations where even a neighboring device can not be trusted, detecting
+intrusion is no absolute science. In this case one has to rely on statistics
+and thresholds to decide when to drop trust in a given device.
 
-Simply checking a threshold after updating some counter, is also not always a
-good strategy. A simple example is that of a
-watchdog\cite{mishra2004intrusion}, observing the actions of other devices.
-There are valid reasons why a devices might miss the theoretical window in
-which certain actions are expected. Simply reacting on such basic threshold
-might result in false positives. A way to overcome this is to decouple the
-detection of problems and the decision what to do about them.
+But simply checking a threshold after updating some counter, is not a good
+strategy. A simple example is that of a watchdog\cite{mishra2004intrusion},
+observing the actions of other devices. There are valid reasons why a devices
+might miss the theoretical window in which certain actions are expected. Simply
+reacting on such basic threshold might result in false positives. A way to
+overcome this is to decouple the detection of problems and the decision what to
+do about them.
 
 This decoupling of detection and decision is the core of the design pattern for
 ID algorithms. Listing \ref{alg:id-algo-pattern} presents the design pattern in
 pseudo-code.
 
-\begin{figure}[b]
+\begin{figure}[ht]
 \captionof{lstlisting}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
 \begin{algorithmic}[1]
   \Require{nodes, global storage for information about nodes}
@@ -475,8 +373,8 @@ the context of multiple algorithms. When implementing different algorithms, one
 will typically encounter a pattern such as describes in listing
 \ref{alg:id-algo-application}.
 
-\begin{figure}[!ht]
-\captionof{lstlisting}{Sequential implementation of ID algorithms\label{alg:id-algo-application}}
+\begin{figure}[ht]
+\captionof{lstlisting}{Application pattern of multiple ID algorithms\label{alg:id-algo-application}}
 \begin{algorithmic}[1]
   \Let{$msg$}{$network$} \Comment{all observed messages}
   \ForEach{$algorithm \in algorithms$}
@@ -494,41 +392,47 @@ The different implementations would be linked and called in a sequential way,
 when new messages are observed on the network and at a regular interval to
 allow them to do internal housekeeping, such as threshold evaluation. 
 
+\subsection*{Inherent Problems}
+\label{pattern-problems}
+
 Given these patterns, we can now identify the problem areas that tend to result
-in suboptimal code when combining multiple ID algorithms.
+in suboptimal code when combining multiple ID algorithms. Two issues arise from
+the nested loops that originate from the combination of the ID algorithm
+pattern and the application pattern: loops and common data. A third issue is
+the use of the network.
 
-\subsection*{Loops and Common Data}
+\begin{LaTeXdescription}
 
-Two issues arise from the nested loops that originate from the combination of
-the ID algorithm patterns and its application pattern. First, each algorithm,
-by itself, will parse each observed message on the network, processing the same
-byte stream, performing comparable operation to find similar patterns.
+  \item[Loops] by themselves are not a problem, but when different loops
+  perform the same operations in sequence, an overhead might be incurred. An
+  example from the ID algorithm pattern is the handling of messages: each
+  algorithm parses each observed message on the network, processing the same
+  byte stream, performing comparable operations to find similar patterns.
 
-Second, there is common data: Each algorithm also has to store information
-about nodes within its own scope, resulting in a lot of duplicated information
-in memory.
+  \item[Common data] is cross-cutting the different algorithms, that have to
+  store information about nodes within its own scope. This results in a lot of
+  duplicated information in memory that also needs to be maintained.
+
+  \item[The network] allows algorithms to operate on a distributed scale. But
+  calls to the \ttt{SEND} function are scattered around the algorithms, causing
+  the wireless radio to be accessed multiple times, keeping it active and
+  energy consuming more than strictly needed.
+
+\end{LaTeXdescription}
 
 Reimplementing the algorithms manually to eliminate these issues is not a valid
 option. This development cost typically isn't a one-time cost, e.g. in case a
 new version of the algorithm is released, or simply when a different set of
-algorithms is selected due to a changing risk analysis. Finally, changing, or
-simply implementing the algorithms from scratch, also holds the risk of making
+algorithms is selected due to a changing risk analysis. Also, changing, or
+simply implementing the algorithms from scratch, holds the risk of making
 mistakes.
 
-\subsection*{Network Usage and Heterogeneity}
-
-A third issue is hidden in the use of the network. The calls to the \ttt{SEND}
-function are scattered around the algorithm, causing the wireless radio to be
-accessed multiple times, keeping it active and energy consuming.
-
-The heterogeneity of the IoT devices, results in many different software
-stacks, each with their own network API. This also explains why there are very
-few implementations readily available to developers: there is no common
-platform to target for researchers.
-
-Even using a unified software library would not only require a consistent
-implementation of it, but would also limit the operational scope of the
-research implementation, still restricting it to a single language.
+The heterogeneity of IoT devices results in many different software stacks,
+each with e.g. their own network API. This also explains why there are very few
+implementations readily available to developers: there is no common platform to
+target for researchers. Even using a unified software library would not only
+require a consistent implementation of it, but would also limit the operational
+scope of the research implementation, still restricting it to a single language.
 
 \section{Design}
 \label{design}
@@ -546,11 +450,137 @@ the problems arising from the patterns/problems presented in listings
 different languages and platforms, while reusing a software library that
 provides e.g. message parsing, network access wrapping,\dots
 
-\subsection*{The Meaning of Loops}
+Choosing for a DSL and code generator is choosing a development strategy. This
+implies several choices with respect to flexibility, update cost and
+development effort. We will first position \NAME and motivate its design with
+respect to these trade offs (\ref{positioning}). Second, we will look at the
+principal design components of the DSL and how it deals with loops and common
+data (\ref{dsl-design}). Third, the structure of the code generator will be
+discussed (\ref{code-generator-design}). Finally, fourth, the supporting
+software library is introduced (\ref{software-lib-design}).
 
-From the design patterns we learned that loops are a major contributor to the
-problem of algorithm fusibility. Loops in program code are technical constructs
-and in fact often hide the actual intended functionality.
+\subsection{\NAME as a Development Strategy}
+\label{positioning}
+
+Figure \ref{fig:positioning} shows a classification of several development
+strategies that can be adopted for projects involving wireless devices.
+
+\newcommand{\ball}[5][above,yshift=+5pt]{
+\tdplottransformmainscreen{#2}{#3}{#4}
+\shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray,shading angle=-90]
+  (\tdplotresx,\tdplotresy) circle (0.20)
+  node[text=gray,font=\footnotesize,#1]{#5};
+}
+
+\begin{figure}[ht]
+  \centering
+  \scalebox{.85}{
+\tdplotsetmaincoords{110}{-10}
+\begin{tikzpicture}[scale=1,tdplot_main_coords]
+  % axis
+  \draw[very thick,->] (0,0,0) -- (7,0,0) node[anchor=north east,xshift=10mm]{$flexibility$};
+  \draw[very thick,->] (0,0,0) -- (0,7,0) node[anchor=north west]{$update\ cost$};
+  \draw[very thick,->] (0,0,0) -- (0,0,4) node[anchor=south]{$development$};
+  % points
+  \coordinate (O)        at (0,0,0);
+  \coordinate (ideal)    at (6,0,0);
+  \coordinate (vm)       at (2,2,2);
+  \coordinate (modular)  at (4,4,4);
+  \coordinate (reconfig) at (4,2,4);
+  \coordinate (full)     at (6,6,4);
+  \coordinate (cg)       at (6,4,2.5);
+  % "lines"
+  \draw[dashed] (2,0,0)    -- (2,2,0) -- (0,2,0);
+  \draw[dashed] (4,0,0)    -- (4,4,0) -- (0,4,0);
+  \draw[dashed] (6,0,0)    -- (6,6,0) -- (0,6,0);
+  \draw[dashed] (vm)       -- (2,2,0);
+  \draw[dashed] (modular)  -- (4,4,0);
+  \draw[dashed] (full)     -- (6,6,0);
+  \draw[dashed] (reconfig) -- (4,2,0);
+  \draw[dashed] (cg)       -- (6,4,0);
+  % "balls"
+  \ball{6}{0}{0}{ideal}
+  \ball{2}{2}{2}{virtual machine}
+  \ball[left,xshift=-5pt]{4}{4}{4}{\shortstack{modular\\native image}}
+  \ball{4}{2}{4}{\shortstack{reconfigurable\\virtual machine}}
+  \ball[right,xshift=+5pt,yshift=+5pt]{6}{6}{4}{full native image}
+  %\ball[right,xshift=+5pt,text=black]{6}{4.5}{3}{code generation};
+  % 5. cg
+  \tdplottransformmainscreen{6}{4}{2.5}
+  \shadedraw[tdplot_screen_coords, ball color=gray,draw=black,shading angle=-90]
+    (\tdplotresx,\tdplotresy) circle (0.20)
+    node[right,xshift=+5pt,text=black,align=center,font=\footnotesize]{code generation\\+ functional code fusion};
+  % "box around our solution" ;-)
+  \tdplottransformmainscreen{0}{0}{0}
+  \draw[tdplot_screen_coords] (4.95,1) rectangle (8.5,0.25);
+
+\end{tikzpicture}
+}
+\caption{Classification of Development Strategies for Wireless Devices (based on \cite{sadilek2007energy})}
+\label{fig:positioning}
+\end{figure}
+
+Three properties are used to classify the strategies\cite{sadilek2007energy}:
+flexibility, update cost and development effort.
+
+\begin{LaTeXdescription}
+
+  \item[Flexibility] is a measure for the number of applications that can be
+  deployed on a device without physical access.
+  
+  \item[Update cost] is equivalent to the energy required to deploy a new
+  version of an application on a device.
+  
+  \item[Development effort] covers the time to write, test and deploy an
+  application.
+
+\end{LaTeXdescription}
+
+The \emph{ideal} situation is that were one ends up with a maximal flexibility
+and no update nor development cost.
+
+If we consider the trade off between flexibility and update cost, we can
+distinguish two extremes: \emph{virtual machines} and \emph{full native
+images}. Virtual machines allow for very small updates due to their concise
+byte code, but at the same time are restricted by the limitations of their
+instruction set and predefined capabilities. A full native image on the other
+hand has unlimited flexibility, but requires transfer of a larger image over
+the network.
+
+Two intermediate alternatives are possible: \emph{modular native image} and
+\emph{reconfigurable virtual machines}. With modular native images, only
+modules are changed, limiting the update size, but the framework to support it
+is static and limits the possibilities. Reconfigurable virtual machines take
+this same approach, but apply it to virtual machines, allowing to
+\emph{upgrade} the instruction set of the virtual machine.
+
+Choosing a development strategy also determines the development cost: e.g.
+developing for a virtual machine will be less demanding than targeting a native
+image.
+
+With \NAME we opt to start from the full native image, allowing full
+flexibility, but try to reduce both the update cost and the development cost.
+Firstly, by applying code generation and functional code fusion, we optimize
+the code organization, which has a positive effect on the code size and hence
+also on the update cost. Secondly, by enabling reuse on a functional level and
+automating the writing phase, the development cost is also lowered.
+
+\subsection{Domain Specific Language}
+\label{dsl-design}
+
+Using a DSL, and especially an external DSL, as a foundation for any solution
+requires special care. It's important to remember that a DSL is merely a
+\emph{thin veneer over a (semantic) model}\cite{fowler2010domain}. Its sole
+purpose should be the easing of filling out the model. In the case of \NAME
+this easing focuses on avoiding constructions that result in problems as
+suggested in \ref{pattern-problems} concerning loops, common data and the use
+of the network.
+
+\subsubsection*{Loops}
+
+Loops are a major contributor to the problem of algorithm fusibility. Loops in
+program code are technical constructs and in fact often hide the actual
+intended functionality.
 
 To illustrate this, we take the example of parsing network messages. Each
 algorithm deals with parsing in the same way: loop over the bytes in the
@@ -558,30 +588,32 @@ payload and look for a pattern that identifies what the algorithm is looking
 for. This is in fact a technical implementation choice. The underlying
 functional goal is to react when such pattern is present in a message. The loop
 has \emph{activated} this functionality, but the real goal is to
-\emph{passively} react on an event, not \emph{actively} look for it.
-
-This is how \NAME removes the need for loops: by introducing event handling,
-constructions with loops are transformed to their functional meaning, allowing
-much easier identification and fusion of common functionalities.
+\emph{passively} react on an event, not \emph{actively} look for it. Using
+event handling, constructions with loops are transformed to their functional
+meaning, allowing identification and fusion of common functionalities.
 
 The same goes for actively polling some variable until it reaches a certain
 threshold. This also can be transformed to an event, eliminating the need for a
 technical loop-construction.
 
-\subsection*{A DSL for Nodes}
+\subsubsection*{The Nodes Domain}
 
-The second problem that could be observed from the patterns, was that of common
-data. All algorithms deal with information about neighboring devices. To
-centralize this information \NAME provides a unified \texttt{nodes} concept as
-part of its DSL and exposes it as an object to the implementor.
+All algorithms deal with information about neighboring devices. To centralize
+this information \NAME provides a unified \ttt{nodes} concept as part of its
+DSL and exposes it as an object to the implementor.
 
 Nodes can be extended with properties only available to the algorithm that
-defines them. This way only one instance for every known devices will be
-present in memory. Finally, nodes can define a scope for some function to be
-executed in. This way, nodes also offer a way to iterate all known devices,
-again without the need for a loop.
+defines them. This way only one instance for every known device will be present
+in memory. Finally, nodes can define a scope for some function to be executed
+in. This way, nodes also offer a way to iterate all known devices, again
+without the need for a loop.
 
-\subsection*{Unified Messaging}
+\subsubsection*{Unified Messaging}
+\label{dsl-unified-msg}
+
+Access to the network that is scattered around an algorithm, causes the
+wireless radio to be more activated than needed. Delaying the sending of
+messages and grouping them, can lower this overhead.
 
 Sending and receiving of network messages is tightly integrated with the
 previously mentioned concepts of event handling and the nodes domain. An
@@ -591,20 +623,14 @@ exposing an API to send messages through the nodes domain. This approach gives
 the framework complete control over the way messages are sent, allowing
 optimized marshaling, grouping,\dots
 
+\subsubsection*{An Example}
+
 Listing \ref{lst:watchdog} illustrates some of the features mentioned above,
 using a small but representative example of an algorithm: a
 watchdog\cite{mishra2004intrusion}. Like a heartbeat, nodes can broadcast a
 message at a regular interval, allowing other nodes to monitor its
 availability. Missing heartbeats could indicate problems, such as physical
 capturing of a device.
-
-\lstdefinelanguage{foo-lang}{
-  emph={module,const,from,import,extend,with,after,do,function,@every,having},
-  emphstyle={\textbf},
-  morecomment=[l]{//},
-  moredelim=[is][]{@@}{@@},       % temp solution to allow keywords without emph
-  moredelim=[is][\emph]{!!}{!!}   % temp solution to hightlight #atoms
-}
 
 \lstinputlisting[
   language=foo-lang,
@@ -614,7 +640,8 @@ capturing of a device.
   caption=Watchdog in \NAME
 ]{src/watchdog.foo}
 
-\subsection*{Code Generator}
+\subsection{Code Generator}
+\label{code-generator-design}
 
 To convert the DSL-based ID algorithms into production-ready code, we propose
 the use of a code generator. Although many approaches here are applicable, like
@@ -622,7 +649,7 @@ template-based text expansion, XSLT transformations or even using the
 CodeDom\cite{dollard2004code}, we believe that for the level of functional
 transformations that need to be performed, a richer model is required.
 
-A semantic model \cite{fowler2010domain}, tied closely to the DSL itself, can
+A semantic model\cite{fowler2010domain}, tied closely to the DSL itself, can
 fulfill this role. Semantic transformations can now be applied to create a
 code-oriented model, comparable to the idea of CodeDom. From there on,
 syntactic transformations an emit actual source code. Figure
@@ -632,7 +659,7 @@ syntactic transformations an emit actual source code. Figure
   \centering
   \scalebox{.85}{
 \begin{tikzpicture}[
-  node distance=8mm,
+  node distance=7mm,
   ,>=stealth,thick,black!50,text=black,
   every new ->/.style={shorten >=1pt}
 ]
@@ -673,7 +700,7 @@ Syntactic transformations now lower this level of expressiveness according to
 the desired platform and language. In the end the code model can be directly
 emitted to the target language.
 
-\subsection*{Semantic Model}
+\subsubsection*{Semantic Model}
 
 The semantic model is the core of the solution. It offers a way to describe ID
 algorithms in a way that allows semantic reinterpretation. This way, the
@@ -691,35 +718,38 @@ implemented for \NAME.
   edge from parent fork down,
   sibling distance=5mm, level distance=20mm, node distance=6mm
   ]
-  \node (model) [class] {Model}
-      child {node (module) [class] {Module} edge from parent [composite]
-        child {node (strategy) [class,align=center,xshift=-9mm] {Execution\\Strategy} edge from parent [composite]
-          child {node(every) [class,xshift=-9mm] {Every} edge from parent [subclass]}
-          child {node (when) [class,xshift=9mm] {When} edge from parent [subclass]}
+  \node (model) [class,fill=black!10!white] {Model}
+      child {node (module) [class,fill=black!10!white] {Module} edge from parent [composite]
+        child {node (strategy) [class,align=center,xshift=-10.5mm,fill=black!10!white] {Execution\\Strategy} edge from parent [composite]
+          child {node(every) [class,xshift=-9mm,fill=black!10!white] {Every} edge from parent [subclass]}
+          child {node (when) [class,xshift=9mm,fill=black!10!white] {When} edge from parent [subclass]}
         }
-        child {node (function) [class,xshift=9mm] {Function} edge from parent [composite]}
+        child {node (function) [class,xshift=10.5mm] {Function} edge from parent [composite]}
       };
   \node (constant)  [class,right=of module]   {Constant};
   \node (scope)     [class,left=of strategy]  {Scope};
   \node (statement) [class,right=of function] {Statement};
-  \node (nodes)     [class,left=of module]    {Nodes\\Domain};
+  \node (nodes)     [class,left=of module,xshift=-13mm]    {Nodes\\Domain};
   
   \draw [aggregate]  (module)   -- (nodes);
   \draw [composite]  (module)   -- (constant);
   \draw [dependency] (strategy) -- (scope);
   \draw [composite]  (function) -- (statement);
+  
+  \draw [composite]  (nodes)    -- (scope);
+  \draw [dependency] (strategy) -- (function);
 \end{tikzpicture}
 }
-\caption{Partial Semantic Model for \NAME}
+\caption{Partial Semantic Model for \NAME. Shaded classes indicate the \emph{event/scheduling} construction around functions to allow interpretation.}
 \label{fig:meta-model}
 \end{figure}
 
 The concept driving this model is the structure starting at the \emph{Model} up
-to the \emph{Execution Strategy}. This structure surrounds the actual
+to the \emph{Execution Strategy}. This structure encompasses the actual
 \emph{Function}s and underlying \emph{Statement}s and allows for interpretation
 and fusion of the algorithms.
 
-\subsection*{Functional Code Fusion}
+\subsubsection*{Functional Code Fusion (FCF)}
 
 Thanks to the functional description of events and the effects that are
 triggered by them, the code generator is able to identify the same actions
@@ -733,7 +763,7 @@ Semantic transformations are performed on the semantic model itself and end
 with a transformation of the semantic model into a code model, which encodes
 the semantics into technical code constructs.
 
-\subsection*{Code Model}
+\subsubsection*{Code Model}
 
 The code model can be compared to an AST for a very expressive language. It
 contains constructs found in certain languages, but not in others. Therefore a
@@ -747,14 +777,36 @@ self-containing code. The generator then uses a software library to perform
 these tasks. It will look for patterns that indicate any of these actions and
 transform them into calls into the \NAME software library.
 
-\subsection*{Software Library}
+\subsection{Software Library}
+\label{software-lib-design}
 
-We already touched upon the underlying software library when discussing the
-unified messaging framework: incoming messages are parsed, outgoing messages
-grouped. Besides these examples, other common functionality also isn't
-generated. The execution of functions based on a schedule or the implementation
-of higher level conceptual functions, such as \texttt{now} and \texttt{sha1},
-are calls into the standard software library that supports the code generator.
+In \ref{pattern-problems} the possibility to use a software library to offload
+common implementation aspects was already proposed. \ref{dsl-unified-msg}
+illustrated this approach with an example use for unified messaging: incoming
+messages are parsed, outgoing messages grouped.
+
+Other common functionality also isn't fully generated. The execution of
+functions based on a schedule or the implementation of higher level conceptual
+functions, such as \ttt{now} and \ttt{sha1}, are calls into the standard
+software library that supports the code generator.
+
+Optimizing such algorithms is not within the scope of \NAME. It also gives
+freedom of choice to the users of the framework to select appropriate
+implementations.
+
+\subsection{Design Summary}
+
+As a framework \NAME tries to reduce inefficiencies in execution, memory usage
+and network access. To achieve this, it tries to avoid constructions that are
+hard to identify and reorganize, such as loops and common data. These
+restrictions are enforced through its DSL.
+
+The DSL is platform and language independent, which allows the source code
+generator to target different configurations without any change to the formal
+descriptions of the algorithms.
+
+Finally, a supporting software library allows to separate functionality that is
+out of scope for the generator.
 
 \section{Implementation and Evaluation}
 \label{evaluation}
@@ -777,7 +829,7 @@ abstracted subsystems, but still in a platform and language independent way.
 The platform and language descriptions define the actual target platform and
 language and convert the abstract constructions in actually supported code. The
 software library is written in native code targeting the platform and language.
-Finally, the code and the image are artifacts of the automated generation and
+Finally, the code and image are artifacts of the automated generation and
 compilation process. They aren't a product of manual work and therefore aren't
 directly dependent on the platform.
 
@@ -815,24 +867,22 @@ implement changes to that platform. For example: to emit a different language
 will require a complete rewrite of the software library and a partial rewrite
 of the language description of the generator. Although this is a reusable,
 one-time effort, it is important in relation to the scalability of the
-framework.
+framework itself.
 
 \subsection*{Implementation}
 
 To evaluate the prototype we chose to use a system based on the Atmel
 ATMEGA1284p micro-controller \cite{datasheet:atmega1284p} and the Digi XBee S2
-ZigBee module \cite{manual:xbee}. To drive the hardware a minimalistic library
-was used, wrapping the technical calls to the components in more easy to use
-functions.
+ZigBee module \cite{manual:xbee}. To drive the hardware a simple library was
+used, wrapping technical calls to the components in more easy to use functions.
 
-The reason for this at first sight unusual setup is simple: relying on basic
-hardware and software allows us to validate that the generator is capable of
-generating code even for the most basic environment available. Any step up,
-both in hardware or software, would offer better and higher abstractions that
-would make it easier to generate code for that situation. It shows that the
-requirements of the generator towards the platform are minimal, don't rely on
-advanced frameworks or operating systems and can therefore be applied in any
-environment, targeting any platform.
+Relying on basic hardware and software allows us to validate that the generator
+is capable of generating code even for the most basic environment available.
+Any step up, both in hardware or software, would offer better and higher
+abstractions that would make it easier to generate code for that situation. It
+shows that the requirements of the generator towards the platform are minimal,
+don't rely on advanced frameworks or operating systems and can therefore be
+applied in any environment, targeting any platform.
 
 For the evaluation we constructed a small meshed network. In this network, not
 all devices have direct access to one another, requiring routing through shared
@@ -840,13 +890,12 @@ neighboring devices.
 
 We started from a basic application that measures light intensity. The
 application was constructed as an includable piece of code. This way it could
-be integrated in an manual implementation and merged into the generated
+be integrated in a manual implementation and merged into the generated
 solution. On top of this baseline we added two intrusion detection related
 algorithms: a watchdog\cite{mishra2004intrusion}, that allows nodes to validate
-each other's continuous presence, and a reputation-building
+each other's presence, and a reputation-based
 algorithm\cite{ganeriwal2008reputation}, that checks if a parent node is
-cooperative and actually forwards messages with a destination further down the
-network.
+cooperative and actually forwards messages further upstream.
 
 \subsection*{Experimental Results}
 
@@ -860,16 +909,6 @@ In case of the manual implementation, both algorithms were constructed as
 standalone modules and sequentially called from the base-application's event
 loop. The code generator was provided with \NAME descriptions of the algorithms
 and generated all four cases.
-
-Before reviewing the results, it is very important to put these results in a
-proper perspective. Comparing manually written code to generated code is no
-exact science. One can always argue that the quality of the two code bases is
-not comparable and that the manual code always can be improved. Still it might
-be interesting to look at the numbers, given that both code bases are
-constructed with the same intentions and practices. We believe we have achieved
-this and have taken honest decisions while constructing the implementations,
-making them comparable. Numerical analysis of the implementation offers us a
-preliminary estimation of the effect of our proposed solution.
 
 Tables \ref{tbl:manual} and \ref{tbl:generated} show the collected data
 respectively for the manual and the generated implementation. The base case is
@@ -908,22 +947,21 @@ added are presented as relative values.
   \label{tbl:generated}
 \end{table}
 
-From these raw results, we learn that adding algorithms manually to the
-base-application, results in a cumulative increase. The impact of both
-algorithms is simply the sum of the impact of each algorithm by itself. In the
-case of the time required to execute one cycle of the event loop, the total
-time is even a bit higher than simply the sum.
+These results show that adding algorithms manually to the base-application has
+a cumulative effect. The impact of both algorithms is simply the sum of the
+impact of each algorithm by itself. In case of the execution time of one cycle
+of the event loop, the total is even a bit higher.
 
-In the case of the generated implementation, this no longer holds: although
-that even the individual increases due to adding a single algorithm are higher
-than in the manual case, the result for the implementation of both algorithms
-is less than the sum of both. Here we clearly see the effect of reusing the
-software library that comes with \NAME. The same goes for all other metrics.
-Maybe most remarkable is the effect on the time of one event loop cycle: both
-algorithms by itself add 150\% with respect to the base case, but when
-combined, the impact hardly increases. Here we learn that the introduced
-software library is responsible for the initial overhead, but it clearly pays
-for itself when adding more algorithms.
+In case of the generated implementation, this effect is no longer observed:
+individual algorithms do have a larger impact by themselves, but the
+combination of both algorithms is less than the sum of both.
+
+Most remarkable is the effect on the time of one event loop cycle: both
+algorithms by itself add 152\%. Adding a second algorithm only augments the
+impact to 188\%. We see the effect of the generic handling of common
+functionality, like message parsing, event scheduling,\dots It comes with an
+overhead for a single algorithm, but clearly pays for itself when adding more
+algorithms.
 
 Table \ref{tbl:summary} compares the two situations by subtracting the manual
 case from the generated case, showing the impact of the code generation. A
@@ -942,33 +980,26 @@ presented.
   time ($\mu$s) & 0     & 27       & 33         & -11   & 93\%   \\
   \hline
   \end{tabular}
-  \caption{Comparison of both implementations.}
+  \caption{Comparison of both manual and generated implementations.}
   \label{tbl:summary}
 \end{table}
 
-When comparing the results of both implementations we first can conclude that
-the generator produces exactly the same code for the base case. We couldn't
-measure any real differences between both implementations. It's important to
-validate this aspect to ensure that both implementations are structurally
-comparable.
+The first observation deals with the base case: both the manual and the
+generated implementations perform exactly the same. There is no fundamental
+structural difference in the overall architecture of the code.
 
 Secondly, we see that the software library that comes with the generated code
 adds to the size of the resulting image. But the cost is almost constant and is
 relatively lower when algorithms are combined. With roughly 3KB of additional
-overhead, or 15\% in this simple case, this impact is affordable.
+overhead, or 15\% in this simple case, this impact limited.
 
-From a functional point of view, the generated code lives up to the
-expectations: both the number of frames as the bytes sent benefit from well
-organized code and reuse of a common software library.
+Thirdly, when turning to the goal to reduce the network usage, we see that both
+the number of frames as well as the amount of bytes sent have dropped by
+respectively 13 and 7\%.
 
 Finally we see that both algorithms by itself add an equal amount of time to
 the processing of a single event loop cycle, but when combined, the event loop
 is about 7\% faster compared to the manual case.
-
-Without any effort to optimize the software library, nor leveraging knowledge
-about the specific algorithms, this very basic generated code shows that the
-proposed principles are not only theoretically feasible but actually result in
-interesting improvements.
 
 \section{Related Work}
 \label{related}
@@ -988,19 +1019,11 @@ framework.
 
 \subsection{Domain Specific Languages}
 
-Using a DSL, and especially an external DSL, as a foundation for any solution
-requires special care. It's important to remember that a DSL is merely a
-\emph{thin veneer over a (semantic) model}\cite{fowler2010domain}. Its sole
-purpose should be the easing of filling out the model. In the case of \NAME the
-reasons to implement a DSL are valid: the key goal is to remove any technical
-restrictions from a formal description of ID algorithms, allowing domain
-experts to produce these specifications\cite{mernik2005and}.
-
-Zooming in on wireless networks of resource constraint devices, we see that
-DSLs are indeed introduced \enquote{to shorten the development cycles
-dramatically during deployments, to reduce the dependency on hardware and
-software engineers, and to lead to a wider adoption outside the computer
-science field}\cite{sadilek2008domain,naumowicz2009prototyping}.
+Within the scope of wireless networks of resource constraint devices, we see
+DSLs being introduced \enquote{to shorten the development cycles dramatically
+during deployments, to reduce the dependency on hardware and software
+engineers, and to lead to a wider adoption outside the computer science
+field}\cite{sadilek2008domain,naumowicz2009prototyping}.
 
 TinyScript\cite{levis2004tinyscript} is an example of a language for wireless
 sensor networks. It's a complete programing language that aims to ease the
@@ -1030,9 +1053,9 @@ our event-driven concept. The framework generates C++.
 
 \subsection{Code Generation}
 
-Code generation can be applied for a number reasons. In combination with a DSL
-it can optimize a development process, reducing the amount of code that needs
-to be constructed or it can be used to systematically create better code. 
+Code generation, in combination with a DSL, can optimize a development process
+by reducing the amount of code that needs to be constructed or systematically
+improving the code quality.
 
 Embedded systems are a prime example of an environment where code needs to be
 of a high quality. Focus on size and performance are a logical choice when
@@ -1055,14 +1078,14 @@ extension\cite{sadilek2007energy}, combined with energy-aware compilation,
 seems a promising approach. By offloading the optimization to a VM and only
 compiling parts and not the whole, the solution allows updating at a very
 granular scale, thus reducing the update cost, while maintaining flexibility
-and lowering the development effort. As stated in the introduction, \NAME
+and lowering the development effort. As explained in \ref{positioning}, \NAME
 focuses on the reduction of the development effort and update cost, while
 preserving flexibility.
 
 Finally, applying code generation to IDS, typically tries to generate native
 code to avoid the interpretation of the description of patterns.
 I2S\cite{charitakis2003code} is an example that generates code for
-SNORT\cite{roesch1999snort} rules. To optimise this highly efficient code, it
+SNORT\cite{roesch1999snort} rules. To optimize this highly efficient code, it
 often targets a specific platform.
 
 \section{Conclusion and Future Work}
@@ -1089,9 +1112,7 @@ This research is partially funded by the Interuniversity Attraction Poles
 Programme Belgian State, Belgian Science Policy, and by the Research Fund KU
 Leuven. This research is partially funded by the EU FP7 project NESSoS. We
 would like to thank the reviewers for their thoughtful and helpful comments
-that enhanced the readability of this paper. Our gratitude and respect also
-goes out to all members of the NES task force at KU Leuven/DistriNet for
-creating the nurturing environment where these ideas could grow.
+that enhanced the readability of this paper.
 
 \bibliographystyle{IEEEtran}
 \bibliography{literature/referenties}
