@@ -1091,20 +1091,36 @@ often targets a specific platform.
 \section{Conclusion and Future Work}
 \label{conclusion}
 
-\TODO
+Wireless resource constraint devices require that software respects their
+energy restrictions. Efficiently adding multiple intrusion detection algorithm
+requires fusion of these algorithms on a functional level, to reduce execution
+inefficiencies, redundant memory usage and superfluous network access.
 
-theoretical gains are met in practice
+In this paper we introduced \NAME, a framework consisting of a DSL, a source
+code generator and accompanying software library. Using the DSL, intrusion
+detection algorithms can be formally described in such way that, using
+functional code fusion during source code generation, it is possible to
+interpret their functional meaning and merge common functionality and shared
+data. The software library hosts common functionality, such as network message
+parsing, sent message aggregation, event scheduling,\dots as a framework for
+the generator to apply.
 
-explore more domains + implement corresponding DSLs for embedded systems
+Initial experiments confirm the theoretical positive impact on the use of
+resources. The platform independent DSL enables generation of source code
+targeting different platforms and languages, which allows high degrees of reuse
+in heterogenous environments and different configurations.
 
-extract generic language as host for DSLs
+Near future research will focus on the integration of applications with the
+generated intrusion detection systems. We see opportunities to allow
+application to actively and dynamically respond to intrusions as they are
+detected and avoid malicious payload to harm them.
 
-Integration of applications with generated IDS allows actively and dynamically
-responding to changes in the reputation of other nodes.
+A continued effort is targeting the reduction of non-platform independent parts
+in the implementation. This way it is possible to add more platforms and
+languages with less effort.
 
-The services running on those devices can take advantage of these local
-security layers. If the IDS detects a problem, the service can immediately
-terminate the communication with the attacker, before it's actually abused.
+In the longer run, we want to investigate the possibility to extend the
+functional code fusion paradigm to other domains beyond intrusion detection.
 
 \section*{Acknowledgements}
 
