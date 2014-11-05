@@ -1,0 +1,50 @@
+% additional packages and utility commands
+
+\usepackage{float}
+
+\newcommand{\TODO}{\textbf{\color{red}TODO}}
+
+% \usepackage{flushend}
+
+% while preparing, linenumbers come in handy
+\usepackage{lineno}
+\setlength\linenumbersep{1mm}
+\linenumbers
+
+% until we settle on the final name ;-)
+\usepackage{xspace}
+\newcommand{\NAME}{id-foo\xspace}
+
+% http://tex.stackexchange.com/questions/299/how-to-get-long-texttt-sections-to-break
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+% http://en.wikibooks.org/wiki/LaTeX/Customizing_LaTeX
+\newcommand{\ttt}[1]{\texttt{\justify{#1}}}
+
+\usepackage{algpseudocode}
+% custom Let command
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\renewcommand{\algorithmicforall}{\textbf{for each}}
+\let\ForEach\ForAll
+
+\usepackage{listings}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usetikzlibrary{graphs}
+\usetikzlibrary{trees}
+\usetikzlibrary{arrows}
+
+\usepackage{tikz-3dplot}
+
+\input{tikz}
+\input{foo-lang}
+
+\usepackage[autostyle]{csquotes}
