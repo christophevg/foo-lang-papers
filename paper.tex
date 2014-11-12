@@ -960,7 +960,9 @@ structural difference in the overall architecture of the code.
 Secondly, we see that the software library that comes with the generated code
 adds to the size of the resulting image. But the cost is close to constant and
 is lower for both algorithms together. With roughly 3KB of additional overhead,
-or 15\% in this simple case, this impact limited.
+or 15\% in this simple case, the impact is small. Taking into account the
+available memory on the ATMega1284p, this is merely 2.3\% of the available
+resources.
 
 Thirdly, when turning to the goal to reduce the network usage, we see that both
 the number of frames as well as the amount of bytes sent have dropped by 13 and
@@ -969,6 +971,21 @@ the number of frames as well as the amount of bytes sent have dropped by 13 and
 Finally we see that both algorithms by itself add an equal amount of time to
 the processing of a single event loop cycle, but when combined, the event loop
 is about 7\% faster compared to the manual case.
+
+\subsection{Analytical Results}
+
+Looking at the generated source code is another way to validate the framework.
+Reusing common data allows elimination of for example the network address
+within the scope of each individual algorithm. Analysis of the source code with
+both algorithms implemented, shows that this reduces the memory footprint for
+one node with 2 bytes from 27 bytes to 25 bytes. A ZigBee network address
+indeed consists of 16 bits. So this results in a reduction of 7.4\%. Using
+ZigBee's 64 bits unique addresses, this reduction can easily become 20.5\%.
+
+Finally comparing the amount of code versus the size of the formal description
+of IDS algorithms, can be an indication of the development effort. Implementing
+both algorithms manually results in 637 lines of clean and documented C code.
+The corresponding \NAME implementation results in 156 lines of DSL code.
 
 \section{Related Work}
 \label{related}
