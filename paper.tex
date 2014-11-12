@@ -630,7 +630,7 @@ a richer model.
 
 A semantic model \cite{fowler2010domain}, tied closely to the DSL itself, can
 fulfill this role. Semantic transformations evolve the model into a
-code-oriented model, comparable to the idea of CodeDom. From there on,
+syntax-oriented model, comparable to the idea of CodeDom. From there on,
 syntactic transformations an emit source code. Figure \ref{fig:code-generation}
 shows the process that \NAME implements.
 
@@ -644,7 +644,7 @@ shows the process that \NAME implements.
 ]
   \node (dsl)  [resource]                                 {DSL};
   \node (sm)   [representation,right=of dsl,align=center] {Semantic\\Model};
-  \node (cm)   [representation,right=of sm,align=center]  {Code\\Model};
+  \node (cm)   [representation,right=of sm,align=center]  {Syntactic\\Model};
   \node (code) [resource,right=of cm]        {Code};
 
 
@@ -673,11 +673,11 @@ shows the process that \NAME implements.
 After parsing the DSL, it's imported into a semantic model. The minimal type
 information present in the initial model allows inferring of the remaining
 types. Through a series of semantic transformations, the model evolves from the
-functional to a more technical code model. This code model is comparable to a
+functional to a more technical syntactic model. This model is comparable to a
 rich abstract syntax tree (AST) with an extensive set of language constructs.
 Syntactic transformations now lower this level of expressiveness according to
-the desired platform and language. In the end the code model can be directly
-emitted to the target language.
+the desired platform and language. In the end the syntactic model can be
+directly emitted to the target language.
 
 \subsubsection{Semantic Model}
 
@@ -739,12 +739,12 @@ executions.
 FCF typically looks for patterns in the semantic model and performs model
 transformations to change these patterns to a more optimized organization. It
 first performs semantic transformations on the semantic model itself and ends
-then transforms the semantic model into a code model, encoding the semantics
-into technical code constructs.
+then transforms the semantic model into a syntactic model, encoding the
+semantics into technical syntax constructs.
 
-\subsubsection{Code Model}
+\subsubsection{Syntactic Model}
 
-The code model is an AST for a virtual, expressive language. It contains
+The syntactic model is an AST for a virtual, expressive language. It contains
 constructs and ideas found in different languages and programming paradigms. No
 single existing programming language supports all features as is. Syntactic
 transformations therefore morph the unsupported constructs into comparable
