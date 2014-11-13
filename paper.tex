@@ -34,16 +34,17 @@ Christophe Huygens, Wouter Joosen}%
 When intrusion prevention fails, intrusion detection serves as a second layer
 of defense. It looks for patterns \& anomalies that can indicate malicious
 behavior. But supporting an adequate set of intrusion detection algorithms
-imposes significant overhead on resource-restricted devices such as those
-targeting the Internet of Things. Fusion of the algorithms, to optimize sharing
-of resources, can alleviate this, yet, proves to be time-consuming, repetitive
-and error-prone. To address this problem we introduce \NAME, a framework for
-the development of efficient intrusion detection systems. It consists of a
-domain specific language, to formally describe intrusion detection algorithms
-on a functional level, and a code generator to produce more optimally organized
-source code. A side-by-side comparison shows that generated code reduces memory
-footprint, message passing overhead and execution time in comparison to a
-straightforward sequential implementation of the same algorithms.
+imposes significant overhead on resource-constraint devices such as those in
+the Internet of Things. Fusion of the algorithms, to optimize sharing of
+resources, can alleviate this, yet, proves to be time-consuming, repetitive and
+error-prone. To address this problem \NAME provides a framework for the
+development of efficient intrusion detection systems. It consists of a domain
+specific language, to formally describe intrusion detection algorithms on a
+functional level, and a code generator to produce more optimally organized
+source code. A side-by-side comparison shows that generated code is smaller and
+reduces message passing overhead, execution time and memory footprint in
+comparison to a straightforward sequential implementation of the same
+algorithms.
 
 \end{abstract}
 
@@ -58,37 +59,38 @@ our daily work and life through domotics, assisted living, e-health and
 enhanced learning \cite{atzori2010internet}. But with this potential the IoT
 also presents a significant threat: by opening our smart homes and personal
 data to all these interconnected devices, we also open them to everyone who is
-able to break the virtual locks (i.e.\ passwords, encryption keys,\dots) that
-protect them. IoT devices typically have limited batteries, processing power
-and memory. These properties make it hard to add any additional service,
-including security.
+able to break the virtual locks that protect them (i.e.\ passwords, encryption
+keys,\dots). IoT devices typically have limited batteries, processing power and
+memory. These properties make it hard to add any additional service, including
+security.
 
 % classic networks: fw and central ids
 
 In classic networks, firewalls focus on the outer perimeter of the network,
 filtering unwanted packets and protecting the entire internal network. But
 attacks on flaws in services can pass unnoticed. This is where intrusion
-detection (ID) steps in: an ID probe monitors all traffic that passes through
-the firewall, looking for patterns and optionally, after detecting a malicious
-pattern, alerting the firewall \cite{denning1987intrusion}.
+detection (ID) comes into play: an intrusion detection systems (IDS) monitors
+all traffic that passes through the firewall, looking for patterns of malicious
+activity, and optionally, after detecting such pattern, alerting the firewall,
+allowing it to take corrective actions \cite{denning1987intrusion}.
 
 % local ids -> localize -> limited resources
 
-In wireless networks of resource constraint devices, which make up an
+In wireless networks of resource-constraint devices, which make up a
 significant part of the IoT, it is not possible to have this single point in
 the network that can oversee all traffic \cite{mishra2004intrusion}. Every
-device has to implement its own lines of defense. But making the intrusion
-detection system (IDS) a local service on each device requires local resources,
-which are a scarce commodity for IoT devices.
+device has to implement its own lines of defense. But making the IDS a local
+service on each device requires local resources, which are a scarce commodity
+for IoT devices.
 
 Attackers have access to a large set of possible attack vectors
 \cite{aschenbruck2012security}, ranging from the wireless network, over the
 medium access control and routing, up to the device itself. Each level presents
 different opportunities to manipulate data, eavesdrop, perform a form of denial
-of service or access the network in a legitimate way. For each of these attacks
-an algorithm needs to look for patterns or anomalies. An IDS for IoT devices
-therefore requires a large number of implemented algorithms for an adequate
-coverage.
+of service or even access the network in a legitimate way. For each of these
+attacks an algorithm needs to look for patterns or anomalies. An IDS for IoT
+devices therefore requires a large number of implemented algorithms for an
+adequate coverage.
 
 % gap analysis
 
@@ -97,8 +99,7 @@ implementation of algorithms \cite{valero2012di} and offer the required basic
 functional components to implement them \cite{krontiris2008lidea}. The first
 aspect that is missing, is that they don't offer a way to optimize the usage of
 resources. A solution that supports the integration of multiple algorithms on
-IoT devices needs to consider the impact on their resources and avoid
-accumulating their impact.
+IoT devices needs to avoid accumulating their impact on the available resources.
 
 A second omission is support for systematic reuse to create different
 configurations for different devices, both in hard- and software. Addressing
@@ -109,36 +110,36 @@ development in this area.
 
 % 1. framework: language + code generator
 
-The first contribution of this paper is a framework that enables the formal
-description of ID algorithms on a functional level. An automated code
-generation process produces corresponding source code, for a given platform and
-configuration. This way, the framework addresses the heterogeneous nature of
-both the IoT and ID algorithms.
+The first contribution of this paper is a framework called \NAME. It enables
+the formal description of ID algorithms on a functional level and provides a
+code generator to produces corresponding source code for a given platform and
+configuration. This way, \NAME addresses the heterogeneous nature of both the
+IoT and ID algorithms.
 
 % 2. FCF to optimise
 
-The second contribution introduces functional code fusion (FCF) as a generation
-paradigm to solve the problem of hard to reuse and combine ID algorithms. FCF
-identifies common data and functions, and organizes code to eliminate redundant
-iterations, tests and computations. Results show improved memory usage,
-execution time and usage of the wireless radio, reducing energy consumption.
+The second contribution introduces functional code fusion (FCF) as a source
+code generation paradigm to solve the problem of hard to reuse and combine ID
+algorithms. FCF identifies common data and functions, and organizes code to
+eliminate redundant iterations, tests and computations. Results show improved
+image size, usage of the wireless radio, execution time and memory usage.
 
 % structure
 
 The remainder of this paper proceeds as follows: section \ref{classification}
 analyses and classifies ID algorithms. Section \ref{pattern} looks for patterns
-in the implementation of these classes and details the ideas behind FCF\@.
-Section \ref{design} describes the design we applied to construct the
-framework, its domain specific language (DSL) and code generator. Section
-\ref{evaluation} evaluates an implementation of the framework. Section
-\ref{related} explores related work in the field of DSLs for ID and code
-generation for the IoT\@. Finally, section \ref{conclusion} summarizes our
-findings, draws conclusions and identifies topics for future work.
+in the implementation of these classes. Section \ref{problems} identifies the
+problems arising from these patterns. Section \ref{design} describes the design
+we applied to construct \NAME, its domain specific language (DSL) and code
+generator. Section \ref{evaluation} discusses and evaluates an implementation.
+Section \ref{related} explores related work in the field of DSLs and code
+generation. Finally, section \ref{conclusion} summarizes our findings, draws
+conclusions and identifies topics for future work.
 
 \section{A Classification of ID Algorithms}
 \label{classification}
 
-Two aspects, currently missing from ID frameworks, that \NAME wants to cover
+Two aspects, currently missing from ID frameworks, that \NAME wants to address,
 are optimization of resources and support for systematic reuse. This section
 uses a classification to define the scope of \NAME, detailing which types of
 algorithms are good candidates for the proposed approach.
@@ -146,14 +147,14 @@ algorithms are good candidates for the proposed approach.
 Research into ID in wireless networks typically focuses on two major topics:
 the devices as single entities and the network as a group of such devices. Both
 are important: a group cannot make a decision without members that detect
-malicious behavior and a group-based decision is often needed because nodes in
-the network can miss certain events that could reveal intrusions. In a wireless
-network, where not all participants are within each others' radio range, nodes
-typically only have a partial view on the entire network. This prohibits them
-to observe potentially crucial events in distant parts of the network. The fact
-that resource constraint devices typically apply duty cycling to lower their
-energy consumption, further increases this problem, introducing periods of time
-where they even don't see local events.
+malicious behavior and a group-based decision is often needed because devices
+in the network can miss certain events that could reveal intrusions. In a
+wireless network, where not all participants are within each others' radio
+range, wireless devices typically only have a partial view on the entire
+network. This prohibits them to observe potentially crucial events in distant
+parts of the network. The fact that resource-constraint devices typically apply
+duty cycling to lower their energy consumption, further increases this problem,
+introducing periods of time where they even don't observe local events.
 
 This leads to two complementary classes of ID activities: local intrusion
 detection and cooperative decision making.
@@ -200,32 +201,32 @@ distributed environment, communication between participants may be even more
 important.
 
 Because not all devices are always actively participating in the network, they
-can miss clues that would otherwise lead them to detect intrusions. It is
+can miss events that would otherwise lead them to detect intrusions. It is
 hardly impossible for a single device to detect a complex attack by itself.
 Therefore a second important research topic consists of cooperative algorithms
 to combine information from single identities into a group-based decision about
 alleged intrusions. We identify two ways to construct cooperative decision
-making and focus on the way participants exchange information: broadcasting and
-interactive.
+making and focus on the way participants exchange information: broadcast and
+interactive communication.
 
 \begin{LaTeXdescription}
 
-  \item[Broadcasting] can sometimes allow to implement a distributed,
+  \item[Broadcast communication] can allow implementing a distributed,
   cooperative algorithm locally. The reputation-based detection algorithm
-  introduced in \cite{ganeriwal2008reputation} illustrates this, based on the
+  introduced in \cite{ganeriwal2008reputation} illustrates this. It uses the
   same principle of a watchdog also found in \cite{mishra2004intrusion}. Using
-  this algorithm, nodes can exchange information about the reputation of other
-  nodes, solely with broadcasts. Combining this information allows them to
-  decide about their trust in a given node, based on more than their own, often
-  partial, observations alone.
+  this algorithm, devices can exchange information about the reputation of
+  other devices, solely using one-way broadcast messages. Combining this
+  information allows them to decide about their trust in a given device, based
+  on more than their own, often partial, observations.
 
-  \item[Interactive] communication allows algorithms to exchange information to
+  \item[Interactive communication] allows algorithms to exchange information to
   reach a consensus. In \cite{krontiris2009cooperative}, the authors first
   present a theoretical foundation to analyze cooperative algorithms. Given
-  these foundations they continue to present an algorithm consisting of 5
-  phases. It essentially implements a voting system-based on the Guy Fawkes
-  protocol \cite{anderson1998new} to identify an intruder. It enables the
-  exchange of suspected intruder information and allows distributed
+  these foundations they continue to present an algorithm consisting of five
+  phases, which essentially implement a voting system based on the Guy Fawkes
+  protocol \cite{anderson1998new}, to identify an intruder. It enables the
+  exchange of suspected intruder information and allows for distributed
   authentication of those \emph{votes}. Based on these authenticated votes, the
   participants can make a distributed decision about the jointly identified
   intruder.
@@ -237,8 +238,8 @@ interactive.
 
 Algorithms that fit this classification are typically platform independent.
 They analyze network messages, looking for patterns that can reveal intrusions
-and deal with the same information: other nodes in the network. To be able to
-formally describe ID algorithms and target the heterogeneous IoT, \NAME
+and all deal with the same information: other devices in the network. To be
+able to formally describe ID algorithms and target the heterogeneous IoT, \NAME
 requires ID algorithms to expose these properties.
 
 A class of ID algorithms that does not have these properties is software
@@ -306,20 +307,20 @@ pseudo-code.
 \begin{figure}[ht]
 \captionof{lstlisting}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
 \begin{algorithmic}[1]
-  \Require{nodes, global storage for information about nodes}
+  \Require{devices: global storage for device information}
   \Function{process\_message}{$msg$}
     \ForEach{$byte \in msg$} \label{alg:id-algo-pattern-loop1}
      \State \dots \Comment{analyze byte-sequences}
     \EndFor
-    \Let{$nodes_x$}{value}  \Comment{optionally update node info}
-    \State \Call{send}{$nodes_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send1}
+    \Let{$devices_x$}{value}  \Comment{optionally update device info}
+    \State \Call{send}{$device_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send1}
   \EndFunction
   \State
   \Function{do\_housekeeping}{}
-    \ForEach{$node \in nodes$} \label{alg:id-algo-pattern-loop2} \label{alg:id-algo-pattern-common-data}
-      \If{$node > \dots$} \Comment{validate recorded value}
+    \ForEach{$device \in devices$} \label{alg:id-algo-pattern-loop2} \label{alg:id-algo-pattern-common-data}
+      \If{$device > \dots$} \Comment{validate recorded value}
         \State \dots \Comment{take actions}
-        \State \Call{send}{$node$, ``info''} \Comment{communicate} \label{alg:id-algo-pattern-send2}
+        \State \Call{send}{$device$, ``info''} \Comment{communicate} \label{alg:id-algo-pattern-send2}
       \EndIf
     \EndFor
   \EndFunction
@@ -327,9 +328,8 @@ pseudo-code.
 \end{algorithmic}
 \end{figure}
 
-We now extend the scope of the design pattern, to include its application in
-the context of multiple algorithms. When implementing different algorithms, a
-pattern such as described in listing \ref{alg:id-algo-application} will
+Applying the pattern in the context of multiple algorithms, extends its scope
+and a pattern such as described in listing \ref{alg:id-algo-application} will
 typically appear.
 
 \begin{figure}[ht]
@@ -347,19 +347,22 @@ typically appear.
 \end{algorithmic}
 \end{figure}
 
-The pattern calls the different, linked implementations in a sequential way in
-two situations: first, when the device observes new messages on the network
-and, secondly, at a regular interval to allow for internal housekeeping, such
-as threshold evaluation.
+The pattern calls the different, linked implementations in sequence in two
+situations: first, when the device observes new messages on the network and,
+secondly, at a regular interval to allow for internal housekeeping, such as
+threshold evaluation.
 
-\subsection{Inherent Problems}
-\label{pattern-problems}
+\section{Inherent Problems}
+\label{problems}
 
-These patterns can now help in identifing the problem areas that tend to result
-in suboptimal code when combining multiple ID algorithms. Two issues arise from
-the nested loops that originate from the combination of the ID algorithm
-pattern and the application pattern: loops and common data. A third issue is
-the use of the network.
+These patterns can now help in identifying the problem areas that tend to
+result in suboptimal code when combining multiple ID algorithms. Besides these
+code-level problems, operational problems also hinder the implementation of an
+IDS for IoT devices.
+
+Two issues arise from the nesting of loops that originate from the combination
+of the ID algorithm pattern and the application pattern: loops and common data.
+A third issue is the use of the network.
 
 \begin{LaTeXdescription}
 
@@ -370,7 +373,7 @@ the use of the network.
   performing comparable operations to find similar patterns.
 
   \item[Common data] cross-cuts the different algorithms, that have to store
-  information about nodes within its own scope. This results in a lot of
+  information about devices within its own scope. This results in a lot of
   duplicated information in memory.
 
   \item[The network] allows algorithms to operate on a distributed scale. But
@@ -380,7 +383,6 @@ the use of the network.
 
 \end{LaTeXdescription}
 
-\bigskip
 Two operational aspects are orthogonal to these problems and amplify them:
 
 \begin{LaTeXdescription}
@@ -417,12 +419,19 @@ overall design.
   ,>=stealth,thick,black!50,text=black,
   every new ->/.style={shorten >=1pt}
 ]
-  \node (dsl)  [resource]                                 {DSL};
-  \node (cg)   [representation,right=of dsl,align=center] {Code\\Generator};
-  \node (code) [resource,right=of cg]                     {Code};
+  \node (dsl)  [resource]                                          {DSL};
+  \node (cg)   [representation,right=of dsl,align=center]          {Code\\Generator};
+  \node (code) [resource,right=of cg]                              {Code};
+  \node (lib)  [resource,below=of code,align=center,yshift=0.5cm]  {Software\\Library};
 
-  \draw [->] (dsl) -> (cg)   node [midway,above=25pt]              {formal};
+  \draw [->] (dsl) -> (cg)   node [midway,above=25pt]              {intent};
   \draw [->] (cg)  -> (code) node [midway,above=15pt,align=center] {platform\\ + language};
+
+  \draw [rounded corners,->]
+        ($ (lib.west) $)
+        -- ++(-0.5cm, 0cm)
+        -- ++( 0cm,   1cm)
+        -- ($ (code.west) + (0cm,-0.22cm) $);
 
 \end{tikzpicture}
 }
@@ -431,11 +440,12 @@ overall design.
 \end{figure}
 
 The DSL enables researchers to formally describe ID algorithms, without
-focusing on any specific language or platform. A code generator can combine
-such formal descriptions, avoiding the identified problems concerning loops,
-common data and network access. It can also target different languages and
-platforms, while reusing a software library that provides services including
-parsing, network access wrapping,\dots
+focusing on any specific language or platform. A code generator can avoid the
+identified problems concerning loops, common data and network access, as the
+formal description provides the underlying intent, not the technical
+implementation. It can also target different languages and platforms, while
+reusing a software library that provides services including parsing, network
+access wrapping,\dots
 
 A DSL and code generator defines a development strategy. This implies choices
 with respect to flexibility, update cost and development effort. We will first
@@ -458,7 +468,7 @@ strategies for projects involving wireless devices.
   node[text=gray,font=\footnotesize,#1]{#5};
 }
 
-\begin{figure}[ht]
+\begin{figure}[hb]
   \centering
   \scalebox{.85}{
 \tdplotsetmaincoords{110}{-10}
@@ -523,28 +533,12 @@ flexibility, update cost and development effort.
 \end{LaTeXdescription}
 
 The \emph{ideal} situation is that were one ends up with a maximal flexibility
-and no update nor development cost.
-
-If we consider the trade off between flexibility and update cost, we can
-distinguish two extremes: \emph{virtual machines} and \emph{full native
-images}. Virtual machines allow for small updates due to their concise byte
-code, but their instruction set and predefined capabilities restrict them at
-the same time. A full native image on the other hand has unlimited flexibility,
-but requires transfer of a larger image over the network.
-
-Two intermediate alternatives are possible: \emph{modular native image} and
-\emph{reconfigurable virtual machines}. Modular native images allow changes on
-module level, limiting the update size, but the framework to support it is
-static and limits the possibilities. Reconfigurable virtual machines take this
-same approach, but apply it to virtual machines, allowing to \emph{upgrade} the
-instruction set of the virtual machine.
-
-\NAME starts from the full native image, allowing full flexibility, and aims to
-reduce both the update and development cost. Firstly, by applying functional
-code fusion, \NAME optimizes the code organization, which has a positive effect
-on the code size and hence also on the update cost. Secondly, by enabling reuse
-on a functional level and automating the writing phase, the development cost is
-also lowered.
+and no update nor development cost. \NAME starts from the full native image,
+allowing full flexibility, and aims to reduce both the update and development
+cost: first, by applying functional code fusion, \NAME optimizes the code
+organization, which has a positive effect on the code size and hence also on
+the update cost. Second, by enabling reuse on a functional level and automating
+the writing phase, the development cost is also lowered.
 
 \subsection{\NAME as a Domain Specific Language}
 \label{dsl-design}
@@ -565,7 +559,7 @@ functionality.
 The example of parsing network messages illustrates this. Each algorithm deals
 with parsing in the same way: loop over the bytes in the payload and look for a
 pattern that identifies what the algorithm is looking for. This is in fact a
-technical implementation choice. The underlying functional goal is to react
+technical implementation choice. The underlying functional intent is to react
 when such a pattern is present in a message. The loop has \emph{activated} this
 functionality, but the real goal is to \emph{passively} react on an event, not
 \emph{actively} look for it. Event handling therefore can transform
@@ -578,14 +572,14 @@ for a technical loop-construction.
 
 \subsubsection{The Nodes Domain}
 
-All algorithms deal with information about neighboring devices. To centralize
-this information \NAME provides a unified \ttt{nodes} concept as part of its
-DSL and exposes it as an object to the implementer.
+All algorithms deal with information about other devices in the network. To
+centralize this information \NAME provides a unified \ttt{nodes} concept as
+part of its DSL and exposes it as an object to the implementer.
 
-Algorithms can extend nodes with their own properties. This way only one
+Algorithms can extend nodes with their own properties. This way, only one
 instance for every known device will be present in memory. Finally, nodes can
-define a scope to execute a function in. This way, nodes also offer a way to
-iterate all known devices, again without the need for a loop.
+define a scope for a function to execute in. This way, nodes also offer a way
+to i.e.\ iterate all known devices, again without the need for a loop.
 
 \subsubsection{Unified Messaging}
 \label{dsl-unified-msg}
@@ -595,10 +589,10 @@ to be more active than needed. Delaying the sending of messages and grouping
 them, can lower this overhead.
 
 Sending and receiving of network messages is tightly integrated with the
-previously mentioned concepts of event handling and the nodes domain. An
-underlying software framework will handle all interaction with the network,
+previously mentioned concepts of event handling and the Nodes domain. An
+underlying software library can handle all interaction with the network,
 triggering functions by means of events when parsing new messages and exposing
-an API to send messages through the nodes domain. This approach gives the
+an API to send messages through the Nodes domain. This approach gives the
 framework complete control over communication, allowing optimized marshaling,
 grouping,\dots
 
@@ -629,10 +623,10 @@ like template-based text expansion, XSLT transformations or CodeDom
 a richer model.
 
 A semantic model \cite{fowler2010domain}, tied closely to the DSL itself, can
-fulfill this role. Semantic transformations evolve the model into a
+fulfill this role. Semantic transformations evolve the model into a more
 syntax-oriented model, comparable to the idea of CodeDom. From there on,
-syntactic transformations an emit source code. Figure \ref{fig:code-generation}
-shows the process that \NAME implements.
+syntactic transformations can further evolve the model into source code. Figure
+\ref{fig:code-generation} shows the process that \NAME implements.
 
 \begin{figure}[ht]
   \centering
@@ -649,14 +643,15 @@ shows the process that \NAME implements.
 
 
   \draw [->] (dsl) -> (sm)   node [midway,above=15pt]              {parse};
-  \draw [->] (sm)  -> (cm)   node [midway,above=15pt,align=center] {semantic\\transform};
+  \draw [->] (sm)  -> (cm)   node [midway,below=10pt,align=center] {semantic\\transform}
+                             node [midway,above=15pt,align=center] {FCF};
   \draw [->] (cm)  -> (code) node [midway,above=15pt]              {emit code};
 
   \draw [rounded corners,->]
         ($ (sm.east) - (5mm,5mm) $)
         -- ++(0,-.5)
         -| ($ (sm.west) + (5mm,-5mm) $)
-           node [near start, below=1pt] {type inference};
+           node [near start, below=5pt] {type inference};
 
   \draw [rounded corners,->]
         ($ (cm.east) - (5mm,5mm) $)
@@ -670,22 +665,13 @@ shows the process that \NAME implements.
 \label{fig:code-generation}
 \end{figure}
 
-After parsing the DSL, it's imported into a semantic model. The minimal type
-information present in the initial model allows inferring of the remaining
-types. Through a series of semantic transformations, the model evolves from the
-functional to a more technical syntactic model. This model is comparable to a
-rich abstract syntax tree (AST) with an extensive set of language constructs.
-Syntactic transformations now lower this level of expressiveness according to
-the desired platform and language. In the end the syntactic model can be
-directly emitted to the target language.
-
 \subsubsection{Semantic Model}
 
 The semantic model is the core of the solution. It offers a way to describe ID
-algorithms in a way that allows semantic reinterpretation. This way,
-reorganizing the functionality of different algorithms allows for more optimal
-execution and memory usage. Hence the name \NAME of the framework: intrusion
-detection functionality organization optimization.
+algorithms in a way that allows semantic reinterpretation through functional
+code fusion. This way, reorganizing the functionality of different algorithms
+allows for more optimal execution and memory usage. Hence the name \NAME of the
+framework: intrusion detection functionality organization optimization.
 
 Figure \ref{fig:meta-model} shows the central part of the semantic model as
 implemented for \NAME.
@@ -742,6 +728,9 @@ first performs semantic transformations on the semantic model itself and ends
 then transforms the semantic model into a syntactic model, encoding the
 semantics into technical syntax constructs.
 
+One example of a semantic transformation is type inference, which supports the
+platform independence of the framework.
+
 \subsubsection{Syntactic Model}
 
 The syntactic model is an AST for a virtual, expressive language. It contains
@@ -759,25 +748,24 @@ of these actions and transforms them into calls to the \NAME software library.
 \subsection{\NAME as a Software Library}
 \label{software-lib-design}
 
-Section \ref{pattern-problems} introduced the option to use a software library
-to offload common implementation aspects, thus avoiding small discrepancies in
-code and suboptimal use of shared resources. Section \ref{dsl-unified-msg}
-illustrated this approach with a case for unified messaging: parsing of
-incoming messages and grouping of outgoing messages.
+A software library allows offloading of common implementation aspects, thus
+avoiding small discrepancies in code and suboptimal use of shared resources.
+Section \ref{dsl-unified-msg} illustrated this approach with a case for unified
+messaging: parsing of incoming messages and grouping of outgoing messages.
 
-Other common functionality also isn't fully generated. The execution of
+Other common functionality also isn't generated as-is. The execution of
 functions based on a schedule or the implementation of higher level conceptual
 functions, such as \ttt{now} and \ttt{sha1}, are calls into the standard
 software library that supports the code generator.
 
-Optimizing such algorithms is not within the scope of \NAME. It also gives
+Optimization of such algorithms is not within the scope of \NAME. It also gives
 freedom of choice to the users of the framework to select appropriate
 implementations for this standard functionality.
 
 \subsection{\NAME as a Framework}
 
-\NAME reduces inefficiencies in execution, memory usage and network access, due
-to the selection of separate ID algorithms. To achieve this, it avoids
+\NAME reduces inefficiencies in network access, execution and memory usage,
+that occur due to a selection of ID algorithms. To achieve this, it avoids
 constructions that are hard to identify and reorganize, such as loops and
 common data. A DSL, focussing on event-handling, enforces these restrictions
 and enables formally describing ID algorithms.
@@ -792,12 +780,6 @@ library for the specific platform and target language is possible.
 
 \section{Implementation and Evaluation}
 \label{evaluation}
-
-This section discusses a prototype implementation and evaluates its
-performance. We first present the architecture of this implementation and
-consider the impact it has from a development point of view. Next we use this
-implementation to quantify its merits using a side-by-side comparison of
-generated code versus a manual implementation.
 
 % table goes here, because a spanning table is placed on the next page, relative
 % to where it's defined.
@@ -836,21 +818,18 @@ size (bytes)  & manual     & 10466 & 15530 &  +48\% & 13306 &  +27\% & 18334 &  
   \label{tbl:results}
 \end{table*}
 
+This section discusses a prototype implementation and evaluates its
+performance. We first present the architecture of this implementation and
+consider the impact it has from a development point of view. Next we use this
+implementation to quantify its merits using a side-by-side comparison of
+generated code versus a manual implementation. We consider experimental results
+regarding the image size, usage of the network and execution time of the
+event-loop. We also take a more analytical approach and look at the handling of
+common data and the size of the source code.
+
 \subsection{Architecture}
 
-Figure \ref{fig:architecture} shows the architecture of the implementation. It
-illustrates the generation of the DSL into compilable code, using the Nodes
-domain information, a platform and language description and the native software
-library. The applied grayscale indicates the components' platform dependency:
-the DSL is platform and language independent and deals with subsystems, such as
-the network, in an abstract way. The Nodes domain implements some of these
-abstracted subsystems, but still in a platform and language independent way.
-The platform and language descriptions define the target platform and language
-and convert the abstract constructions in actually supported code. The software
-library is standard native code, targeting the platform and language. Finally,
-the code and image are artifacts of the automated generation and compilation
-process. They aren't a product of manual work and therefore aren't directly
-dependent on the platform.
+Figure \ref{fig:architecture} shows the architecture of the implementation.
 
 \begin{figure}[ht]
   \centering
@@ -880,6 +859,19 @@ dependent on the platform.
   \label{fig:architecture}
 \end{figure}
 
+It illustrates the generation of the DSL into compilable code, using the Nodes
+domain information, a platform and language description and the native software
+library. The applied grayscale indicates the components' platform dependency:
+the DSL is platform and language independent and deals with subsystems, such as
+the network, in an abstract way. The Nodes domain implements some of these
+abstracted subsystems, but still in a platform and language independent way.
+The platform and language descriptions define the target platform and language
+and convert the abstract constructions in actually supported code. The software
+library is standard native code, targeting the platform and language. Finally,
+the code and image are artifacts of the automated generation and compilation
+process. They aren't a product of manual work and therefore aren't directly
+dependent on the platform.
+
 This hierarchy is important from a development effort point of view. The level
 of dependency on the targeted platform also dictates the level of effort to
 implement changes to that platform. For example: to generate a different
@@ -891,9 +883,9 @@ the framework itself.
 \subsection{Implementation}
 
 To evaluate the prototype we chose to use a system based on the Atmel
-ATMEGA1284p micro-controller \cite{datasheet:atmega1284p} and the Digi XBee S2
-ZigBee module \cite{manual:xbee}. A basic library wrapped the technical calls
-to the hardware components in more easy to use functions.
+ATMEGA1284p micro-controller and the Digi XBee S2 ZigBee module. A basic
+library wrapped the technical calls to the hardware components in more easy to
+use functions.
 
 Relying on basic hardware and software allows us to validate that the generator
 is capable of generating code even for the most basic environment available.
@@ -919,12 +911,12 @@ upstream.
 \subsection{Experimental Results}
 
 We evaluated three criteria: the image size of the resulting compiled code, the
-network usage in number of frames and bytes and the time required to perform
+network usage in number of packets and bytes and the time required to perform
 once cycle of the event loop. To do this, we collected these metrics for four
 situations: without ID algorithms, with a watchdog, with reputation-tracking
 and with both algorithms implemented.
 
-The manual implementation implemented both algorithms as standalone modules and
+The manual implementation realized both algorithms as standalone modules and
 sequentially called them from the base-application's event loop. Given the
 \NAME descriptions of the algorithms, the code generator generated all four
 cases.
@@ -965,50 +957,52 @@ available memory on the ATMega1284p, this is merely 2.3\% of the available
 resources.
 
 Thirdly, when turning to the goal to reduce the network usage, we see that both
-the number of frames as well as the amount of bytes sent have dropped by 13 and
-7\%.
+the number of packets as well as the amount of bytes sent have dropped by 13
+and 7\%.
 
-Finally we see that both algorithms by itself add an equal amount of time to
-the processing of a single event loop cycle, but when combined, the event loop
-is about 7\% faster compared to the manual case.
+Finally, focusing on the execution time, both algorithms by themselves add an
+equal amount of time to the processing of a single event loop cycle. But when
+combined, the event loop is about 7\% faster compared to the manual case.
 
 \subsection{Analytical Results}
 
 Looking at the generated source code is another way to validate the framework.
-Reusing common data allows elimination of for example the network address
-within the scope of each individual algorithm. Analysis of the source code with
-both algorithms implemented, shows that this reduces the memory footprint for
-one node with 2 bytes from 27 bytes to 25 bytes. A ZigBee network address
-indeed consists of 16 bits. So this results in a reduction of 7.4\%. Using
-ZigBee's 64 bits unique addresses, this reduction can easily become 20.5\%.
+A simple metric is comparing the amount of code versus the size of the formal
+description of IDS algorithms. This can be an indication of the development
+effort and complexity. In this experiment, implementing both algorithms
+manually results in 637 lines of C code. The corresponding \NAME implementation
+results in 156 lines of DSL code.
 
-Finally comparing the amount of code versus the size of the formal description
-of IDS algorithms, can be an indication of the development effort. Implementing
-both algorithms manually results in 637 lines of clean and documented C code.
-The corresponding \NAME implementation results in 156 lines of DSL code.
+We can also look at data structures. Sharing data eliminates redundant
+information, such as a network address, from the scope of each individual
+algorithm. Analysis of the source code with both algorithms implemented, shows
+that this reduces the memory footprint for one node entry by 2 bytes, from 27
+bytes to 25 bytes. A ZigBee network address indeed consists of 16 bits. So this
+results in a reduction of 7.4\%. Using ZigBee's 64 bits unique addresses, this
+reduction can easily become 20.5\%.
 
 \section{Related Work}
 \label{related}
 
-Section \ref{classification} introduced some ID
-algorithms \cite{ganeriwal2008reputation,mishra2004intrusion,krontiris2009cooperative}
-and presented a classification \cite{mishra2004intrusion,ioannis2007towards,alrajeh2013intrusion}
-based on their detection approach and interaction style.
+Section \ref{classification} introduced some ID algorithms
+\cite{ganeriwal2008reputation,mishra2004intrusion,krontiris2009cooperative} and
+presented a classification
+\cite{mishra2004intrusion,ioannis2007towards,alrajeh2013intrusion} based on
+their detection approach and interaction style.
 
 This section focuses on related work in the field of domain specific languages
-and code generation, both in relation to wireless networks of resource
-constraint devices. These two components are the core of the \NAME framework
-and the solution it proposes. We also look at the more general scope: the
-application in other disciplines and their relevance in the scope of intrusion
-detection in the IoT and the proposed \NAME framework.
+and code generation, both in relation to wireless networks of
+resource-constraint devices. These two components are the core of the \NAME
+framework and the solution it proposes. We also look at their application in
+other disciplines and how this can relate to our context.
 
 \subsection{Domain Specific Languages}
 
-Within the scope of wireless networks of resource constraint devices, we see
+Within the scope of wireless networks of resource-constraint devices, we see
 the introduction of DSLs \enquote{to shorten the development cycles
 dramatically during deployments, to reduce the dependency on hardware and
 software engineers, and to lead to a wider adoption outside the computer
-science field} \cite{sadilek2008domain,naumowicz2009prototyping}.
+science field} \cite{sadilek2008domain}.
 
 TinyScript \cite{levis2004tinyscript} is an example of a language for wireless
 sensor networks. It's a complete programing language that aims to ease the
@@ -1030,10 +1024,10 @@ BMSL \cite{uppuluri2001experiences} is a DSL that allows the specification of
 patterns and actions. Patterns can contain events extracted from log files,
 system calls and network packets.
 
-The STAT framework with its STATL
-language \cite{eckmann2002statl,vigna2003designing} are not intrusion detection
+The STAT framework with its STATL language
+\cite{eckmann2002statl,vigna2003designing} are not intrusion detection
 specific, but through extensions they allow to model attack scenarios using
-state machines. Our event-driven approach shares this same ideas.
+state machines. Our event-driven approach shares these same ideas.
 
 \subsection{Code Generation}
 
@@ -1044,8 +1038,8 @@ quality.
 Embedded systems are a prime example of an environment where code needs to be
 of a high quality. Focus on size and performance are a logical choice when
 dealing with limited storage and processing power. Compilers implement
-different techniques to address this at the lowest level \cite{leupers2000code,
-marwedel2002code}.
+different techniques to address this at the lowest level
+\cite{marwedel2002code}.
 
 Optimizing for power efficiency however proves to be concurrent to size and
 performance optimization, and requires different strategies. Data and memory
@@ -1055,15 +1049,15 @@ architecture, radio handling, efficient software,\dots \cite{naik2001software}.
 Most of these are beyond the control of the compiler and require a higher level
 of abstraction to address them.
 
-DSLs are a solution here, but other paradigms are possible. A mixed framework
-consisting of a virtual machine (VM) and native code
-extension \cite{sadilek2007energy}, combined with energy-aware compilation,
-seems a promising approach. By offloading the optimization to a VM and only
-compiling parts and not the whole, the solution allows updating at a granular
-scale, thus reducing the update cost, while maintaining flexibility and
-lowering the development effort. As explained in \ref{positioning}, \NAME
-focuses on the reduction of the development effort and update cost, while
-preserving flexibility.
+DSLs offer a solution here, but other paradigms are possible. A mixed framework
+consisting of a virtual machine (VM) and native code extension
+\cite{sadilek2007energy}, combined with energy-aware compilation, seems a
+promising approach. By offloading the optimization to a VM and only compiling
+parts and not the whole, the solution allows updating at a granular scale, thus
+reducing the update cost, while maintaining flexibility and lowering the
+development effort. As explained in \ref{positioning}, \NAME focuses on the
+reduction of the development effort and update cost, while preserving maximal
+flexibility.
 
 Finally, applying code generation to IDS, typically tries to generate native
 code to avoid the interpretation of the description of patterns.
@@ -1081,11 +1075,10 @@ IDS for IoT devices. Reselection of algorithms, due to changing requirements or
 security threats, requires a flexible way to incorporate the different
 algorithms. This eliminates manual implementation and optimization.
 
-Wireless resource constraint devices, such as IoT devices, require that
-software respects their restrictions. Efficiently adding multiple intrusion
-detection algorithm requires fusion of these algorithms on a functional level,
-to reduce execution inefficiencies, redundant memory usage and superfluous
-network access.
+Wireless resource-constraint devices, such as IoT devices, require that
+software respects their restrictions. Adding multiple intrusion detection
+algorithm requires fusion of these algorithms on a functional level, to reduce
+execution inefficiencies, redundant memory usage and superfluous network access.
 
 \NAME is a framework consisting of a DSL, a source code generator and
 accompanying software library. Using the DSL, intrusion detection algorithms
@@ -1104,11 +1097,11 @@ heterogenous environments and different configurations.
 Future research will focus on the integration of applications with the
 generated intrusion detection systems. We see opportunities for applications
 who detect intrusion, to actively and dynamically respond and avoid malicious
-payloads to harm them.
+payloads.
 
-A continued effort is targeting the reduction of non-platform independent parts
-in the implementation. This way it is possible to add more platforms and
-languages with less effort.
+A continued effort is targeting the reduction of platform-dependent parts in
+the implementation. This way it is possible to add more platforms and languages
+with less effort.
 
 In the longer run, we want to investigate the possibility to extend the
 functional code fusion paradigm to other domains beyond intrusion detection.
