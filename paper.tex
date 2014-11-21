@@ -69,7 +69,7 @@ security.
 In classic networks, firewalls focus on the outer perimeter of the network,
 filtering unwanted packets and protecting the entire internal network. But
 attacks on flaws in services can pass unnoticed. This is where intrusion
-detection (ID) comes into play: an intrusion detection systems (IDS) monitors
+detection (ID) comes into play: an intrusion detection system (IDS) monitors
 all traffic that passes through the firewall, looking for patterns of malicious
 activity, and optionally, after detecting such pattern, alerting the firewall,
 allowing it to take corrective actions \cite{denning1987intrusion}.
@@ -263,7 +263,7 @@ scope of \NAME.
     child {node (signature)     [align=center] {Signature\\Misuse}}
     child {node (specification) [align=center] {Specification}};
   \node (decision)              [align=center,right=of detection] {Decision\\Making}
-    child {node (broadcasting)  [align=center] {Broadcasting}}
+    child {node (broadcasting)  [align=center] {Broadcast}}
     child {node (interactive)   [align=center] {Interactive}};
 \end{tikzpicture}
 }
@@ -313,7 +313,7 @@ pseudo-code.
      \State \dots \Comment{analyze byte-sequences}
     \EndFor
     \Let{$devices_x$}{value}  \Comment{optionally update device info}
-    \State \Call{send}{$device_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send1}
+    \State \Call{send}{$devices_y$, ``info''} \Comment{optionally exchange info} \label{alg:id-algo-pattern-send1}
   \EndFunction
   \State
   \Function{do\_housekeeping}{}
@@ -458,9 +458,6 @@ the network access issue.
 \subsection{\NAME as a Development Strategy}
 \label{positioning}
 
-Figure \ref{fig:positioning} shows a classification of possible development
-strategies for projects involving wireless devices.
-
 \newcommand{\ball}[5][above,yshift=+5pt]{
 \tdplottransformmainscreen{#2}{#3}{#4}
 \shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray,shading angle=-90]
@@ -516,8 +513,10 @@ strategies for projects involving wireless devices.
 \label{fig:positioning}
 \end{figure}
 
-Three properties can classify development strategies \cite{sadilek2007energy}:
-flexibility, update cost and development effort.
+Figure \ref{fig:positioning} shows a classification of possible development
+strategies for projects involving wireless devices. Three properties can
+classify development strategies \cite{sadilek2007energy}: flexibility, update
+cost and development effort.
 
 \begin{LaTeXdescription}
 
@@ -616,9 +615,9 @@ capturing of a device.
 \subsection{\NAME as a Code Generator}
 \label{code-generator-design}
 
-To convert the DSL-based ID algorithms into production-ready code, we apply
-code generation techniques. Although different approaches here are applicable,
-like template-based text expansion, XSLT transformations or CodeDom
+To convert the DSL-based ID algorithms into production-ready code, \NAME
+applies code generation techniques. Although different approaches here are
+applicable, like template-based text expansion, XSLT transformations or CodeDom
 \cite{dollard2004code}, we believe that the functional transformations require
 a richer model.
 
@@ -673,9 +672,6 @@ code fusion. This way, reorganizing the functionality of different algorithms
 allows for more optimal execution and memory usage. Hence the name \NAME of the
 framework: intrusion detection functionality organization optimization.
 
-Figure \ref{fig:meta-model} shows the central part of the semantic model as
-implemented for \NAME.
-
 \begin{figure}[ht]
   \centering
   \scalebox{.85}{
@@ -709,23 +705,23 @@ implemented for \NAME.
 \label{fig:meta-model}
 \end{figure}
 
-The concept driving this model is the structure starting at the \emph{Model} up
-to the \emph{Execution Strategy}. This structure encompasses the
-\emph{Function}s and underlying \emph{Statement}s and allows for interpretation
-and fusion of the algorithms.
+Figure \ref{fig:meta-model} shows the central part of the semantic model as
+implemented for \NAME. The concept driving this model is the structure starting
+at the \emph{Model} up to the \emph{Execution Strategy}. This structure
+encompasses the \emph{Function}s and underlying \emph{Statement}s and allows
+for interpretation and fusion of the algorithms.
 
 \subsubsection{Functional Code Fusion (FCF)}
 
 Thanks to the functional description of events and the effects triggered by
 them, the code generator is able to identify the same actions across different
-algorithms. This way it is possible to extract the parsing of incoming
-messages, group actions on the same sets of data or scheduled function
-executions.
+algorithms. This way it is possible to extract the parsing of incoming messages
+and group actions on the same sets of data or scheduled function executions.
 
 FCF typically looks for patterns in the semantic model and performs model
 transformations to change these patterns to a more optimized organization. It
-first performs semantic transformations on the semantic model itself and ends
-then transforms the semantic model into a syntactic model, encoding the
+first performs semantic transformations on the semantic model itself. A second
+phase transforms the semantic model into a syntactic model, encoding the
 semantics into technical syntax constructs.
 
 One example of a semantic transformation is type inference, which supports the
@@ -753,7 +749,7 @@ avoiding small discrepancies in code and suboptimal use of shared resources.
 Section \ref{dsl-unified-msg} illustrated this approach with a case for unified
 messaging: parsing of incoming messages and grouping of outgoing messages.
 
-Other common functionality also isn't generated as-is. The execution of
+Other common functionality also isn't generated as is. The execution of
 functions based on a schedule or the implementation of higher level conceptual
 functions, such as \ttt{now} and \ttt{sha1}, are calls into the standard
 software library that supports the code generator.
@@ -882,18 +878,17 @@ the framework itself.
 
 \subsection{Implementation}
 
-To evaluate the prototype we chose to use a system based on the Atmel
-ATMEGA1284p micro-controller and the Digi XBee S2 ZigBee module. A basic
-library wrapped the technical calls to the hardware components in more easy to
-use functions.
+To evaluate the prototype we used a system based on the Atmel ATMEGA1284p
+micro-controller and the Digi XBee S2 ZigBee module. A basic library wrapped
+the technical calls to the hardware components in more easy to use functions.
 
 Relying on basic hardware and software allows us to validate that the generator
-is capable of generating code even for the most basic environment available.
-Any step up, both in hardware or software, would offer better and higher
-abstractions that would make it easier to generate code for that situation. It
-shows that the requirements of the generator towards the platform are minimal,
-don't rely on advanced frameworks or operating systems and therefore are
-applicable in any environment, targeting any platform.
+is capable of generating code even for the most basic environment. Any step up,
+both in hardware or software, would offer better and higher abstractions that
+would make it easier to generate code for that situation. It shows that the
+requirements of the generator towards the platform are minimal, don't rely on
+advanced frameworks or operating systems and therefore are applicable in any
+environment, targeting any platform.
 
 For the evaluation we constructed a small meshed network. In this network, not
 all devices have direct access to one another, requiring routing through shared
@@ -927,8 +922,8 @@ relative.
 
 These results show that adding algorithms manually to the base-application has
 a cumulative effect. The impact of both algorithms is simply the sum of the
-impact of each algorithm by itself. In case of the execution time of one cycle
-of the event loop, the total is even a bit higher.
+impact of each algorithm by itself. The execution time of one cycle of the
+event loop with both algorithms enabled is even higher than simply the sum.
 
 In case of the generated implementation, this effect is no longer observed:
 individual algorithms do have a larger impact by themselves, but the
@@ -1055,9 +1050,9 @@ consisting of a virtual machine (VM) and native code extension
 promising approach. By offloading the optimization to a VM and only compiling
 parts and not the whole, the solution allows updating at a granular scale, thus
 reducing the update cost, while maintaining flexibility and lowering the
-development effort. As explained in \ref{positioning}, \NAME focuses on the
-reduction of the development effort and update cost, while preserving maximal
-flexibility.
+development effort. As explained in section \ref{positioning}, \NAME focuses on
+the reduction of the development effort and update cost, while preserving
+maximal flexibility.
 
 Finally, applying code generation to IDS, typically tries to generate native
 code to avoid the interpretation of the description of patterns.
