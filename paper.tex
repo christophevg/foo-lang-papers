@@ -54,13 +54,13 @@ same algorithms.
 
 % IoT + threat
 
-The internet of things (IoT) holds a great potential to positively influence
-our daily work and life through domotics, assisted living, e-health and
-enhanced learning \cite{atzori2010internet}. But with this potential the IoT
-also presents a significant threat: by opening our smart homes and personal
-data to all these interconnected devices, we also open them to everyone who is
-able to break the virtual locks that protect them (i.e.\ passwords, encryption
-keys,\dots). IoT devices typically have limited batteries, processing power and
+The internet of things (IoT) holds great potential to positively influence our
+daily work and life through domotics, assisted living, e-health and enhanced
+learning \cite{atzori2010internet}. But with this potential the IoT also
+presents a significant threat: by opening our smart homes and personal data to
+all of these interconnected devices, we also open them to everyone who is able
+to break the virtual locks that protect them (i.e.\ passwords, encryption
+keys). IoT devices typically have limited batteries, processing power and
 memory. These properties make it hard to add any additional service, including
 security.
 
@@ -71,20 +71,19 @@ filtering unwanted packets and protecting the entire internal network. But
 attacks on flaws in services can pass unnoticed. This is where intrusion
 detection (ID) comes into play: an intrusion detection system (IDS) monitors
 all traffic that passes through the firewall, looking for patterns of malicious
-activity, and optionally, after detecting such pattern, alerting the firewall,
+activity, and optionally, after detecting such pattern, alerts the firewall,
 allowing it to take corrective actions \cite{denning1987intrusion}.
 
 % local ids -> localize -> limited resources
 
-In wireless networks of resource-constraint devices, which make up a
-significant part of the IoT, it is not possible to have this single point in
-the network that can oversee all traffic \cite{mishra2004intrusion}. Every
-device has to implement its own lines of defense. But making the IDS a local
-service on each device requires local resources, which are a scarce commodity
-for IoT devices.
+In wireless networks of resource-constrained devices, which make up a
+significant part of the IoT, it is not possible for a single point in the
+network to oversee all traffic \cite{mishra2004intrusion}. Every device has to
+implement its own lines of defense. But making the IDS a local service on each
+device requires local resources, which are a scarce commodity for IoT devices.
 
 Attackers have access to a large set of possible attack vectors
-\cite{aschenbruck2012security}, ranging from the wireless network, over the
+\cite{aschenbruck2012security}, ranging from the wireless network, through the
 medium access control and routing, up to the device itself. Each level presents
 different opportunities to manipulate data, eavesdrop, perform a form of denial
 of service or even access the network in a legitimate way. For each of these
@@ -94,17 +93,18 @@ adequate coverage.
 
 % gap analysis
 
-Current developments in ID focus on programming frameworks to structure the
+Current developments in ID focus on programming frameworks that structure the
 implementation of algorithms \cite{valero2012di} and offer the required basic
-functional components to implement them \cite{krontiris2008lidea}. The first
-aspect that is missing, is that they don't offer a way to optimize the usage of
-resources. A solution that supports the integration of multiple algorithms on
-IoT devices needs to avoid accumulating their impact on the available resources.
+functional components to implement them \cite{krontiris2008lidea}. A key
+shortcoming of prior ID frameworks, is that they don't offer a way to optimize
+the usage of resources. A solution that supports the integration of multiple
+algorithms on IoT devices needs to avoid accumulating their impact on the
+available resources.
 
 A second omission is support for systematic reuse to create different
-configurations for different devices, both in hard- and software. Addressing
-this in a transparent and automated way is important for any kind of
-development in this area.
+configurations heterogeneous devices. Addressing this in a transparent and
+automated way offers the potential to significantly reduce the effort of
+developing an IDS.
 
 % scientific contribution
 
@@ -122,7 +122,8 @@ The second contribution introduces functional code fusion (FCF) as a source
 code generation paradigm to solve the problem of hard to reuse and combine ID
 algorithms. FCF identifies common data and functions, and organizes code to
 eliminate redundant iterations, tests and computations. Results show improved
-image size, usage of the wireless radio, execution time and memory usage.
+image size, reduced usage of the wireless radio, reduced execution time and
+lower memory usage.
 
 % structure
 
@@ -151,10 +152,11 @@ malicious behavior and a group-based decision is often needed because devices
 in the network can miss certain events that could reveal intrusions. In a
 wireless network, where not all participants are within each others' radio
 range, wireless devices typically only have a partial view on the entire
-network. This prohibits them to observe potentially crucial events in distant
-parts of the network. The fact that resource-constraint devices typically apply
-duty cycling to lower their energy consumption, further increases this problem,
-introducing periods of time where they even don't observe local events.
+network. This prohibits them from observing potentially crucial events in
+distant parts of the network. The fact that resource-constrained devices
+typically apply duty cycling to lower their energy consumption, further
+increases this problem, introducing periods of time where they cannot observe
+local events.
 
 This leads to two complementary classes of ID activities: local intrusion
 detection and cooperative decision making.
@@ -212,13 +214,13 @@ interactive communication.
 \begin{LaTeXdescription}
 
   \item[Broadcast communication] can allow implementing a distributed,
-  cooperative algorithm locally. The reputation-based detection algorithm
-  introduced in \cite{ganeriwal2008reputation} illustrates this. It uses the
-  same principle of a watchdog also found in \cite{mishra2004intrusion}. Using
-  this algorithm, devices can exchange information about the reputation of
-  other devices, solely using one-way broadcast messages. Combining this
-  information allows them to decide about their trust in a given device, based
-  on more than their own, often partial, observations.
+  cooperative algorithm locally: devices can exchange information about the
+  reputation of other devices, solely using one-way broadcast messages.
+  Combining this information allows them to decide about their trust in a given
+  device, based on more than their own, often partial, observations. The
+  reputation-based detection algorithm introduced in
+  \cite{ganeriwal2008reputation} illustrates this. It uses the same principle
+  of a watchdog also found in \cite{mishra2004intrusion}.
 
   \item[Interactive communication] allows algorithms to exchange information to
   reach a consensus. In \cite{krontiris2009cooperative}, the authors first
@@ -235,19 +237,6 @@ interactive communication.
 
 \subsection{Properties and Scope of \NAME}
 \label{scope}
-
-Algorithms that fit this classification are typically platform independent.
-They analyze network messages, looking for patterns that can reveal intrusions
-and all deal with the same information: other devices in the network. To be
-able to formally describe ID algorithms and target the heterogeneous IoT, \NAME
-requires ID algorithms to expose these properties.
-
-A class of ID algorithms that does not have these properties is software
-attestation \cite{seshadri2008sake}. It enables exchanging information about
-the software that is running on a device and identifying devices with modified
-content. These algorithms are highly platform dependent and have no data in
-common with other algorithms, as they look for the effects of an intrusion, not
-the intruder itself.
 
 Figure \ref{fig:classification} visually summarizes the dual classification and
 scope of \NAME.
@@ -271,15 +260,27 @@ scope of \NAME.
   \label{fig:classification}
 \end{figure}
 
+Algorithms that fit this classification are typically platform independent.
+They analyze network messages, looking for patterns that can reveal intrusions
+and all deal with the same information: other devices in the network. To be
+able to formally describe ID algorithms and target the heterogeneous IoT, \NAME
+requires ID algorithms to expose these properties.
+
+A class of ID algorithms that does not have these properties is software
+attestation \cite{seshadri2008sake}. It enables exchanging information about
+the software that is running on a device and identifying devices with modified
+content. These algorithms are highly platform dependent and have no data in
+common with other algorithms, as they look for the effects of an intrusion, not
+the intruder itself.
+
 \section{A Design Pattern for ID Algorithms}
 \label{pattern}
 
-Given this classification, we now introduce a design pattern that identifies
-common functional aspects of these algorithms. It will allow us to define a
-strategy for optimizing the combination of these algorithms. From the
-classification and a survey of algorithms, we extract two activities common to
-most algorithms: the inspection of network traffic and the evaluation of
-thresholds.
+Based upon the classification presented in section \ref{classification}, we now
+introduce a design pattern that identifies common functional aspects of ID
+algorithms. It will allow us to define a strategy for optimizing the
+combination of these algorithms. We extract two activities common to most
+algorithms: the inspection of network traffic and the evaluation of thresholds.
 
 Network traffic is the carrier along which malicious payloads reach a device
 directly. Indirectly a device can also detect aberrant patterns of
@@ -292,13 +293,17 @@ it is impossible to fully trust any neighboring device. In these situations one
 has to rely on statistics and thresholds to decide when to drop trust in a
 given device.
 
-But simply checking a threshold after updating some counter, is not a good
-strategy. A simple example is that of a watchdog \cite{mishra2004intrusion},
-observing the actions of other devices. There are valid reasons why a device
-can miss a theoretical window in which one expects activity, i.e.\ the wireless
-network being the most predominantly unreliable component. Directly reacting on
-a basic threshold can result in false positives. A way to overcome this is to
-decouple the detection of problems and the decision what to do about them.
+Updating such statistics and evaluating the corresponding thresholds should be
+distinct operations. The example of a watchdog \cite{mishra2004intrusion}
+illustrates this: a device monitors the actions of other devices and checks if
+they correctly forward messages to distant nodes in the network. Missing
+forwards can indicate a malicious intension to silently drop messages and
+obstruct the normal operation of the network. There are valid reasons why a
+device can miss the theoretical window in which one expects activity, i.e.\ the
+wireless network being the most predominantly unreliable component. Directly
+reacting upon a basic threshold can result in false positives. A way to
+overcome this is to decouple the detection of problems and the decision what to
+do about them.
 
 This decoupling of detection and decision is the core of the design pattern for
 ID algorithms. Listing \ref{alg:id-algo-pattern} presents the design pattern in
@@ -307,7 +312,7 @@ pseudo-code.
 \begin{figure}[ht]
 \captionof{lstlisting}{ID Algorithm Pattern\label{alg:id-algo-pattern}}
 \begin{algorithmic}[1]
-  \Require{devices: global storage for device information}
+  \Require{devices: global variable for device information}
   \Function{process\_message}{$msg$}
     \ForEach{$byte \in msg$} \label{alg:id-algo-pattern-loop1}
      \State \dots \Comment{analyze byte-sequences}
@@ -367,9 +372,9 @@ A third issue is the use of the network.
 \begin{LaTeXdescription}
 
   \item[Loops] by themselves are not a problem, but different loops, that
-  perform the same operations in sequence, can incur an overhead. An example
-  from the ID algorithm pattern is the handling of messages: each algorithm
-  parses each observed message on the network, processing the same byte stream,
+  perform the same operations in sequence, can incur overhead. An example from
+  the ID algorithm pattern is the handling of messages: each algorithm parses
+  each observed message on the network, processing the same byte stream,
   performing comparable operations to find similar patterns.
 
   \item[Common data] cross-cuts the different algorithms, that have to store
@@ -395,7 +400,7 @@ Two operational aspects are orthogonal to these problems and amplify them:
 
   \item[The heterogeneity of IoT devices] results in different software stacks,
   each with for example their own network API\@. This also explains why there
-  are no implementations readily available to developers: there is no single
+  are few implementations readily available to developers: there is no single
   platform to target for researchers.
 
 \end{LaTeXdescription}
@@ -592,17 +597,16 @@ previously mentioned concepts of event handling and the Nodes domain. An
 underlying software library can handle all interaction with the network,
 triggering functions by means of events when parsing new messages and exposing
 an API to send messages through the Nodes domain. This approach gives the
-framework complete control over communication, allowing optimized marshaling,
-grouping,\dots
+framework complete control over communication and for example allows for
+optimized marshaling and grouping of messages.
 
 \subsubsection{An Example}
 
 Listing \ref{lst:watchdog} illustrates some of the features mentioned above,
-using a small but representative example of an algorithm: a
-watchdog \cite{mishra2004intrusion}. Like a heartbeat, nodes can broadcast a
-message at a regular interval, allowing other nodes to monitor its
-availability. Missing heartbeats could indicate problems, such as physical
-capturing of a device.
+using a small but representative example of an algorithm: a watchdog
+\cite{mishra2004intrusion}. Like a heartbeat, nodes can broadcast a message at
+a regular interval, allowing other nodes to monitor its availability. Missing
+heartbeats could indicate problems, such as physical capture of a device.
 
 \lstinputlisting[
   language=foo-lang,
@@ -883,12 +887,10 @@ micro-controller and the Digi XBee S2 ZigBee module. A basic library wrapped
 the technical calls to the hardware components in more easy to use functions.
 
 Relying on basic hardware and software allows us to validate that the generator
-is capable of generating code even for the most basic environment. Any step up,
-both in hardware or software, would offer better and higher abstractions that
-would make it easier to generate code for that situation. It shows that the
-requirements of the generator towards the platform are minimal, don't rely on
-advanced frameworks or operating systems and therefore are applicable in any
-environment, targeting any platform.
+is capable of generating code even for the most basic environment. It shows
+that the requirements of the generator towards the platform are minimal, don't
+rely on advanced frameworks or operating systems and therefore are applicable
+in any environment, targeting any platform.
 
 For the evaluation we constructed a small meshed network. In this network, not
 all devices have direct access to one another, requiring routing through shared
@@ -932,7 +934,7 @@ combination of both algorithms is less than the sum of both.
 Most remarkable is the effect on the time of one event loop cycle: both
 algorithms by itself add 152\%. Adding a second algorithm only augments the
 impact to 188\%. We see the effect of the generic handling of common
-functionality, like message parsing, event scheduling,\dots It comes with an
+functionality, like message parsing and event scheduling. It comes with an
 overhead for a single algorithm, but pays for itself when adding more
 algorithms.
 
@@ -948,12 +950,12 @@ Secondly, we see that the software library that comes with the generated code
 adds to the size of the resulting image. But the cost is close to constant and
 is lower for both algorithms together. With roughly 3KB of additional overhead,
 or 15\% in this simple case, the impact is small. Taking into account the
-available memory on the ATMega1284p, this is merely 2.3\% of the available
+available memory on the ATMega1284p, this is only 2.3\% of the available
 resources.
 
 Thirdly, when turning to the goal to reduce the network usage, we see that both
-the number of packets as well as the amount of bytes sent have dropped by 13
-and 7\%.
+the number of packets as well as the amount of bytes sent have dropped by 13\%
+and 7\% respectively.
 
 Finally, focusing on the execution time, both algorithms by themselves add an
 equal amount of time to the processing of a single event loop cycle. But when
@@ -1007,8 +1009,7 @@ resource problems inherently connected to the context.
 
 SEAL \cite{elsts2013seal} is a novel complete programming language that focuses
 on novice programmers. It is a clear fit for \emph{sense-and-send} type of
-applications, and doesn't pretend to be the best choice for any type of
-application. It does however share the idea of event to overcome the technical
+applications. It does however share the idea of events to overcome the technical
 nature of loops.
 
 Shifting the scope to intrusion detection, we learn that DSLs are predominantly
@@ -1054,25 +1055,25 @@ development effort. As explained in section \ref{positioning}, \NAME focuses on
 the reduction of the development effort and update cost, while preserving
 maximal flexibility.
 
-Finally, applying code generation to IDS, typically tries to generate native
-code to avoid the interpretation of the description of patterns.
-I2S \cite{charitakis2003code} is an example that generates code for
-SNORT \cite{roesch1999snort} rules. To optimize this highly efficient code, it
-often targets a specific platform.
+Applying code generation to the context of ID, often focusses on the generation
+of native code to avoid the interpretation of descriptions of patterns to look
+for. I2S \cite{charitakis2003code} is an example that generates code for SNORT
+\cite{roesch1999snort} rules. To optimize this highly efficient code, it often
+targets a specific platform.
 
 \section{Conclusion and Future Work}
 \label{conclusion}
 
 Adequate intrusion detection for IoT devices requires multiple algorithms to
 operate at the same time. Recent literature describes different algorithms, but
-hardly any are readily available for direct application when implementing an
-IDS for IoT devices. Reselection of algorithms, due to changing requirements or
+few are readily available for direct application when implementing an IDS for
+IoT devices. Reselection of algorithms, due to changing requirements or
 security threats, requires a flexible way to incorporate the different
 algorithms. This eliminates manual implementation and optimization.
 
 Wireless resource-constraint devices, such as IoT devices, require that
 software respects their restrictions. Adding multiple intrusion detection
-algorithm requires fusion of these algorithms on a functional level, to reduce
+algorithms requires fusion of these algorithms on a functional level, to reduce
 execution inefficiencies, redundant memory usage and superfluous network access.
 
 \NAME is a framework consisting of a DSL, a source code generator and
@@ -1081,8 +1082,8 @@ can be formally described in terms of functionality. During source code
 generation, functional code fusion interprets the functional meaning of the
 algorithms and merges common functionality and shared data. The software
 library hosts common functionality, such as network message parsing, sent
-message aggregation, event scheduling,\dots This allows the source code
-generator to focus on the optimization of the organization of the functionality.
+message aggregation and event scheduling. This allows the source code generator
+to focus on the optimization of the organization of the functionality.
 
 Initial experiments confirm the theoretical positive impact on resource usage.
 The platform independent DSL enables generation of source code targeting
