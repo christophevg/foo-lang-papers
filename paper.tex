@@ -60,9 +60,8 @@ learning \cite{atzori2010internet}. But with this potential the IoT also
 presents a significant threat: by opening our smart homes and personal data to
 all of these interconnected devices, we also open them to everyone who is able
 to break the virtual locks that protect them (i.e.\ passwords, encryption
-keys). IoT devices typically have limited batteries, processing power and
-memory. These properties make it hard to add any additional service, including
-security.
+keys). Implementation of security measures by itself is hindered by the fact
+that IoT devices typically have limited batteries, processing power and memory.
 
 % classic networks: fw and central ids
 
@@ -86,10 +85,9 @@ Attackers have access to a large set of possible attack vectors
 \cite{aschenbruck2012security}, ranging from the wireless network, through the
 medium access control and routing, up to the device itself. Each level presents
 different opportunities to manipulate data, eavesdrop, perform a form of denial
-of service or even access the network in a legitimate way. For each of these
-attacks an algorithm needs to look for patterns or anomalies. An IDS for IoT
-devices therefore requires a large number of implemented algorithms for an
-adequate coverage.
+of service. For each of these attacks an algorithm needs to look for patterns
+or anomalies. An IDS for IoT devices therefore requires a large number of
+implemented algorithms for an adequate coverage.
 
 % gap analysis
 
@@ -99,12 +97,10 @@ functional components to implement them \cite{krontiris2008lidea}. A key
 shortcoming of prior ID frameworks, is that they don't offer a way to optimize
 the usage of resources. A solution that supports the integration of multiple
 algorithms on IoT devices needs to avoid accumulating their impact on the
-available resources.
-
-A second omission is support for systematic reuse to create different
-configurations heterogeneous devices. Addressing this in a transparent and
-automated way offers the potential to significantly reduce the effort of
-developing an IDS.
+available resources. A second omission is support for systematic reuse to
+create different configurations heterogeneous devices. Addressing this in a
+transparent and automated way offers the potential to significantly reduce the
+effort of developing an IDS.
 
 % scientific contribution
 
@@ -166,12 +162,12 @@ detection and cooperative decision making.
 
 There are different ways to construct a taxonomy for intrusion detection, but
 common themes do appear. According to \cite{mishra2004intrusion} and
-\cite{ioannis2007towards} there are three major categories: anomaly detection,
-signature or misuse detection, and specification-based detection. In
-\cite{alrajeh2013intrusion} the authors agree with this typology and add the
-notion of hybrid intrusion detection systems and cross layer intrusion
-detection systems as recent advances in research. Although these additional
-categories seem promising, the authors admit that the impact on
+\cite{ioannis2007towards} there are three major categories: 1) anomaly
+detection, 2) signature or misuse detection, and 3) specification-based
+detection. In \cite{alrajeh2013intrusion} the authors agree with this typology
+and add the notion of hybrid intrusion detection systems and cross layer
+intrusion detection systems as recent advances in research. Although these
+additional categories seem promising, the authors admit that the impact on
 resource-constrained devices will be too much. We therefore focus on the three
 categories agreed upon by most sources.
 
@@ -189,9 +185,9 @@ categories agreed upon by most sources.
   services on the devices, this approach can produce false positives.
   
   \item[Specification-based detection] uses constraints that describe the
-  correct behavior of the system. Although that this approach can detect
-  previously unknown attacks, it can sometimes not detect specific attacks that
-  anomaly or misuse detection can.
+  correct behavior of the system. Although this approach can detect previously
+  unknown attacks, it can sometimes not detect specific attacks that anomaly or
+  misuse detection can.
   
 \end{LaTeXdescription}
 
@@ -261,10 +257,10 @@ scope of \NAME.
 \end{figure}
 
 Algorithms that fit this classification are typically platform independent.
-They analyze network messages, looking for patterns that can reveal intrusions
-and all deal with the same information: other devices in the network. To be
-able to formally describe ID algorithms and target the heterogeneous IoT, \NAME
-requires ID algorithms to expose these properties.
+They look for patterns in network messages that can reveal intrusions and, in
+doing so, all deal with the same information: other devices in the network. To
+be able to formally describe ID algorithms and target the heterogeneous IoT,
+\NAME requires ID algorithms to expose these properties.
 
 A class of ID algorithms that does not have these properties is software
 attestation \cite{seshadri2008sake}. It enables exchanging information about
@@ -393,10 +389,10 @@ Two operational aspects are orthogonal to these problems and amplify them:
 \begin{LaTeXdescription}
   
   \item[Reimplementing] the algorithms manually to eliminate these issues is
-  not a one-time cost. For example due to the release of a new version of an
-  algorithm, or simply a reselection of algorithms due to a changing risk
-  analysis. Also, changing, or simply implementing the algorithms from scratch,
-  holds the risk of making mistakes.
+  not a one-time cost. A release of a new version of an algorithm, or simply a
+  reselection of algorithms, due to a changing risk analysis, can trigger it.
+  Also, changing, or simply implementing the algorithms from scratch, holds the
+  risk of making mistakes.
 
   \item[The heterogeneity of IoT devices] results in different software stacks,
   each with for example their own network API\@. This also explains why there
@@ -405,6 +401,43 @@ Two operational aspects are orthogonal to these problems and amplify them:
 
 \end{LaTeXdescription}
 
+\begin{figure*}[b]
+  \centering
+  \scalebox{1}{
+\begin{tikzpicture}[
+  node distance=9mm,
+  ,>=stealth,very thick,black!50,text=black,
+  every new ->/.style={shorten >=1pt}
+]
+  \node (dsl)   [user]                                      {DSL};
+  \node (cg)    [representation,right=of dsl,align=center]  {Code\\Generator};
+  \node (code)  [generated,right=of cg]                     {code};
+  \node (comp)  [representation,right=of code]              {Compiler};
+  \node (image) [generated,right=of comp]                   {image};
+
+  \node (nodes) [dom,above=of cg, align=center]             {Nodes\\Domain};
+  \node (plat)  [platform,below=of cg,align=center]         {Platform \&\\Language};          
+  \node (lib)   [native,below=of comp,align=center]         {Software\\Library};
+
+  \draw [->] (dsl)   -> (cg);
+  \draw [->] (nodes) -> (cg);
+  \draw [->] (plat)  -> (cg);
+  \draw [->] (cg)    -> (code);
+  \draw [->] (code)  -> (comp);
+  \draw [->] (lib)   -> (comp);
+  \draw [->] (comp)  -> (image);
+
+\end{tikzpicture}
+}
+
+\caption{The high level design of \NAME, showing the resources, processes and
+artifacts. A grayscale background represents the level of platform dependency,
+with darker shades indicating a higher dependency. Both the source code and the
+installable image are artifacts.}
+
+\label{fig:design}
+\end{figure*}
+
 \section{Design}
 \label{design}
 
@@ -412,37 +445,11 @@ The previous sections identified loops, common data and the network as three
 important code-level problems. These problems are inherent to ID algorithms.
 But at the same time they conflict with their target environment, the IoT\@.
 \NAME provides a framework to efficiently implement an IDS for the IoT and
-offers a solution for the identified problems. It consists of a DSL, source
-code generator and software library. Figure \ref{fig:design} visualises the
-overall design.
+offers a solution for the identified problems. It consists of a 1) DSL, 2)
+source code generator and 3) software library. Figure \ref{fig:design}
+visualizes the overall design.
 
-\begin{figure}[ht]
-  \centering
-  \scalebox{.85}{
-\begin{tikzpicture}[
-  node distance=7mm,
-  ,>=stealth,thick,black!50,text=black,
-  every new ->/.style={shorten >=1pt}
-]
-  \node (dsl)  [resource]                                          {DSL};
-  \node (cg)   [representation,right=of dsl,align=center]          {Code\\Generator};
-  \node (code) [resource,right=of cg]                              {Code};
-  \node (lib)  [resource,below=of code,align=center,yshift=0.5cm]  {Software\\Library};
-
-  \draw [->] (dsl) -> (cg)   node [midway,above=25pt]              {intent};
-  \draw [->] (cg)  -> (code) node [midway,above=15pt,align=center] {platform\\ + language};
-
-  \draw [rounded corners,->]
-        ($ (lib.west) $)
-        -- ++(-0.5cm, 0cm)
-        -- ++( 0cm,   1cm)
-        -- ($ (code.west) + (0cm,-0.22cm) $);
-
-\end{tikzpicture}
-}
-\caption{Overall Design}
-\label{fig:design}
-\end{figure}
+% figure design is moved up to end up on this page
 
 The DSL enables researchers to formally describe ID algorithms, without
 focusing on any specific language or platform. A code generator can avoid the
@@ -452,97 +459,46 @@ implementation. It can also target different languages and platforms, while
 reusing a software library that provides services including parsing, network
 access wrapping,\dots
 
-A DSL and code generator defines a development strategy. This implies choices
-with respect to flexibility, update cost and development effort. We will first
-position \NAME and motivate its design with respect to these trade offs.
-Second, we will look at the principal design components of the DSL and how it
-deals with loops and common data. Third, we discuss the structure of the code
-generator and introduce its software library, that offers a way to deal with
-the network access issue.
+A DSL and code generator defines a development strategy. This has implications,
+both on what is possible and how it can be achieved. We will first position
+\NAME and motivate its design with respect to these trade offs. Second, we will
+look at the principal design components of the DSL. Third, we discuss the
+structure of the code generator and introduce its software library, that offers
+a way to deal with for example the network access issue.
 
 \subsection{\NAME as a Development Strategy}
 \label{positioning}
 
-\newcommand{\ball}[5][above,yshift=+5pt]{
-\tdplottransformmainscreen{#2}{#3}{#4}
-\shadedraw[tdplot_screen_coords, ball color=lightgray,draw=lightgray,shading angle=-90]
-  (\tdplotresx,\tdplotresy) circle (0.20)
-  node[text=gray,font=\footnotesize,#1]{#5};
-}
+The introduction of a code generator in the development process changes the
+traditional way of working. Most importantly because the actual source code is
+no longer the driving force that can be controlled by developers. It is
+literally an intermediate representation between code generator and compiler.
 
-\begin{figure}[hb]
-  \centering
-  \scalebox{.85}{
-\tdplotsetmaincoords{110}{-10}
-\begin{tikzpicture}[scale=1,tdplot_main_coords]
-  % axis
-  \draw[thick,->] (0,0,0) -- (7,0,0) node[anchor=north east,xshift=10mm]{$flexibility$};
-  \draw[thick,->] (0,0,0) -- (0,7,0) node[anchor=north west]{$update\ cost$};
-  \draw[thick,->] (0,0,0) -- (0,0,4) node[anchor=south]{$development$};
-  % points
-  \coordinate (O)        at (0,0,0);
-  \coordinate (ideal)    at (6,0,0);
-  \coordinate (vm)       at (2,2,2);
-  \coordinate (modular)  at (4,4,4);
-  \coordinate (reconfig) at (4,2,4);
-  \coordinate (full)     at (6,6,4);
-  \coordinate (cg)       at (6,4,2.5);
-  % "lines"
-  \draw[dashed] (2,0,0)    -- (2,2,0) -- (0,2,0);
-  \draw[dashed] (4,0,0)    -- (4,4,0) -- (0,4,0);
-  \draw[dashed] (6,0,0)    -- (6,6,0) -- (0,6,0);
-  \draw[dashed] (vm)       -- (2,2,0);
-  \draw[dashed] (modular)  -- (4,4,0);
-  \draw[dashed] (full)     -- (6,6,0);
-  \draw[dashed] (reconfig) -- (4,2,0);
-  \draw[dashed] (cg)       -- (6,4,0);
-  % "balls"
-  \ball{6}{0}{0}{ideal}
-  \ball{2}{2}{2}{virtual machine}
-  \ball[left,xshift=-5pt]{4}{4}{4}{\shortstack{modular\\native image}}
-  \ball{4}{2}{4}{\shortstack{reconfigurable\\virtual machine}}
-  \ball[right,xshift=+5pt,yshift=+5pt]{6}{6}{4}{full native image}
-  %\ball[right,xshift=+5pt,text=black]{6}{4.5}{3}{code generation};
-  % 5. cg
-  \tdplottransformmainscreen{6}{4}{2.5}
-  \shadedraw[tdplot_screen_coords, ball color=gray,draw=black,shading angle=-90]
-    (\tdplotresx,\tdplotresy) circle (0.20)
-    node[right,xshift=+5pt,text=black,align=center,font=\footnotesize]{code generation\\+ functional code fusion};
-  % "box around our solution" ;-)
-  \tdplottransformmainscreen{0}{0}{0}
-  \draw[tdplot_screen_coords] (4.95,1) rectangle (8.5,0.25);
+A code generator constructs this representation using three components, as
+shown in figure \ref{fig:design}: 1) the description of the algorithm in the
+DSL, 2) information about the domain, in this case the Nodes domain and 3)
+information about the platform and target language. At the level of the
+compiler, a software library is introduced to offload specialized
+implementations and allow custom extensions.
 
-\end{tikzpicture}
-}
-\caption{Classification of Development Strategies for Wireless Devices (based on \cite{sadilek2007energy})}
-\label{fig:positioning}
-\end{figure}
+The applied grayscale indicates the components' platform dependency: the DSL is
+platform and language independent and deals with subsystems, such as the
+network, in an abstract way. The Nodes domain implements some of these
+abstracted subsystems, but still in a platform and language independent way.
+The platform and language descriptions define the target platform and language
+and convert the abstract constructions in actually supported code. The software
+library is standard native code, targeting the platform and language. Finally,
+the code and image are artifacts of the automated generation and compilation
+process. They aren't a product of manual work and therefore aren't directly
+dependent on the platform.
 
-Figure \ref{fig:positioning} shows a classification of possible development
-strategies for projects involving wireless devices. Three properties can
-classify development strategies \cite{sadilek2007energy}: flexibility, update
-cost and development effort.
-
-\begin{LaTeXdescription}
-
-  \item[Flexibility] is a measure for the number of applications one can deploy
-  on a device without physical access.
-  
-  \item[Update cost] is equivalent to the energy required to deploy a new
-  version of an application on a device.
-  
-  \item[Development effort] covers the time to write, test and deploy an
-  application.
-
-\end{LaTeXdescription}
-
-The \emph{ideal} situation is that were one ends up with a maximal flexibility
-and no update nor development cost. \NAME starts from the full native image,
-allowing full flexibility, and aims to reduce both the update and development
-cost: first, by applying functional code fusion, \NAME optimizes the code
-organization, which has a positive effect on the code size and hence also on
-the update cost. Second, by enabling reuse on a functional level and automating
-the writing phase, the development cost is also lowered.
+This hierarchy is important from a development effort point of view. The level
+of dependency on the targeted platform also dictates the level of effort to
+implement changes to that platform. For example: to generate a different
+language will require a complete rewrite of the software library and a partial
+rewrite of the language description of the generator. Although this is a
+reusable, one-time effort, it is important in relation to the scalability of
+the framework itself.
 
 \subsection{\NAME as a Domain Specific Language}
 \label{dsl-design}
@@ -553,6 +509,13 @@ populating the model. \NAME's DSL and model focuses on avoiding constructions
 that result in problems concerning loops, common data and the use of the
 network. To do this, \NAME uses an event-based approach to defining
 functionality.
+
+Besides avoiding these problems, \NAME's DSL also provides a higher level of
+abstraction with respect to memory management and data access.
+
+This section therefore discusses \NAME's approach to 1) loops, 2) nodes domain,
+3) unified messaging, 4) language support and illustrates these with a complete
+example.
 
 \subsubsection{Loops}
 
@@ -576,14 +539,15 @@ for a technical loop-construction.
 
 \subsubsection{The Nodes Domain}
 
-All algorithms deal with information about other devices in the network. To
-centralize this information \NAME provides a unified \ttt{nodes} concept as
-part of its DSL and exposes it as an object to the implementer.
+Most, if not all, ID algorithms deal with information about other devices in
+the network. To centralize this information \NAME provides a unified
+\ttt{nodes} concept as part of its DSL and exposes it as an object to the
+implementer.
 
 Algorithms can extend nodes with their own properties. This way, only one
 instance for every known device will be present in memory. Finally, nodes can
 define a scope for a function to execute in. This way, nodes also offer a way
-to i.e.\ iterate all known devices, again without the need for a loop.
+to i.e.\ iterate all known devices, again without the need for an explicit loop.
 
 \subsubsection{Unified Messaging}
 \label{dsl-unified-msg}
@@ -599,6 +563,15 @@ triggering functions by means of events when parsing new messages and exposing
 an API to send messages through the Nodes domain. This approach gives the
 framework complete control over communication and for example allows for
 optimized marshaling and grouping of messages.
+
+\subsubsection{Language Support}
+\label{language-support}
+
+Using a platform independent language also offers the possibility to relief the
+implementer of explicit memory management and low-level data structures. From a
+language perspective, \NAME offers several programming constructs, typically
+found in modern programming languages with higher levels of abstraction:
+optional typing, object orientation, pattern matching, aspect orientation.
 
 \subsubsection{An Example}
 
@@ -664,7 +637,7 @@ syntactic transformations can further evolve the model into source code. Figure
 
 \end{tikzpicture}
 }
-\caption{Overview of \NAME's code generation process}
+\caption{\NAME's code generation process}
 \label{fig:code-generation}
 \end{figure}
 
@@ -705,7 +678,11 @@ framework: intrusion detection functionality organization optimization.
   \draw [dependency] (strategy) -- (function);
 \end{tikzpicture}
 }
-\caption{Partial Semantic Model for \NAME. Shaded classes indicate the \emph{event/scheduling} construction around functions to allow interpretation.}
+
+\caption{Partial Semantic Model for \NAME. Shaded classes indicate the
+\emph{event/scheduling} construction around functions to allow interpretation
+of the intended functionality.}
+
 \label{fig:meta-model}
 \end{figure}
 
@@ -778,9 +755,6 @@ A supporting software library allows separation of standard functionality that
 is out of scope for the generator. Optimization of the implementation of this
 library for the specific platform and target language is possible.
 
-\section{Implementation and Evaluation}
-\label{evaluation}
-
 % table goes here, because a spanning table is placed on the next page, relative
 % to where it's defined.
 \begin{table*}[b]
@@ -788,12 +762,6 @@ library for the specific platform and target language is possible.
   \begin{tabular}{llrrrrrrr}
 \toprule
               &            & base  & \multicolumn{2}{c}{watchdog} & \multicolumn{2}{c}{reputation} & \multicolumn{2}{c}{both} \\
-\midrule
-image
-size (bytes)  & manual     & 10466 & 15530 &  +48\% & 13306 &  +27\% & 18334 &  +75\%\\
-              & generated  & 10466 & 18352 &  +75\% & 16376 &  +56\% & 20998 & +101\%\\
-\cmidrule{2-9}
-              & difference &     0 &  2822 &  +18\% &  3070 &  +23\% &  2664 &  +15\%\\
 \midrule
 \multirow{2}{*}{\pbox{\textwidth}{total packets sent\\in a window of 90s}}
               & manual     &    20 &    51 & +155\% &    32 &  +60\% &    63 & +215\%\\
@@ -812,79 +780,36 @@ size (bytes)  & manual     & 10466 & 15530 &  +48\% & 13306 &  +27\% & 18334 &  
               & generated  &    48 &   121 & +152\% &   121 & +152\% &   138 & +188\%\\
 \cmidrule{2-9}
               & difference &     0 &    27 &  +29\% &    33 &  +38\% &   -11 &   -7\%\\
+\midrule
+image
+size (bytes)  & manual     & 10466 & 15530 &  +48\% & 13306 &  +27\% & 18334 &  +75\%\\
+              & generated  & 10466 & 18352 &  +75\% & 16376 &  +56\% & 20998 & +101\%\\
+\cmidrule{2-9}
+              & difference &     0 &  2822 &  +18\% &  3070 &  +23\% &  2664 &  +15\%\\
 \bottomrule
   \end{tabular}
   \caption{Results and Side-by-Side Comparison.}
   \label{tbl:results}
 \end{table*}
 
-This section discusses a prototype implementation and evaluates its
-performance. We first present the architecture of this implementation and
-consider the impact it has from a development point of view. Next we use this
-implementation to quantify its merits using a side-by-side comparison of
-generated code versus a manual implementation. We consider experimental results
-regarding the image size, usage of the network and execution time of the
-event-loop. We also take a more analytical approach and look at the handling of
-common data and the size of the source code.
+\section{Implementation and Evaluation}
+\label{evaluation}
 
-\subsection{Architecture}
-
-Figure \ref{fig:architecture} shows the architecture of the implementation.
-
-\begin{figure}[ht]
-  \centering
-  \scalebox{.85}{
-\begin{tikzpicture}[
-  node distance=10mm and 20mm,
-  ,>=stealth,thick,black!50,text=black,
-  every new ->/.style={shorten >=1pt},
-]
-  \node (dsl)      [user,align=center]                                     {DSL};
-  \node (code)     [generated,right=of dsl]                                {code};
-  \node (image)    [generated,right=of code]                               {image};
-
-  \node (nodes)    [dom,above right=of dsl,xshift=-20mm]                   {Nodes};
-  \node (platform) [platform,below right=of dsl,align=center,xshift=-20mm] {Platform \&\\Language};
-  \node (lib)      [native,below right=of code,align=center,xshift=-20mm]  {Software\\Library};
-
-  \draw [->] (dsl)  -> (code)  node [midway,above=2pt] {generation};
-  \draw [->] (code) -> (image) node [midway,above=2pt] {compilation};
-
-  \draw [->,dashed] (nodes.south)    -> ++(0,-15mm);
-  \draw [->,dashed] (platform.north) -> ++(0,15mm);
-  \draw [->,dashed] (lib.north)      -> ++(0,15mm);
-\end{tikzpicture}
-}
-  \caption{Architecture of Prototype Implementation}
-  \label{fig:architecture}
-\end{figure}
-
-It illustrates the generation of the DSL into compilable code, using the Nodes
-domain information, a platform and language description and the native software
-library. The applied grayscale indicates the components' platform dependency:
-the DSL is platform and language independent and deals with subsystems, such as
-the network, in an abstract way. The Nodes domain implements some of these
-abstracted subsystems, but still in a platform and language independent way.
-The platform and language descriptions define the target platform and language
-and convert the abstract constructions in actually supported code. The software
-library is standard native code, targeting the platform and language. Finally,
-the code and image are artifacts of the automated generation and compilation
-process. They aren't a product of manual work and therefore aren't directly
-dependent on the platform.
-
-This hierarchy is important from a development effort point of view. The level
-of dependency on the targeted platform also dictates the level of effort to
-implement changes to that platform. For example: to generate a different
-language will require a complete rewrite of the software library and a partial
-rewrite of the language description of the generator. Although this is a
-reusable, one-time effort, it is important in relation to the scalability of
-the framework itself.
+In this section we present a prototype implementation and evaluates its
+performance. We first present the implementation consisting of the hardware
+platform, network and software stack. Next we use this implementation to
+quantify its merits using a side-by-side comparison of generated code versus a
+manual implementation. We consider experimental results regarding the image
+size, usage of the network and execution time of the event-loop. We also take a
+more analytical approach and look at the handling of common data and the size
+of the source code.
 
 \subsection{Implementation}
 
 To evaluate the prototype we used a system based on the Atmel ATMEGA1284p
-micro-controller and the Digi XBee S2 ZigBee module. A basic library wrapped
-the technical calls to the hardware components in more easy to use functions.
+micro-controller and the Digi XBee S2 ZigBee module. A basic software library
+wraps the technical calls to the hardware components in more easy to use
+functions.
 
 Relying on basic hardware and software allows us to validate that the generator
 is capable of generating code even for the most basic environment. It shows
@@ -907,9 +832,9 @@ upstream.
 
 \subsection{Experimental Results}
 
-We evaluated three criteria: the image size of the resulting compiled code, the
-network usage in number of packets and bytes and the time required to perform
-once cycle of the event loop. To do this, we collected these metrics for four
+We evaluated three criteria: the network usage in number of packets and bytes,
+the time required to perform once cycle of the event loop and the image size of
+the resulting compiled code. To do this, we collected these metrics for four
 situations: without ID algorithms, with a watchdog, with reputation-tracking
 and with both algorithms implemented.
 
@@ -941,25 +866,27 @@ algorithms.
 Table \ref{tbl:results} also compares the two situations by subtracting the
 manual case from the generated case, showing the impact of the code generation.
 A relative value for this difference, to the manual case, is also included.
+Four observations allow us to evaluate the overall performance of \NAME's
+approach.
 
 The first observation deals with the base case: both the manual and the
 generated implementations perform exactly the same. There is no fundamental
 structural difference in the overall architecture of the code.
 
-Secondly, we see that the software library that comes with the generated code
+Secondly, when turning to the goal to reduce the network usage, we see that both
+the number of packets as well as the amount of bytes sent have dropped by 13\%
+and 7\% respectively.
+
+Thirdly, focusing on the execution time, both algorithms by themselves add an
+equal amount of time to the processing of a single event loop cycle. But when
+combined, the event loop is about 7\% faster compared to the manual case.
+
+Finally, we see that the software library that comes with the generated code
 adds to the size of the resulting image. But the cost is close to constant and
 is lower for both algorithms together. With roughly 3KB of additional overhead,
 or 15\% in this simple case, the impact is small. Taking into account the
 available memory on the ATMega1284p, this is only 2.3\% of the available
 resources.
-
-Thirdly, when turning to the goal to reduce the network usage, we see that both
-the number of packets as well as the amount of bytes sent have dropped by 13\%
-and 7\% respectively.
-
-Finally, focusing on the execution time, both algorithms by themselves add an
-equal amount of time to the processing of a single event loop cycle. But when
-combined, the event loop is about 7\% faster compared to the manual case.
 
 \subsection{Analytical Results}
 
@@ -968,7 +895,9 @@ A simple metric is comparing the amount of code versus the size of the formal
 description of IDS algorithms. This can be an indication of the development
 effort and complexity. In this experiment, implementing both algorithms
 manually results in 637 lines of C code. The corresponding \NAME implementation
-results in 156 lines of DSL code.
+results in 156 lines of DSL code. This is largely thanks to the higher level
+coding constructs, as introduced in section \ref{language-support} dealing with
+\NAME's language support.
 
 We can also look at data structures. Sharing data eliminates redundant
 information, such as a network address, from the scope of each individual
@@ -1025,6 +954,12 @@ The STAT framework with its STATL language
 specific, but through extensions they allow to model attack scenarios using
 state machines. Our event-driven approach shares these same ideas.
 
+Although not a real DSL, nesC \cite{gay2003nesc} is a general purpose language
+that shares some typical concepts with \NAME, such as the high degree of
+analysis during code generation to optimize execution. The biggest difference
+is that \NAME starts from the intended functionality and can optimize certain
+constructions that can't be interpreted from more technical source code.
+
 \subsection{Code Generation}
 
 Code generation, in combination with a DSL, can optimize a development process
@@ -1055,9 +990,9 @@ development effort. As explained in section \ref{positioning}, \NAME focuses on
 the reduction of the development effort and update cost, while preserving
 maximal flexibility.
 
-Applying code generation to the context of ID, often focusses on the generation
-of native code to avoid the interpretation of descriptions of patterns to look
-for. I2S \cite{charitakis2003code} is an example that generates code for SNORT
+Applying code generation to ID, often focusses on the generation of native code
+to avoid the interpretation of descriptions of patterns to look for. I2S
+\cite{charitakis2003code} is an example that generates code for SNORT
 \cite{roesch1999snort} rules. To optimize this highly efficient code, it often
 targets a specific platform.
 
@@ -1065,35 +1000,38 @@ targets a specific platform.
 \label{conclusion}
 
 Adequate intrusion detection for IoT devices requires multiple algorithms to
-operate at the same time. Recent literature describes different algorithms, but
-few are readily available for direct application when implementing an IDS for
-IoT devices. Reselection of algorithms, due to changing requirements or
-security threats, requires a flexible way to incorporate the different
-algorithms. This eliminates manual implementation and optimization.
+operate at the same time. Frequent reselection, e.g. due to changing
+requirements or security threats, requires a flexible way to incorporate the
+different algorithms.
 
-Wireless resource-constraint devices, such as IoT devices, require that
-software respects their restrictions. Adding multiple intrusion detection
-algorithms requires fusion of these algorithms on a functional level, to reduce
-execution inefficiencies, redundant memory usage and superfluous network access.
+Adding multiple intrusion detection algorithms to wireless resource-constraint
+devices requires fusion of these algorithms on a functional level. This can
+reduce execution inefficiencies, redundant memory usage and superfluous network
+access.
 
-\NAME is a framework consisting of a DSL, a source code generator and
-accompanying software library. Using the DSL, intrusion detection algorithms
-can be formally described in terms of functionality. During source code
-generation, functional code fusion interprets the functional meaning of the
-algorithms and merges common functionality and shared data. The software
-library hosts common functionality, such as network message parsing, sent
-message aggregation and event scheduling. This allows the source code generator
-to focus on the optimization of the organization of the functionality.
+\NAME is a framework consisting of a DSL, a source code generator and software
+library. Using the DSL, intrusion detection algorithms can be formally
+described. The code generator applies functional code fusion to interpret the
+intent of algorithms and merges common functionality and shared data. The
+software library hosts common functionality, such as network message parsing
+and event scheduling.
 
-Initial experiments confirm the theoretical positive impact on resource usage.
+Initial experiments confirm the theoretical positive impact on resource usage:
+grouping of messages lowers the number of packets by 13\%, while the total
+number of bytes sent over the network is reduced by 7\%. Finally, the execution
+time is also improved by 7\%.
+
 The platform independent DSL enables generation of source code targeting
-different platforms and languages, which allows high degrees of reuse in
-heterogenous environments and different configurations.
+different platforms and languages, which allows high degrees of reuse with
+heterogenous devices.
 
-Future research will focus on the integration of applications with the
-generated intrusion detection systems. We see opportunities for applications
-who detect intrusion, to actively and dynamically respond and avoid malicious
-payloads.
+As a next step, we want to investigate the relation of \NAME's DSL to reactive
+programming. Both clearly share common concepts with respect to
+event-drivenness and the absence of e.g. explicit loops.
+
+Future research will focus on the integration of applications with a generated
+IDS. We see opportunities for applications who detect intrusion, to actively
+and dynamically respond and avoid malicious payloads.
 
 A continued effort is targeting the reduction of platform-dependent parts in
 the implementation. This way it is possible to add more platforms and languages
