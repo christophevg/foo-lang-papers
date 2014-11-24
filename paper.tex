@@ -32,7 +32,7 @@ Christophe Huygens, Wouter Joosen}%
 \begin{abstract}
 
 When intrusion prevention fails, intrusion detection serves as a second layer
-of defense. It looks for patterns \& anomalies that can indicate malicious
+of defense. It looks for patterns and anomalies that can indicate malicious
 behavior. However, supporting an adequate set of intrusion detection algorithms
 imposes significant overhead on resource-constrained devices such as those in
 the Internet of Things. Fusion of the algorithms reduces resource consumption
@@ -91,16 +91,16 @@ implemented algorithms for an adequate coverage.
 
 % gap analysis
 
-Current developments in ID focus on programming frameworks that structure the
-implementation of algorithms \cite{valero2012di} and offer the required basic
-functional components to implement them \cite{krontiris2008lidea}. A key
-shortcoming of prior ID frameworks, is that they don't offer a way to optimize
-the usage of resources. A solution that supports the integration of multiple
-algorithms on IoT devices needs to avoid accumulating their impact on the
-available resources. A second omission is support for systematic reuse to
-create different configurations heterogeneous devices. Addressing this in a
-transparent and automated way offers the potential to significantly reduce the
-effort of developing an IDS.
+Current developments in ID on resource-constrained devices focus on
+programming frameworks that structure the implementation of algorithms
+\cite{valero2012di} and offer the required basic functional components to
+implement them \cite{krontiris2008lidea}. A key shortcoming of prior ID
+frameworks, is that they don't offer a way to optimize the usage of resources.
+A solution that supports the integration of multiple algorithms on IoT devices
+needs to avoid accumulating their impact on the available resources. A second
+omission is support for systematic reuse to create different configurations
+heterogeneous devices. Addressing this in a transparent and automated way
+offers the potential to significantly reduce the effort of developing an IDS.
 
 % scientific contribution
 
@@ -108,7 +108,7 @@ effort of developing an IDS.
 
 The first contribution of this paper is a framework called \NAME. It enables
 the formal description of ID algorithms on a functional level and provides a
-code generator to produces corresponding source code for a given platform and
+code generator to produce corresponding source code for a given platform and
 configuration. This way, \NAME addresses the heterogeneous nature of both the
 IoT and ID algorithms.
 
@@ -117,9 +117,9 @@ IoT and ID algorithms.
 The second contribution introduces functional code fusion (FCF) as a source
 code generation paradigm to solve the problem of hard to reuse and combine ID
 algorithms. FCF identifies common data and functions, and organizes code to
-eliminate redundant iterations, tests and computations. Results show improved
-image size, reduced usage of the wireless radio, reduced execution time and
-lower memory usage.
+eliminate redundant iterations, tests and computations. Results show reduced
+usage of the wireless radio, reduced execution time, lower memory usage and
+improved image size.
 
 % structure
 
@@ -567,11 +567,12 @@ optimized marshaling and grouping of messages.
 \subsubsection{Language Support}
 \label{language-support}
 
-Using a platform independent language also offers the possibility to relief the
-implementer of explicit memory management and low-level data structures. From a
-language perspective, \NAME offers several programming constructs, typically
-found in modern programming languages with higher levels of abstraction:
-optional typing, object orientation, pattern matching, aspect orientation.
+Using a platform independent language also offers the possibility to relieve
+the implementer of explicit memory management and low-level data structures.
+From a language perspective, \NAME offers several programming constructs,
+typically found in modern programming languages with higher levels of
+abstraction: optional typing, object orientation, pattern matching, aspect
+orientation.
 
 \subsubsection{An Example}
 
@@ -595,8 +596,8 @@ heartbeats could indicate problems, such as physical capture of a device.
 To convert the DSL-based ID algorithms into production-ready code, \NAME
 applies code generation techniques. Although different approaches here are
 applicable, like template-based text expansion, XSLT transformations or CodeDom
-\cite{dollard2004code}, we believe that the functional transformations require
-a richer model.
+\cite{dollard2004code}, we believe that the required transformations demand a
+richer model.
 
 A semantic model \cite{fowler2010domain}, tied closely to the DSL itself, can
 fulfill this role. Semantic transformations evolve the model into a more
@@ -795,12 +796,12 @@ size (bytes)  & manual     & 10466 & 15530 &  +48\% & 13306 &  +27\% & 18334 &  
 \section{Implementation and Evaluation}
 \label{evaluation}
 
-In this section we present a prototype implementation and evaluates its
+In this section we present a prototype implementation and evaluate its
 performance. We first present the implementation consisting of the hardware
 platform, network and software stack. Next we use this implementation to
 quantify its merits using a side-by-side comparison of generated code versus a
-manual implementation. We consider experimental results regarding the image
-size, usage of the network and execution time of the event-loop. We also take a
+manual implementation. We consider experimental results regarding usage of the
+network, execution time of the event-loop and the image size. We also take a
 more analytical approach and look at the handling of common data and the size
 of the source code.
 
@@ -832,7 +833,7 @@ upstream.
 
 \subsection{Experimental Results}
 
-We evaluated three criteria: the network usage in number of packets and bytes,
+We evaluated four criteria: the network usage in number of packets and bytes,
 the time required to perform once cycle of the event loop and the image size of
 the resulting compiled code. To do this, we collected these metrics for four
 situations: without ID algorithms, with a watchdog, with reputation-tracking
@@ -873,9 +874,9 @@ The first observation deals with the base case: both the manual and the
 generated implementations perform exactly the same. There is no fundamental
 structural difference in the overall architecture of the code.
 
-Secondly, when turning to the goal to reduce the network usage, we see that both
-the number of packets as well as the amount of bytes sent have dropped by 13\%
-and 7\% respectively.
+Secondly, when turning to the goal to reduce the network usage, we see that
+both the number of packets as well as the amount of bytes sent have dropped by
+13\% and 7\% respectively.
 
 Thirdly, focusing on the execution time, both algorithms by themselves add an
 equal amount of time to the processing of a single event loop cycle. But when
@@ -892,7 +893,7 @@ resources.
 
 Looking at the generated source code is another way to validate the framework.
 A simple metric is comparing the amount of code versus the size of the formal
-description of IDS algorithms. This can be an indication of the development
+description of ID algorithms. This can be an indication of the development
 effort and complexity. In this experiment, implementing both algorithms
 manually results in 637 lines of C code. The corresponding \NAME implementation
 results in 156 lines of DSL code. This is largely thanks to the higher level
@@ -918,13 +919,13 @@ their detection approach and interaction style.
 
 This section focuses on related work in the field of domain specific languages
 and code generation, both in relation to wireless networks of
-resource-constraint devices. These two components are the core of the \NAME
+resource-constrained devices. These two components are the core of the \NAME
 framework and the solution it proposes. We also look at their application in
 other disciplines and how this can relate to our context.
 
 \subsection{Domain Specific Languages}
 
-Within the scope of wireless networks of resource-constraint devices, we see
+Within the scope of wireless networks of resource-constrained devices, we see
 the introduction of DSLs \enquote{to shorten the development cycles
 dramatically during deployments, to reduce the dependency on hardware and
 software engineers, and to lead to a wider adoption outside the computer
@@ -986,9 +987,8 @@ consisting of a virtual machine (VM) and native code extension
 promising approach. By offloading the optimization to a VM and only compiling
 parts and not the whole, the solution allows updating at a granular scale, thus
 reducing the update cost, while maintaining flexibility and lowering the
-development effort. As explained in section \ref{positioning}, \NAME focuses on
-the reduction of the development effort and update cost, while preserving
-maximal flexibility.
+development effort. In this terminology, \NAME focuses on the reduction of the
+development effort and update cost, and maximizes flexibility.
 
 Applying code generation to ID, often focusses on the generation of native code
 to avoid the interpretation of descriptions of patterns to look for. I2S
@@ -1004,10 +1004,9 @@ operate at the same time. Frequent reselection, e.g. due to changing
 requirements or security threats, requires a flexible way to incorporate the
 different algorithms.
 
-Adding multiple intrusion detection algorithms to wireless resource-constraint
-devices requires fusion of these algorithms on a functional level. This can
-reduce execution inefficiencies, redundant memory usage and superfluous network
-access.
+Adding multiple intrusion detection algorithms to wireless resource-constrained
+devices requires fusion of algorithms on a functional level. This can reduce
+execution inefficiencies, redundant memory usage and superfluous network access.
 
 \NAME is a framework consisting of a DSL, a source code generator and software
 library. Using the DSL, intrusion detection algorithms can be formally
