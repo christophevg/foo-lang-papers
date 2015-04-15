@@ -1,0 +1,13 @@
+The classes and styles used for these papers are:
+
+- for WoWMoM15: the IEEEtrans class is available through TeX-Live
+
+- for EUSPN15: the adapted Elsevier class is downloaded and added to this
+  repository. It can be installed using the following commands:
+  
+  $ ROOT=`kpsewhich -expand-var='$TEXMFHOME'`
+  $ mkdir -p "$ROOT/tex/latex/"
+  $ cp -r ecrc-procs "$ROOT/tex/latex/elsarticle"
+  
+  The commands are also implemented as an "install" target in the Makefile.
+  

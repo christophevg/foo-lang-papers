@@ -1,4 +1,4 @@
-id-foo: A framework for efficient Intrusion Detection in the Internet of Things
+Introducing foo-lang...
 
 Christophe VG <Christophe.VanGinneken@cs.kuleuven.be>
 
@@ -7,4 +7,8 @@ Christophe VG <Christophe.VanGinneken@cs.kuleuven.be>
 This repository contains my first paper, based on my Masters' thesis and a
 first small step towards my PhD.
 
-It will be submitted to WoWMoM15.
+It was initially submitted to WoWMoMM15, titled "id-foo: A framework for
+efficient Intrusion Detection in the Internet of Things", but was rejected.
+
+Inspired by my more current research topics, the spirit of the paper was
+adapted and updated. The paper in this form will be submitted to EUSPN15.

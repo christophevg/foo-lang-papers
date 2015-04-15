@@ -13,9 +13,10 @@
 % \setlength\linenumbersep{1mm}
 % \linenumbers
 
-% until we settle on the final name ;-)
+% what's in a name? ;-)
 \usepackage{xspace}
 \newcommand{\NAME}{id-foo\xspace}
+\newcommand{\FOO}{\mbox{foo-lang}\xspace}
 
 % http://tex.stackexchange.com/questions/299/how-to-get-long-texttt-sections-to-break
 \newcommand*\justify{%
@@ -29,6 +30,7 @@
 % http://en.wikibooks.org/wiki/LaTeX/Customizing_LaTeX
 \newcommand{\ttt}[1]{\texttt{\justify{#1}}}
 
+\usepackage{algorithm}
 \usepackage{algpseudocode}
 % custom Let command
 \newcommand*\Let[2]{\State #1 $\gets$ #2}
