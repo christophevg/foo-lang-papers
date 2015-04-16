@@ -5,5 +5,7 @@
 *.bbl
 *.bbg
 *.blg
-paper.pdf
+*.lb
+*.spl
+paper-*.pdf
 
