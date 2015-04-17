@@ -13,6 +13,7 @@ Christophe Huygens, Wouter Joosen, Danny Hughes}
 \usepackage[figuresright]{rotating}
 
 \input{packages}
+\input{squeeze}
 
 \begin{document}
 
@@ -28,11 +29,11 @@ ICTH 2015,}
 of detection algorithms for the Internet of Things
 }
 
-\author[]{Christophe Van Ginneken}
-\author[]{Jef Maerien}
-\author[]{Christophe Huygens}
-\author[]{\\Wouter Joosen}
-\author[]{Danny Hughes}
+\author{Christophe Van Ginneken}
+\author{Jef Maerien}
+\author{Christophe Huygens}
+\author{Wouter Joosen}
+\author{Danny Hughes}
 
 \address{
 iMinds-DistriNet, KU Leuven, 3001 Leuven, Belgium\\
@@ -48,38 +49,38 @@ detection algorithms imposes significant overhead on resource-constrained
 devices such as those in the Internet of Things. Manual fusion of the
 algorithms reduces resource consumption by optimizing resource sharing, yet,
 proves to be time-consuming, repetitive and error-prone. To address this
-problem we propose \FOO, a framework for the generation of efficient detection
-algorithms. It consists of a domain specific language and a code generator. The
-language allows formally describing the intent of detection algorithms and
-supports the generator in organizing the source code. As a case study, we apply
-\FOO to the generation of an Intrusion Detection System for wireless sensor
-nodes. A side-by-side comparison shows that \FOO-generated source code reduces
-message passing overhead, execution time and memory footprint in comparison to
-sequential calls into stand-alone implementations of the algorithms.
+problem we propose \FOO, a framework for the generation of efficient
+combinations of detection algorithms. It consists of a domain specific language
+and a code generator. The language allows formally describing the intent of
+detection algorithms and supports the generator in organizing the source code.
+As a case study, we apply \FOO to the generation of an intrusion detection
+system for wireless sensor nodes. A side-by-side comparison shows that
+\FOO-generated source code reduces message passing overhead, execution time and
+memory footprint in comparison to sequential calls into standalone
+implementations of the algorithms.
 
 \end{abstract}
 
 \begin{keyword}
 
-IoT, Domain Specific Languages, Source Code Generation, Source Code
-Optimization, Intrusion Detection, Context Awareness
+Internet of Things, Domain Specific Languages, Source Code Generation, Source
+Code Optimization, Intrusion Detection, Context Awareness
 
 \end{keyword}
 
 \end{frontmatter}
 
-\vspace*{-10pt}
-
 \section{Introduction}
+\label{introduction}
 
 The Internet of Things (IoT), the mother of all ubiquitous and pervasive
 networks, populates our daily lives with millions of internet-connected
 \emph{smart things}: from smart watches that assist visually impaired
-persons\cite{porzi2013smart} to monitoring systems for flood hazardous
-areas\cite{hughes2006gridstix}. Their applications cannot be more diverse,
-however they share one common concern: each of these \emph{things} is
-resource-constrained, relying on a battery and operating with limited
-processing power and memory.
+persons\cite{porzi2013smart} to monitoring systems for waste management in our
+\emph{smart cities}\cite{zanella2014internet}. Their applications cannot be
+more diverse, however they share one common concern: each of these
+\emph{things} is resource-constrained, relying on a battery and operating with
+limited processing power and memory.
 
 Although their applications at first seem unrelated, under the hood they share
 a common paradigm: pattern recognition. With the introduction of \emph{smart
@@ -88,24 +89,23 @@ least time and resource consuming, to obtain otherwise. The ability to detect
 patterns in its usage or its applied context, is what makes these \emph{things}
 \emph{smart}. A watch that recognizes gestures can perform certain actions on
 behalf of its wearer. That same watch can also detect a wet floor and notify
-this hazard.
+this hazard\cite{porzi2013smart}.
 
 Monitoring human activities is an active research field for more than a
 decade\cite{lara2013survey}, but with the advent of the IoT it now moves into
-the real world. Equipped with wearables with numerous sensors, the
-possibilities seem endless, but so are the number of detection and recognition
-algorithms that have to run simultaneously on these small \emph{things}, to
-support our augmented reality.
+the real world at an increased pace. Equipped with wearables, hosting numerous
+sensors, the possibilities seem endless, but so are the number of detection and
+recognition algorithms that have to run simultaneously on these small
+\emph{things}, to support our augmented reality.
 
 Another prime example of a class of algorithms that inhibit the same properties
-related to pattern recognition is Intrusion Detection (ID). The vast number of
-security related opportunities for attackers makes way for an equally sized
-amount of ID algorithms, all with a similar structure, but largely independent
-operation.
+is Intrusion Detection (ID). The large number of security related opportunities
+for attackers requires an equally sized amount of ID algorithms, all with a
+similar structure, still independent in their operation.
 
 % scientific contribution
 
-The contributions of this paper are threefold: The first contribution consists
+The contributions of this work are threefold: the first contribution consists
 in the formulation of a design pattern for detection/recognition algorithms for
 IoT devices. This defines the target algorithms that fit our proposed
 framework. The second contribution is a framework called \FOO.\@ It enables the
@@ -123,42 +123,35 @@ radio, execution time and memory usage.
 The remainder of this paper proceeds as follows: section \ref{problems}
 identifies problems that arise when combining multiple algorithms in the
 context of resource-constrained devices. Section \ref{pattern} formulates a
-pattern common to the detection/recognition algorithms in the IoT context.
-Section \ref{design} introduces our framework, its design and components. In
-section \ref{evaluation} we apply our solution to case study related to ID,
-showing an actual implementation and evaluation of the experimental results.
-Section \ref{related} explores related work in the field of DSLs and code
-generation. Finally, section \ref{conclusion} summarizes our findings, draws
-conclusions and identifies topics for future work.
+pattern common to detection/recognition algorithms in the IoT context. Section
+\ref{design} introduces our framework, its design and components. In section
+\ref{evaluation} we apply it to a case study related to ID and evaluate the
+results. Section \ref{related} explores related work in the field of DSLs and
+code generation. Finally, section \ref{conclusion} summarizes our findings,
+draws conclusions and identifies topics for future work.
 
 \section{Problems when combining multiple algorithms}
 \label{problems}
 
 Simply taking existing implementations of algorithms and calling them in
-sequence, to allow them to perform their functionality, will in most cases
-result in suboptimal code. Three prime examples on the source code level
-illustrate this:
+sequence, will in most cases result in suboptimal code. Three prime examples on
+the source code level illustrate this:
 
-\vspace{-2mm}
-
-\begin{description}
+\begin{description}[style=unboxed,leftmargin=0cm]
 
   \item[Loops] by themselves are not a problem, but different loops, that
   perform the same operations in sequence, can cause overhead. An example is
   the handling of messages: each algorithm parses each observed message on the
   network, processing the same byte stream, performing comparable operations to
-  find similar patterns. These loops can also hold calls to poll sensor for
-  their values. This results in an execution overhead, putting a strain on the
+  find similar patterns. Polling sensors for their value is another example.
+  This redundancy results in an execution overhead, putting a strain on the
   power consumption.
 
-\vspace{-2mm}
-
   \item[Common data] cross-cuts the different algorithms, that have to store
-  the same information over and over again within their own scope. This results
-  in a lot of duplicated information in memory, raising the hardware
-  requirements.
-
-\vspace{-2mm}
+  the same information over and over again within their own scope. Typical
+  examples here include information about neighboring nodes, sensor readings,
+  etc.\ This results in a lot of duplicated information in memory, raising the
+  hardware requirements.
 
   \item[The network] allows algorithms to operate on a distributed scale.
   Scattered calls to a message sending function cause multiple accesses to the
@@ -170,9 +163,7 @@ illustrate this:
 Two operational aspects are orthogonal to these problems and further amplify
 them:
 
-\vspace{-2mm}
-
-\begin{description}
+\begin{description}[style=unboxed,leftmargin=0cm]
   
   \item[Reimplementing] algorithms manually to eliminate these issues is
   not a one-time cost. A release of a new version of an algorithm, or simply a
@@ -180,66 +171,57 @@ them:
   Also, changing, or simply implementing the algorithms from scratch, holds the
   risk of making mistakes.
 
-\vspace{-2mm}
-
   \item[The heterogeneity of IoT devices] results in different software stacks,
   each with for example their own network API\@. This partially explains why
-  there are few implementations of algorithms readily available to developers:
-  there is no single platform to target for researchers, which lowers the
-  opportunity to reuse prior work.
+  there are hardly any implementations of algorithms readily available to
+  developers: there is no single platform to target for researchers, which
+  lowers the opportunity to reuse prior work.
 
 \end{description}
 
-\section{A Design Pattern for Detection/Recognition Algorithms}
+\section{A design pattern for detection/recognition algorithms}
 \label{pattern}
 
 The source code level problems that arise when combining multiple algorithms,
 as presented in section \ref{problems}, are in fact inherent to the design
-pattern that is the foundation for the type of algorithms we identify in
-typical detection/recognition applications in IoT applications. The formulation
+pattern that forms the foundation for the type of algorithms we identify in
+typical detection/recognition applications in an IoT context. The formulation
 of such a design pattern will allow us to define a strategy for the
 optimization of the combination of these algorithms. We start by extracting two
-common activities of these algorithms: the collection of sensor values and the
-evaluation of thresholds. Periodically collecting sensor values requires
-preparing the hardware for value extraction, waiting for the value to become
-available, reading the actual bytes, interpreting them into a meaningful value
-and recording them for further analysis. This can be as simple as reading a
-single byte, but can also be as complex as parsing a network message.
+common activities: the collection of sensor values and the evaluation of
+thresholds. Periodically collecting sensor values requires preparing the
+hardware for value extraction, waiting for the value to become available,
+reading the bytes from the sensor, interpreting these bytes and recording this
+interpretation for further analysis. This can be as simple as reading a single
+byte, but can also be as complex as parsing a network message.
 
-A single recorded sensor value hardly ever results in a decision. The
-combination, often over time, of several of these values and the evaluation of
-thresholds will be key to decide if a change in the environment requires an
-action. Updating such statistics and evaluating the corresponding thresholds
-should be distinct operations. Therefore this is a separate function that is
-also periodically executed.
+A single sensor value hardly ever results in a decision. The combination, often
+over time, of these values and the evaluation of thresholds will be key to
+decide if a change in the environment requires an action. Updating such
+statistics and evaluating the corresponding thresholds should be distinct
+operations. This decoupling of detection and decision is the core of the design
+pattern for detection algorithms. Listing \ref{alg:pattern} presents the design
+pattern in pseudo-code. Applying the pattern in the context of multiple
+algorithms, extends its scope and an application pattern such as described in
+listing \ref{alg:application} appears.
 
-This decoupling of detection and decision is the core of the design pattern for
-ID algorithms. Listing \ref{alg:pattern} presents the design pattern in
-pseudo-code. Applying the pattern in the context of multiple algorithms,
-extends its scope and a pattern such as described in listing
-\ref{alg:application} will typically appear. The pattern calls the individual,
-implementations in sequence in two situations: first, to collect sensor
-readings, and secondly, at a regular interval to allow for internal
-housekeeping, such as threshold evaluation.
+We see the three aforementioned problems manifest themselves: first, nesting of
+loops causes redundant executions of potentially the same sensor readings
+inside individual algorithms' $collect\_data$ functions. Second, each
+individual algorithm stores the same sensor values in memory. Third, scattered
+calls to network functions (in case of distributed algorithms) lead to
+suboptimal use of the wireless radio.
 
-We clearly see the three aforementioned problems manifest itself: first, the
-nesting of loops causes redundant executions of potentially the same sensor
-readings inside the individual algorithms' $collect\_data$ functions. Second,
-each individual algorithm stores the same sensor values in memory. Third,
-scattered calls to e.g. network functions (in case of distributed algorithms)
-lead to suboptimal use of the wireless radio.
-
-Implementing the solution from scratch, it would be possible to identify these
-problems and reorganize the code in such a way that sensor values are only read
-once, stored in memory once and network messages parsed once. In section
+When implementing the solution from scratch, it would be possible to identify
+these problems and reorganize the code in such a way that it reads and stores
+sensor values in memory once or centrally parses network messages. In section
 \ref{problems} we identified two operational problems that show that this is
-not feasible or at least suboptimal. We therefore present \FOO, a framework
+not feasible, or at least suboptimal. We therefore present \FOO, a framework
 that enables formally describing such algorithms and fusing common data and
 functions in an automated way, to overcome both these problems.
 
-\vspace{-2mm}
-
-\begin{algorithm}[b]
+\begin{algorithm}[t]
+  \small
   \caption{Detection/Recognition Algorithm Pattern}
   \label{alg:pattern}
   \begin{algorithmic}
@@ -263,7 +245,8 @@ functions in an automated way, to overcome both these problems.
   \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}[b]
+\begin{algorithm}[t]
+  \small
   \caption{Application pattern of multiple algorithms}
   \label{alg:application}
   \begin{algorithmic}
@@ -280,16 +263,44 @@ functions in an automated way, to overcome both these problems.
 \label{design}
 
 The previous sections identified loops, common data and the network as three
-important code-level problems. These problems are inherent to detection
+important code level problems. These problems are inherent to detection
 algorithms, but conflict with the target environment, the IoT\@. \FOO provides
-a framework to efficiently implement these algorithms for the IoT and offers a
-solution for all identified problems. It consists of a 1) DSL, 2) source code
-generator and 3) software library. Figure \ref{fig:design} visualizes the
-design.
+a framework to efficiently implement these algorithms and offers a solution for
+all identified problems. It consists of a 1) DSL, 2) source code generator and
+3) software library.
 
-\begin{figure}[b]
+The DSL enables researchers to formally describe algorithms, without focusing
+on a specific language or platform. The code generator can avoid the identified
+problems concerning loops, common data and network access, because the formal
+description provides the underlying intent, not the technical implementation.
+It applies Functional Code Fusion (FCF) to identify hotspots for optimization.
+A key component of FCF are \emph{functional domains} that harbor common
+functionality.
+
+We will first position \FOO as a development strategy and motivate its design.
+Second, we will look at the principal design components of the DSL.\@ Third, we
+discuss the structure of the code generator and introduce its software library.
+
+\subsection{\FOO as a development strategy}
+\label{positioning}
+
+The introduction of a code generator in the development process changes the way
+of working: the source code is no longer the driving force, controlled by
+developers. It is literally an intermediate representation between code
+generator and compiler. A code generator constructs this representation using
+three components, as shown in figure \ref{fig:design}: 1) the description of
+the algorithm in the DSL, 2) information about the functional domains, and 3)
+information about the platform and target language. At the level of the
+compiler, a software library offloads specialized implementations and allows
+custom extensions. The applied grayscale indicates the components' platform
+dependency. This hierarchy is important from a development effort point of
+view. The level of dependency on the target platform dictates the level of
+effort to implement changes. This is important in relation to the scalability
+of the framework itself.
+
+\begin{figure}[t]
   \centering
-  \scalebox{0.75}{
+  \scalebox{0.70}{
 \begin{tikzpicture}[
   node distance=9mm,
   ,>=stealth,very thick,black!50,text=black,
@@ -321,42 +332,7 @@ installable image are artifacts.}
 \label{fig:design}
 \end{figure}
 
-The DSL enables researchers to formally describe algorithms, without focusing
-on any specific language or platform. A code generator can avoid the identified
-problems concerning loops, common data and network access, as the formal
-description provides the underlying intent, not the technical implementation.
-It can also target different languages and platforms, while reusing a software
-library that provides services including parsing, network access wrapping,\dots
-It applies the Functional Code Fusion (FCF) paradigm to identify the hotspots
-for optimization. A key component of FCF is the introduction of
-\emph{functional domains} that harbor common functionality.
-
-Using a DSL and code generator defines a development strategy. We will first
-position \FOO and motivate its design. Second, we will look at the principal
-design components of the DSL.\@ Third, we discuss the structure of the code
-generator and introduce its software library, that offers a way to deal with
-for example the network access issue.
-
-\vspace{-1mm}
-\subsection{\FOO as a Development Strategy}
-\label{positioning}
-
-The introduction of a code generator in the development process changes the way
-of working. The actual source code is no longer the driving force, controlled
-by developers. It is literally an intermediate representation between code
-generator and compiler. A code generator constructs this representation using
-three components, as shown in figure \ref{fig:design}: 1) the description of
-the algorithm in the DSL, 2) information about the functional domains, and 3)
-information about the platform and target language. At the level of the
-compiler, a software library offloads specialized implementations and allow
-custom extensions. The applied grayscale indicates the components' platform
-dependency. This hierarchy is important from a development effort point of
-view. The level of dependency on the target platform dictates the level of
-effort to implement changes. This is important in relation to the scalability
-of the framework itself.
-
-\vspace{-1mm}
-\subsection{\FOO as a Domain Specific Language}
+\subsection{\FOO as a domain specific language}
 \label{dsl-design}
 
 It's important to remember that a DSL is merely a \emph{thin veneer over a
@@ -364,11 +340,10 @@ It's important to remember that a DSL is merely a \emph{thin veneer over a
 populating the model. \FOO's DSL and model focus on avoiding constructions that
 result in problems concerning loops, common data and the use of the network. To
 do this, \FOO uses an event-based approach to defining functionality.
-Describing algorithms in function of events that occur will remove the
-technical descriptions and allows FCF to identify the actual intent of the
-algorithms with respect to the identified source code problems.
+Describing algorithms based on events removes the technical interpretations and
+allows FCF to identify the intent of algorithms and avoid the identified source
+code problems.
 
-\vspace{-1mm}
 \subsubsection{Loops}
 
 Loops are a major contributor to the problem of algorithm fusibility. Loops in
@@ -383,36 +358,33 @@ loop has \emph{activated} this functionality, but the real goal is to
 handling therefore can transform constructions with loops to their functional
 meaning, allowing identification and fusion of common functionality.
 
-\vspace{-1mm}
-\subsubsection{Common Data}
+\subsubsection{Common data}
 
 Different detection algorithms typically deal with the same classes of
 information, be it sensor data or network messages. Functional domains
 consolidate these and store and manage this data in a unified way. \FOO
 provides the concept of such domains as plug-ins to the DSL, extending it with
 domain specific storage and logic. For example in the case of distributed
-algorithms, such as ID algorithms, a \emph{Nodes} domain will manage
-information about neighbor nodes, exposing them as global objects to the
-algorithms, relieving them from managing these themselves. Functional domains
-are accessible as collections, allowing execution of functions in their scope,
-eliminating the need for explicit loops.
+algorithms a \emph{Nodes} domain will manage information about neighbor nodes,
+exposing them as global objects to the algorithms, relieving them from managing
+these themselves. Functional domains are also accessible as collections,
+allowing execution of functions in their scope, again eliminating the need for
+explicit loops.
 
-\vspace{-1mm}
-\subsubsection{Unified Messaging}
+\subsubsection{Unified messaging}
 \label{dsl-unified-msg}
 
 Access to the network, scattered around an algorithm, causes the wireless radio
 to be more active than needed. Delaying the sending of messages and grouping
 them can lower this overhead. Sending and receiving of network messages is
 tightly integrated with the previously mentioned concepts of event handling and
-for example the Nodes domain. An underlying software library can handle all
-interaction with the network, triggering functions by means of events when
-parsing new messages and exposing an API to send messages through the Nodes
-domain. This approach gives the framework complete control over communication
-and allows for optimized marshaling and grouping of messages.
+for example the \emph{Nodes} domain. An underlying software library can handle
+all interaction with the network, triggering functions by means of events when
+parsing messages and exposing an API to send messages. This approach gives the
+framework complete control over communication and allows for optimized
+marshaling and grouping of messages.
 
-\vspace{-1mm}
-\subsection{\FOO as a Code Generator}
+\subsection{\FOO as a code generator}
 
 To convert the DSL-based ID algorithms into production-ready code, \FOO applies
 code generation techniques. Although different approaches are applicable, like
@@ -420,13 +392,13 @@ template-based text expansion, XSLT transformations or CodeDom
 \cite{dollard2004code}, we believe that the required transformations demand a
 richer model. A semantic model \cite{fowler2010domain}, tied closely to the DSL
 itself, can fulfill this role. Semantic transformations evolve the model into a
-more syntax-oriented model, comparable to the idea of CodeDom. From there on,
-syntactic transformations can further evolve the model into source code. Figure
-\ref{fig:code-generation} shows the process that \FOO implements.
+more syntax-oriented model, comparable to the idea of CodeDom. Syntactic
+transformations can further evolve the model into source code. Figure
+\ref{fig:code-generation} shows this process.
 
-\begin{figure}[b]
+\begin{figure}[t]
   \centering
-  \scalebox{.75}{
+  \scalebox{.70}{
 \begin{tikzpicture}[
   node distance=7mm,
   ,>=stealth,thick,black!50,text=black,
@@ -435,13 +407,13 @@ syntactic transformations can further evolve the model into source code. Figure
   \node (dsl)  [resource]                                 {DSL};
   \node (sm)   [representation,right=of dsl,align=center] {Semantic\\Model};
   \node (cm)   [representation,right=of sm,align=center]  {Syntactic\\Model};
-  \node (code) [resource,right=of cm]        {Code};
+  \node (code) [resource,right=of cm]                     {Source Code};
 
 
   \draw [->] (dsl) -> (sm)   node [midway,above=15pt]              {parse};
   \draw [->] (sm)  -> (cm)   node [midway,below=10pt,align=center] {semantic\\transform}
                              node [midway,above=15pt,align=center] {FCF};
-  \draw [->] (cm)  -> (code) node [midway,above=15pt]              {emit code};
+  \draw [->] (cm)  -> (code) node [midway,above=15pt]              {emit};
 
   \draw [rounded corners,->]
         ($ (sm.east) - (5mm,5mm) $)
@@ -461,8 +433,7 @@ syntactic transformations can further evolve the model into source code. Figure
 \label{fig:code-generation}
 \end{figure}
 
-\vspace{-1mm}
-\subsubsection{Semantic Model}
+\subsubsection{Semantic model}
 
 The semantic model is the core of the generator. It offers a way to describe
 algorithms so that semantic reinterpretation through FCF is possible. This
@@ -477,7 +448,7 @@ algorithms.
 
 \begin{figure}[b]
   \centering
-  \scalebox{.75}{
+  \scalebox{.70}{
 \begin{tikzpicture}[
   edge from parent fork down,
   sibling distance=5mm, level distance=20mm, node distance=6mm
@@ -505,13 +476,11 @@ algorithms.
 \end{tikzpicture}
 }
 \caption{Partial Semantic Model for \FOO.\@ Shaded classes indicate the
-\emph{event/scheduling} construction around functions to allow interpretation
-of the intended functionality.}
+\emph{event/scheduling} construction around functions.}
 \label{fig:meta-model}
 \end{figure}
 
-\vspace{-1mm}
-\subsubsection{Functional Code Fusion (FCF)}
+\subsubsection{Functional code fusion (FCF)}
 
 Thanks to the functional description of events and the effects triggered by
 them, the code generator is able to identify the same actions across different
@@ -525,37 +494,38 @@ semantics into technical syntax constructs. One example of a semantic
 transformation is type inference, which supports the platform independence of
 the framework.
 
-\vspace{-1mm}
-\subsubsection{Syntactic Model}
+\subsubsection{Syntactic model}
 
-The syntactic model is like an abstract syntax tree (AST) for a virtual,
-expressive language. It contains constructs and ideas found in different
-languages and programming paradigms. No single existing programming language
-supports all features as is. Syntactic transformations therefore translate the
-unsupported constructs into comparable constructs supported by the targeted
-platform and language. Depending on the target platform, some constructions
-aren't transformed into actually corresponding code. In selected cases, the
-generator uses a software library. For example when it needs to parse incoming
-messages or schedule tasks. During the generation process, it looks for
-patterns that indicate any of these actions and transforms them into calls to
-the \FOO software library.
+The syntactic model is like an abstract syntax tree for a virtual, expressive
+language. It contains constructs and ideas found in different languages and
+programming paradigms. No single existing programming language supports all
+features as is. Syntactic transformations therefore translate the unsupported
+constructs into comparable constructs supported by the targeted platform and
+language. Depending on the target platform, some constructions aren't
+transformed into actually corresponding code. In selected cases, the generator
+uses a software library. For example when it needs to parse incoming messages
+or schedule tasks. During the generation process, it looks for patterns that
+indicate any of these actions and transforms them into calls to the \FOO
+software library.
 
-\vspace{-1mm}
-\subsection{\FOO as a Software Library}
+\subsection{\FOO as a software library}
 \label{software-lib-design}
 
 A software library allows offloading of common implementation aspects, thus
 avoiding small discrepancies in code and suboptimal use of shared resources.
 Previously we illustrated this approach with a case for unified messaging:
 parsing of incoming messages and grouping of outgoing messages. More common
-functionality isn't generated verbatim either. The execution of functions based
-on a schedule or the implementation of higher level conceptual functions are
-calls into the standard software library. Optimization of such algorithms is
-not within the scope of \FOO.\@ This gives freedom of choice to the users of
-the framework to select appropriate implementations for this standard
-functionality.
+functionality isn't generated verbatim either. A standard software library
+provides functionality for the execution of functions based on a schedule or
+the implementation of higher level conceptual functions. Optimization of these
+type of algorithms is not within the scope of \FOO.\@ This further gives
+freedom of choice to the users of the framework to select appropriate
+implementations for this standard functionality.
 
-\section{Implementation and Evaluation: Case Study on Intrusion Detection in Wireless Sensor Networks}
+\section{
+Implementation and evaluation:
+a case study on intrusion detection in wireless sensor networks
+}
 \label{evaluation}
 
 In wired networks, firewalls focus on the outer perimeter of the network,
@@ -564,16 +534,15 @@ is where an Intrusion Detection System (IDS) comes into play: monitoring all
 traffic that passes through the firewall, looking for patterns of malicious
 activity\cite{denning1987intrusion}. In meshed networks it is not possible for
 a single point in the network to oversee all traffic
-\cite{mishra2004intrusion}. Every device has to implement its own IDS.
+\cite{mishra2004intrusion}. So every device has to implement its own IDS.\@
 
 Attackers have access to a large set of possible attack vectors
 \cite{aschenbruck2012security}, ranging from the physical layer up to the
 application layer. Each layer presents different opportunities for launching an
 attack. For each of these attacks an algorithm needs to look for patterns or
-anomalies. An IDS therefore requires a many algorithms to achieve adequate
+anomalies. An IDS therefore requires a lot of algorithms to achieve adequate
 coverage.
 
-\vspace{-1mm}
 \subsection{Implementation}
 
 To evaluate the prototype we used a system based on the Atmel ATMEGA1284p
@@ -585,15 +554,14 @@ network, not all devices have direct access to one another, requiring routing
 through shared neighboring devices.
 
 We started from a basic application that measures light intensity. The
-application was an includable piece of code, allowing integration in a both a
+application was an includable piece of code, allowing integration in both a
 manual implementation and generated code base. On top of this baseline we added
 two intrusion detection related algorithms: a watchdog
 \cite{mishra2004intrusion}, that allows nodes to validate each other's
 presence, and a reputation-based algorithm \cite{ganeriwal2008reputation}, that
 checks if a parent node is cooperative and actually forwards messages.
 
-\vspace{-1mm}
-\subsection{Analytical Results}
+\subsection{Analytical results}
 
 Looking at the generated source code, a simple metric is comparing the amount
 of code versus the size of the formal description of ID algorithms.
@@ -606,8 +574,7 @@ network address, which consists of 16 bits. This results in a reduction of
 7.4\% of dynamic memory per known device. Using ZigBee's 64 bits unique
 addresses, this reduction can easily become 20.5\%.
 
-\vspace{-1mm}
-\subsection{Experimental Results}
+\subsection{Experimental results}
 
 We also instrumented the code and evaluated four criteria: network usage
 (number of packets and bytes), the time required to perform once cycle of the
@@ -618,8 +585,8 @@ standalone modules and sequentially called them from the base-application's
 event loop. Given the \FOO descriptions of the algorithms, the code generator
 generated all four cases. Table \ref{tbl:results} shows the collected data.
 
-\begin{table}[h]
-  \caption{Experimental Results and Side-by-Side Comparison.}
+\begin{table}[ht]
+  \caption{Experimental results and side-by-side comparison.}
   \label{tbl:results}
 \begin{tabular*}{\hsize}{@{\extracolsep{\fill}}llrrrrrrr@{}}
 \toprule
@@ -652,8 +619,8 @@ size (bytes)  & manual     & 10466 & 15530 &  +48\% & 13306 &  +27\% & 18334 &  
   \end{tabular*}
 \end{table}
 
-These results show that adding algorithms manually to the base-application has
-a cumulative effect. In case of the generated implementation, this effect is no
+It is clear that adding algorithms manually to the base-application has a
+cumulative effect. In case of the generated implementation, this effect is no
 longer observed: individual algorithms do have a larger impact by themselves,
 but the combination of both algorithms is less than the sum of both. Most
 remarkable is the effect on the time of one event loop cycle: both algorithms
@@ -662,18 +629,19 @@ by itself add 152\%. Adding a second algorithm only augments the impact to
 comes with an overhead for a single algorithm, but pays for itself when adding
 more algorithms.
 
-Table \ref{tbl:results} also compares the two situations, showing the impact of
-the code generation: Both the number of packets as well as the amount of bytes
-sent have dropped by 13\% and 7\%. In case of the execution time, both
-algorithms by themselves add an equal amount of time to a single event loop
-cycle. When combined, the event loop is about 7\% faster compared to the manual
-case. Finally, we see that the software library adds to the size of the
-resulting image. However, the cost is close to constant and is lower for both
-algorithms together. With roughly 3KB of additional overhead, or 15\% in this
-simple case, the impact is small. Taking into account the available memory on
-the ATMega1284p, this is only 2.3\% of the available resources.
+Table \ref{tbl:results} also compares the manual versus de generated versions,
+showing the impact of the code generation: both the number of packets as well
+as the amount of bytes sent have dropped by 13\% and 7\%. In case of the
+execution time, both algorithms by themselves add an equal amount of time to a
+single event loop cycle. When combined, the event loop is about 7\% faster
+compared to the manual case. Finally, we see that the software library adds to
+the size of the resulting image. However, the cost is close to constant and is
+lower for both algorithms together. With roughly 3KB of additional overhead, or
+15\% in this simple case, the impact is small. Taking into account the
+available memory on the ATMega1284p, this is only 2.3\% of the available
+resources.
 
-\section{Related Work}
+\section{Related work}
 \label{related}
 
 This section focuses on related work in the field of domain specific languages
@@ -696,13 +664,13 @@ using events to overcome the technical nature of loops. In the context of
 intrusion detection, we learn that DSLs are predominantly used to describe
 patterns of events found in network packets
 \cite{sekar1999high,roesch1999snort} in a concise way. The STAT framework with
-its STATL language \cite{eckmann2002statl,vigna2003designing} allow to model
-scenarios using state machines. Our event-driven approach shares these same
-ideas. Although not a real DSL, nesC \cite{gay2003nesc} is a general purpose
-language that shares some typical concepts with \FOO, such as the high degree
-of analysis during code generation to optimize execution. The biggest
-difference is that \FOO starts from the intended functionality and can optimize
-certain constructions that can't be interpreted from more technical source code.
+its STATL language \cite{eckmann2002statl,vigna2003designing} allows modeling
+scenarios using state machines. Our event-driven approach shares this idea.
+Although not a real DSL, nesC \cite{gay2003nesc} is a general purpose language
+that shares some typical concepts with \FOO, such as the high degree of
+analysis during code generation to optimize execution. The biggest difference
+is that \FOO starts from the intended functionality and can optimize certain
+constructions that can't be interpreted from more technical source code.
 
 Code generation, in combination with a DSL, can optimize a development process
 by reducing the size of the code base or systematically improving the code
@@ -719,14 +687,14 @@ software,\dots \cite{naik2001software}. Most of these are beyond the control of
 the compiler and require a higher level of abstraction to address them. DSLs
 offer a solution here, but other paradigms are possible. A mixed framework
 consisting of a virtual machine (VM) and native code extension
-\cite{sadilek2007energy}, combined with energy-aware compilation, seems a
-promising approach. By offloading the optimization to a VM and only compiling
-parts and not the whole, the solution allows updating at a granular scale, thus
-reducing the update cost, while maintaining flexibility and lowering the
-development effort. In this terminology, \FOO focuses on the reduction of the
-development effort and update cost, and maximizes flexibility.
+\cite{sadilek2007energy}, combined with energy-aware compilation, seems a valid
+approach. By offloading the optimization to a VM and only compiling parts and
+not the whole, the solution allows updating at a granular scale, thus reducing
+the update cost, while maintaining flexibility and lowering the development
+effort. In this terminology, \FOO focuses on the reduction of the development
+effort and update cost, and maximizes flexibility.
 
-\section{Conclusion and Future Work}
+\section{Conclusion and future work}
 \label{conclusion}
 
 Many IoT applications typically are constructed of similar algorithms that
@@ -749,7 +717,7 @@ with heterogenous devices.
 Initial experiments confirm the theoretically positive impact on resource
 usage: grouping of messages lowers the number of packets by 13\%, while the
 total number of bytes sent over the network is reduced by 7\%. The execution
-time is improved by 7\% and memory usage can be reduced by even 20\%.
+time is improved by 7\% and memory usage can be reduced even by 20\%.
 
 Future research will focus on the integration of applications with the
 generated functionality. We see opportunities for applications to adopt the
