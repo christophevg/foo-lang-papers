@@ -42,9 +42,9 @@ iMinds-DistriNet, KU Leuven, 3001 Leuven, Belgium\\
 
 \begin{abstract}
 
-The ability to detect patterns in its usage is what makes \emph{things}
-\emph{smart}. The more patterns it can detect, the more accurate its
-operational results will be. However, supporting an adequate set of pattern
+The ability to detect patterns in its application context is what makes
+\emph{things} \emph{smart}. The more patterns it can detect, the more accurate
+its operational results will be. However, supporting an adequate set of pattern
 detection algorithms imposes significant overhead on resource-constrained
 devices such as those in the Internet of Things. Manual fusion of the
 algorithms reduces resource consumption by optimizing resource sharing, yet,
@@ -76,7 +76,7 @@ Code Optimization, Intrusion Detection, Context Awareness
 The Internet of Things (IoT), the mother of all ubiquitous and pervasive
 networks, populates our daily lives with millions of internet-connected
 \emph{smart things}: from smart watches that assist visually impaired
-persons\cite{porzi2013smart} to monitoring systems for waste management in our
+persons\cite{porzi2013smart} to monitoring systems for waste management in
 \emph{smart cities}\cite{zanella2014internet}. Their applications cannot be
 more diverse, however they share one common concern: each of these
 \emph{things} is resource-constrained, relying on a battery and operating with
@@ -96,10 +96,10 @@ decade\cite{lara2013survey}, but with the advent of the IoT it now moves into
 the real world at an increased pace. Equipped with wearables, hosting numerous
 sensors, the possibilities seem endless, but so are the number of detection and
 recognition algorithms that have to run simultaneously on these small
-\emph{things}, to support our augmented reality.
+\emph{things}.
 
 Another prime example of a class of algorithms that inhibit the same properties
-is Intrusion Detection (ID). The large number of security related opportunities
+is intrusion detection (ID). The large number of security related opportunities
 for attackers requires an equally sized amount of ID algorithms, all with a
 similar structure, still independent in their operation.
 
@@ -111,7 +111,7 @@ IoT devices. This defines the target algorithms that fit our proposed
 framework. The second contribution is a framework called \FOO.\@ It enables the
 formal description of algorithms on a functional level and provides a code
 generator producing source code for a given platform and configuration. This
-way, \FOO also addresses the heterogeneous nature of both IoT and the
+way, \FOO also addresses the heterogeneous nature of both the IoT and the
 algorithms. The third contribution introduces functional code fusion (FCF) as a
 source code generation paradigm to address the combination of algorithms. FCF
 identifies common data and functions, and organizes code to eliminate redundant
@@ -165,9 +165,9 @@ them:
 
 \begin{description}[style=unboxed,leftmargin=0cm]
   
-  \item[Reimplementing] algorithms manually to eliminate these issues is
-  not a one-time cost. A release of a new version of an algorithm, or simply a
-  reselection of algorithms, due to a changing requirements, can trigger it.
+  \item[Reimplementing] algorithms manually to eliminate these issues is not a
+  one-time cost. A release of a new version of an algorithm, or simply a
+  reselection of algorithms, due to changing requirements, can trigger it.
   Also, changing, or simply implementing the algorithms from scratch, holds the
   risk of making mistakes.
 
@@ -222,11 +222,11 @@ functions in an automated way, to overcome both these problems.
 
 \begin{algorithm}[t]
   \small
-  \caption{Detection/Recognition Algorithm Pattern}
+  \caption{Detection/recognition algorithm pattern}
   \label{alg:pattern}
   \begin{algorithmic}
-    \Require{readings: global variables to hold collected sensor data for the given algorithm}
-    \Require{devices: global variable to information about neighbor devices} \Comment{optional in case of distributed algorithms}
+    \Require{readings: global variable to hold collected sensor data for the given algorithm}
+    \Require{devices: global variable to store information about neighbor devices} \Comment{optional in case of distributed algorithms}
     \Function{collect\_data}{}
       \ForEach{$sensor \in required\_sensors$}
         \Let{values[]}{$sensor$}   \Comment{collect sensor data}
@@ -292,7 +292,7 @@ three components, as shown in figure \ref{fig:design}: 1) the description of
 the algorithm in the DSL, 2) information about the functional domains, and 3)
 information about the platform and target language. At the level of the
 compiler, a software library offloads specialized implementations and allows
-custom extensions. The applied grayscale indicates the components' platform
+for custom extensions. The applied grayscale indicates the components' platform
 dependency. This hierarchy is important from a development effort point of
 view. The level of dependency on the target platform dictates the level of
 effort to implement changes. This is important in relation to the scalability
@@ -339,10 +339,10 @@ It's important to remember that a DSL is merely a \emph{thin veneer over a
 (semantic) model} \cite{fowler2010domain}. Its sole purpose should be
 populating the model. \FOO's DSL and model focus on avoiding constructions that
 result in problems concerning loops, common data and the use of the network. To
-do this, \FOO uses an event-based approach to defining functionality.
-Describing algorithms based on events removes the technical interpretations and
-allows FCF to identify the intent of algorithms and avoid the identified source
-code problems.
+do this, \FOO uses an event-based approach to define functionality. Describing
+algorithms based on events removes the technical interpretations and allows FCF
+to identify the intent of algorithms and avoid the identified source code
+problems.
 
 \subsubsection{Loops}
 
@@ -366,10 +366,10 @@ consolidate these and store and manage this data in a unified way. \FOO
 provides the concept of such domains as plug-ins to the DSL, extending it with
 domain specific storage and logic. For example in the case of distributed
 algorithms a \emph{Nodes} domain will manage information about neighbor nodes,
-exposing them as global objects to the algorithms, relieving them from managing
-these themselves. Functional domains are also accessible as collections,
-allowing execution of functions in their scope, again eliminating the need for
-explicit loops.
+exposing them as objects to the algorithms, relieving them from managing these
+themselves. Functional domains are also accessible as collections, allowing
+execution of functions in their scope, again eliminating the need for explicit
+loops.
 
 \subsubsection{Unified messaging}
 \label{dsl-unified-msg}
@@ -386,7 +386,7 @@ marshaling and grouping of messages.
 
 \subsection{\FOO as a code generator}
 
-To convert the DSL-based ID algorithms into production-ready code, \FOO applies
+To convert the DSL-based algorithms into production-ready code, \FOO applies
 code generation techniques. Although different approaches are applicable, like
 template-based text expansion, XSLT transformations or CodeDom
 \cite{dollard2004code}, we believe that the required transformations demand a
@@ -480,7 +480,7 @@ algorithms.
 \label{fig:meta-model}
 \end{figure}
 
-\subsubsection{Functional code fusion (FCF)}
+\subsubsection{Functional code fusion}
 
 Thanks to the functional description of events and the effects triggered by
 them, the code generator is able to identify the same actions across different
@@ -517,7 +517,7 @@ Previously we illustrated this approach with a case for unified messaging:
 parsing of incoming messages and grouping of outgoing messages. More common
 functionality isn't generated verbatim either. A standard software library
 provides functionality for the execution of functions based on a schedule or
-the implementation of higher level conceptual functions. Optimization of these
+the implementation of higher level conceptual functions. Optimization of this
 type of algorithms is not within the scope of \FOO.\@ This further gives
 freedom of choice to the users of the framework to select appropriate
 implementations for this standard functionality.
@@ -577,7 +577,7 @@ addresses, this reduction can easily become 20.5\%.
 \subsection{Experimental results}
 
 We also instrumented the code and evaluated four criteria: network usage
-(number of packets and bytes), the time required to perform once cycle of the
+(number of packets and bytes), the time required to perform one cycle of the
 event loop and the resulting image size. We collected these metrics for four
 situations: without ID algorithms, with a watchdog, with reputation-tracking
 and with both algorithms. The manual implementation realized both algorithms as
@@ -697,13 +697,13 @@ effort and update cost, and maximizes flexibility.
 \section{Conclusion and future work}
 \label{conclusion}
 
-Many IoT applications typically are constructed of similar algorithms that
-adhere to a pattern of collecting sensor data and periodically checking
-recorded values for patterns that require action. Fusing these algorithms is
-hard but needed to deal with the resource-constrained devices they are
-targeting. Frequent reselection, e.g. due to changing requirements or changing
-security threats, requires a flexible way to incorporate these algorithms in
-subsequent iterations of the software.
+IoT applications are typically constructed of similar algorithms that adhere to
+a pattern of collecting sensor data and periodically checking recorded values
+for patterns that require action. Fusing these algorithms is hard but needed to
+deal with the resource-constrained devices they are targeting. Frequent
+reselection, e.g. due to changing requirements or changing security threats,
+requires a flexible way to incorporate these algorithms in subsequent
+iterations of the software.
 
 \FOO is a framework consisting of a DSL, a source code generator and software
 library. The DSL allows formally describing algorithms, enabling the code
@@ -714,10 +714,10 @@ scheduling. The platform independent DSL enables generation of source code
 targeting different platforms and languages, which allows high degrees of reuse
 with heterogenous devices.
 
-Initial experiments confirm the theoretically positive impact on resource
-usage: grouping of messages lowers the number of packets by 13\%, while the
-total number of bytes sent over the network is reduced by 7\%. The execution
-time is improved by 7\% and memory usage can be reduced even by 20\%.
+Initial experiments confirm the expected positive impact on resource usage:
+grouping of messages lowers the number of packets by 13\%, while the total
+number of bytes sent over the network is reduced by 7\%. The execution time is
+improved by 7\% and memory usage can be reduced by 20\%.
 
 Future research will focus on the integration of applications with the
 generated functionality. We see opportunities for applications to adopt the
